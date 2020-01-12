@@ -1,0 +1,497 @@
+/**
+* Stylesheet for help panel.
+*/
+.helpPanel {
+	position: absolute;
+	left: 50%;
+	top: 50%;
+	width: 20em;
+	margin-left: -11em;
+	margin-top: -10em;
+	border: 1px solid #ccc;
+	padding: 1em;
+	background: white;
+	box-shadow: 0 0 3em rgba(0, 0, 0, 0.2);
+	border-radius: 1em;
+}
+
+	.helpPanel .title,
+	.helpPanel .hint {
+		opacity: 0;
+		transition: opacity 350ms;
+	}
+
+		.helpPanel .title[data-show="true"],
+		.helpPanel .hint[data-show="true"] {
+			opacity: 1;
+		}
+
+	.helpPanel .title {
+		border-bottom: 1px solid #ccc;
+	}
+
+	.helpPanel .hint {
+		padding-bottom: 1em;
+		border-bottom: 1px solid #ccc;
+	}
+
+	.helpPanel .body {
+		position: relative;
+		height: 11em;
+		overflow: hidden;
+	}
+
+
+		.helpPanel .hint {
+			color: #999;
+			font-size: 0.8em;
+			text-align: center;
+			font-style: italic;
+		}
+
+		.helpPanel .body .scroller {
+			position: relative;
+			left: 0;
+			height: 100%;
+			white-space: nowrap;
+			opacity: 1;
+			transition: opacity 350ms;
+		}
+
+			.helpPanel .body .scroller > * {
+				white-space: normal;
+			}
+
+			.helpPanel .body .scroller .view {
+				display: inline-block;
+				position: relative;
+				height: 100%;
+				width: 100%;
+				vertical-align: top;
+				overflow: hidden;
+				/* box-shadow: 0 0 1em blue inset; */
+			}
+
+			.helpPanel .body .scroller[data-hide="true"] {
+				opacity: 0;
+			}
+
+			.helpPanel .body .scroller[data-scroll="next"] {
+				left: -100%;
+				transition: left 500ms ease-out;
+			}
+
+			.helpPanel .body .scroller[data-scroll="prev-pre"] {
+				left: -100%;
+			}
+
+			.helpPanel .body .scroller[data-scroll="prev"] {
+				left: 0;
+				transition: left 500ms ease-out;
+			}
+
+	.helpPanel .footer {
+		text-align: right;
+	}
+
+		.helpPanel .footer button {
+			padding: 0.5em 1em;
+			margin: 0.25em;
+			color: white;
+			background: #333;
+			border: none;
+			border-radius: 1em;
+			cursor: pointer;
+		}
+
+			.helpPanel .footer button:hover {
+				background: #575757;
+			}
+
+				.helpPanel .footer button[disabled],
+				.helpPanel .footer button[disabled]:hover {
+					background: #999;
+					cursor: default;
+				}
+
+	/**
+	* Icons.
+	*/
+
+	.helpPanel .finger,
+	.helpPanel .concave,
+	.helpPanel .lens,
+	.helpPanel .mode {
+		background-repeat: no-repeat;
+	}
+
+	.helpPanel .concave,
+	.helpPanel .lens {
+		width: 16px;
+		height: 64px;
+	}
+
+	.helpPanel .finger {
+		width: 31px;
+		height: 48px;
+		transform-origin: 7px 30px;
+		transition: transform 250ms, opacity 250ms;
+
+		background-image: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHhtbG5zOnhsaW5rPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rIiB3aWR0aD0iMzEiIGhlaWdodD0iNDgiIHZpZXdCb3g9IjAgMCAxODAgMjgwIj4gPHBhdGggZmlsbD0iIzRhOTBkNiIgc3Ryb2tlPSIjMjIyIiBzdHJva2Utd2lkdGg9IjIiIGQ9Ik0xOCwyMjIgQyAxMiwxOTkgLTMsMTM5IDQsMTE3IEMgMTEsOTYgMjcsMTQ0IDI4LDE2MSBDIDMwLDE3OSAzMSw4MiAzMiwzNCBDIDMzLC0xMyA2OSwtMyA2OCwzNyBDIDY3LDc5IDY1LDE2MiA3MSwxNjIgQyA3NiwxNjIgNzEsMTI3IDczLDEwMSBDIDc1LDc1IDEwNSw3OSAxMDQsMTAxIEMgMTAyLDEyMiAxMDIsMTY1IDEwNiwxNjUgQyAxMTAsMTY1IDEwOCwxMjIgMTA5LDEwNiBDIDEwOSw4OSAxNDAsOTUgMTM4LDExMiBDIDEzNywxMzAgMTM3LDE2NCAxNDEsMTY1IEMgMTQ0LDE2NSAxNDMsMTM3IDE0NiwxMTcgQyAxNDgsOTYgMTcyLDEwOCAxNzMsMTMxIEMgMTc0LDE1MyAxNzQsMjA0IDE2NSwyMTkgQyAxNTYsMjM0IDEzNSwyNjkgOTMsMjY5IEMgNTEsMjY5IDIzLDI0NCAxOCwyMjIgeiIgLz48L3N2Zz4=");
+		/* <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="31" height="48" viewBox="0 0 180 280"> <path fill="#4a90d6" stroke="#222" stroke-width="2" d="M18,222 C 12,199 -3,139 4,117 C 11,96 27,144 28,161 C 30,179 31,82 32,34 C 33,-13 69,-3 68,37 C 67,79 65,162 71,162 C 76,162 71,127 73,101 C 75,75 105,79 104,101 C 102,122 102,165 106,165 C 110,165 108,122 109,106 C 109,89 140,95 138,112 C 137,130 137,164 141,165 C 144,165 143,137 146,117 C 148,96 172,108 173,131 C 174,153 174,204 165,219 C 156,234 135,269 93,269 C 51,269 23,244 18,222 z" /></svg> */
+	}
+
+	.helpPanel .concave {
+		background-image: url("data:image/svg+xml;base64,PHN2ZyB2ZXJzaW9uPSIxLjEiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiIHZpZXdCb3g9Ii04IC0zMiAxNiA2NCIgZmlsbD0ibm9uZSIgaGVpZ2h0PSI2NCI+CjxwYXRoIGQ9Ik0gOC4wMCAyNCBMIC00LjgwIDMyIEwgLTIuNzAgMjQgTSA4LjAwIDE2IEwgLTIuNzAgMjQgTCAtMS4yMCAxNiBNIDguMDAgOCBMIC0xLjIwIDE2IEwgLTAuMzAgOCBNIDguMDAgMCBMIC0wLjMwIDggTCAwLjAwIDAgTSA4LjAwIC04IEwgMC4wMCAwIEwgLTAuMzAgLTggTSA4LjAwIC0xNiBMIC0wLjMwIC04IEwgLTEuMjAgLTE2IE0gOC4wMCAtMjQgTCAtMS4yMCAtMTYgTCAtMi43MCAtMjQgTSA4LjAwIC0zMiBMIC0yLjcwIC0yNCBMIC00LjgwIC0zMiIgc3Ryb2tlPSIjMDAwIj48L3BhdGg+CQo8L3N2Zz4=");
+		/* <svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="-8 -32 16 64" fill="none" height="64"><path d="M 8.00 24 L -4.80 32 L -2.70 24 M 8.00 16 L -2.70 24 L -1.20 16 M 8.00 8 L -1.20 16 L -0.30 8 M 8.00 0 L -0.30 8 L 0.00 0 M 8.00 -8 L 0.00 0 L -0.30 -8 M 8.00 -16 L -0.30 -8 L -1.20 -16 M 8.00 -24 L -1.20 -16 L -2.70 -24 M 8.00 -32 L -2.70 -24 L -4.80 -32" stroke="#000"></path></svg> */
+	}
+
+	.helpPanel .concave.l {
+		transform: rotate(180deg);
+	}
+
+	.helpPanel .lens {
+		background-image: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHhtbG5zOnhsaW5rPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rIiB3aWR0aD0iMTYiIGhlaWdodD0iNjQiIHZpZXdCb3g9Ii04IC0zMiAxNiA2NCI+PHBhdGggZmlsbD0ibm9uZSIgZD0iTSAwLjgwIDMyIEwgMi4yMCAyNCBMIDMuMjAgMTYgTCAzLjgwIDggTCA0LjAwIDAgTCAzLjgwIC04IEwgMy4yMCAtMTYgTCAyLjIwIC0yNCBMIDAuODAgLTMyIEwgLTAuODAgLTMyIEwgLTIuMjAgLTI0IEwgLTMuMjAgLTE2IEwgLTMuODAgLTggTCAtNC4wMCAwIEwgLTMuODAgOCBMIC0zLjIwIDE2IEwgLTIuMjAgMjQgTCAtMC44MCAzMiBaIiBzdHJva2U9IiMwMDAiIHN0cm9rZS13aWR0aD0iMSI+PC9wYXRoPjwvc3ZnPg==");
+		/* <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="16" height="64" viewBox="-8 -32 16 64"><path fill="none" d="M 0.80 32 L 2.20 24 L 3.20 16 L 3.80 8 L 4.00 0 L 3.80 -8 L 3.20 -16 L 2.20 -24 L 0.80 -32 L -0.80 -32 L -2.20 -24 L -3.20 -16 L -3.80 -8 L -4.00 0 L -3.80 8 L -3.20 16 L -2.20 24 L -0.80 32 Z" stroke="#000" stroke-width="1"></path></svg> */
+	}
+
+	.helpPanel .mode {
+		background-image: url("data:image/svg+xml;base64,PHN2ZyB2ZXJzaW9uPSIxLjEiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiIHZpZXdCb3g9Ii0xMjUgLTMyIDI1MCA2NCIgZmlsbD0ibm9uZSIgaGVpZ2h0PSI2NCI+PHBhdGggZD0iTS0xMjUgLTcgTC01OCAtNSBMLTE5IC00IEwwLjAwIC00IEwxOSAtNCBMNTggLTUgTDEyNSAtNyBNMTI1IDcgTDU4IDUgTDE5IDQgTDAuMDAgNCBMLTE5IDQgTC01OCA1IEwtMTI1IDcgTTAgLTQgTDAgNCIgc3Ryb2tlPSIjMzMzM2NjIiBzdHJva2Utd2lkdGg9IjIiIC8+PHBhdGggZD0iIE0tMTI1IC03IEwtNTggLTUgTCAtMTkgLTQgTDAuMDAgLTQgTDE5IC00IEw1OCAtNSBMMTI1IC03IE0xMjUgNyBMNTggNSBMMTkgNCBMMC4wMCA0IEwtMTkgNCBMLTU4IDUgTC0xMjUgNyBNMCAtNCBMMCA0IiBzdHJva2U9IiNjNzM4MzgiIHN0cm9rZS13aWR0aD0iMSIgLz48cGF0aCBkPSJNLTEyNSAwIEwxMjUgMCIgc3Ryb2tlPSIjMDAwIiBzdHJva2Utd2lkdGg9IjEiIC8+PC9zdmc+");
+		/* <svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="-125 -32 250 64" fill="none" height="64"><path d="M-125 -7 L-58 -5 L-19 -4 L0.00 -4 L19 -4 L58 -5 L125 -7 M125 7 L58 5 L19 4 L0.00 4 L-19 4 L-58 5 L-125 7 M0 -4 L0 4" stroke="#3333cc" stroke-width="2" /><path d=" M-125 -7 L-58 -5 L -19 -4 L0.00 -4 L19 -4 L58 -5 L125 -7 M125 7 L58 5 L19 4 L0.00 4 L-19 4 L-58 5 L-125 7 M0 -4 L0 4" stroke="#c73838" stroke-width="1" /><path d="M-125 0 L125 0" stroke="#000" stroke-width="1" /></svg> */
+	}
+
+	/**
+	* Views.
+	*/
+
+	/* -- Dragging the cavity -- */
+
+	@keyframes drag-cavity-cavity {
+		0% { width: 250px; }
+		30% { width: 250px; }
+		70% { width: 150px; }
+		100% { width: 150px; }
+	}
+	
+	@keyframes drag-cavity-hoverer {
+		0% {transform: scale(0); opacity: 0; }
+		20% {transform: scale(0); opacity: 0; }
+		30% {transform: scale(1); opacity: 1; }
+		70% {transform: scale(1); opacity: 1; }
+		80% {transform: scale(0); opacity: 0; }
+		100% {transform: scale(0); opacity: 0; }
+	}
+
+	@keyframes drag-cavity-finger {
+		0% {transform: scale(1.5); opacity: 0; }
+		10% {transform: scale(1.5); opacity: 0; }
+		30% {transform: scale(1); opacity: 1; }
+		70% {transform: scale(1); opacity: 1; }
+		90% {transform: scale(1.5); opacity: 0; }
+		100% {transform: scale(1.5); opacity: 0; }
+	}
+
+	.helpPanel .drag-cavity {
+		position: relative;
+		margin: 60px 25px 0;
+		padding: 0 8px;
+		animation: drag-cavity-cavity 4s infinite alternate;
+	}
+
+		.helpPanel .drag-cavity .hoverer {
+			position: absolute;
+			top: 16px;
+			right: -6px;
+			width: 24px;
+			height: 24px;
+			background: #ffc;
+			border: 3px solid #b36060;
+			border-radius: 50%;
+			transform-origin: 16px 16px;
+			animation: drag-cavity-hoverer 4s infinite alternate;
+		}
+
+		.helpPanel .drag-cavity .mode,
+		.helpPanel .add-cavity .mode,
+		.helpPanel .inspect-cavity .mode {
+			position: absolute;
+			top: 0;
+			left: 8px;
+			width: calc(100% - 16px);
+			height: 64px;
+		}
+
+		.helpPanel .drag-cavity .concave,
+		.helpPanel .add-cavity .concave,
+		.helpPanel .add-cavity .lens,
+		.helpPanel .add-cavity .finger,
+		.helpPanel .inspect-cavity .concave,
+		.helpPanel .inspect-cavity .finger {
+			position: absolute;
+		}
+
+			.helpPanel .drag-cavity .concave.l,
+			.helpPanel .add-cavity .concave.l,
+			.helpPanel .inspect-cavity .concave.l {
+				left: 0;
+			}
+			.helpPanel .drag-cavity .concave.r,
+			.helpPanel .add-cavity .concave.r,
+			.helpPanel .inspect-cavity .concave.r {
+				right: 0;
+			}
+
+		.helpPanel .drag-cavity .finger {
+			position: absolute;
+			right: -12px;
+			top: 28px;
+			animation: drag-cavity-finger 4s infinite alternate;
+		}
+
+	/* -- Adding to cavity -- */
+
+	@keyframes add-cavity-lens {
+		0% { left: 20%; top: 80px; }
+		30% { left: 20%; top: 80px; }
+		50% { left: 50%; top: 0; }
+		90% { opacity: 1; }
+		100% { left: 50%; top: 0; opacity: 0; }
+	}
+
+	@keyframes add-cavity-mode-full {
+		0% { opacity: 1; }
+		50% { opacity: 1; }
+		55% { opacity: 0; }
+		90% { opacity: 0; }
+		100% { opacity: 1; }
+	}
+
+	@keyframes add-cavity-mode-half {
+		0% { opacity: 0; }
+		50% { opacity: 0; }
+		55% { opacity: 1; }
+		90% { opacity: 1; }
+		100% { opacity: 0; }
+	}
+
+	@keyframes add-cavity-finger {
+		0% { transform: scale(1.5); opacity: 0; }
+		15% { transform: scale(1.5); opacity: 0; }
+		25% { transform: scale(1); opacity: 1; }
+		50% { transform: scale(1); opacity: 1; }
+		55% { transform: scale(1.5); opacity: 0; }
+		100% { transform: scale(1.5); opacity: 0; }
+	}
+
+	.helpPanel .add-cavity {
+		position: relative;
+		padding: 0 8px;
+		margin: 1em 25px;
+		width: 250px;
+	}
+
+		.helpPanel .add-cavity .mode.full {
+			animation: add-cavity-mode-full 6s infinite;
+		}
+
+		.helpPanel .add-cavity .mode.half {
+			width: calc(50% - 8px);
+			background-position: 50% 0;
+			animation: add-cavity-mode-half 6s infinite;
+		}
+
+		.helpPanel .add-cavity .mode.half.l {
+			left: 8px;
+		}
+
+		.helpPanel .add-cavity .mode.half.r {
+			left: 50%;
+		}
+
+		.helpPanel .add-cavity .lens.animated {
+			margin-top: 4px;
+			margin-left: -8px;
+			animation: add-cavity-lens 6s infinite;
+		}
+
+		.helpPanel .add-cavity .lens .finger {
+			top: 21px;
+			animation: add-cavity-finger 6s infinite;
+		}
+		
+		.helpPanel .add-cavity .source {
+			left: 20%;
+			top: 80px;
+			margin-left: -36px;
+			width: 64px;
+			height: 64px;
+			padding: 4px;
+			background-color: #ccc;
+			background-position: 50% 4px;
+			border-radius: 4px;
+		}
+
+	/* -- Inspect cavity -- */
+
+	@keyframes inspect-cavity-inspector {
+		0% { opacity: 0; }
+		20% { left: 20%; opacity: 0; }
+		30% { opacity: 1; }
+		40% { left: 20%; }
+		70% { left: 60%; }
+		80% { opacity: 1; }
+		90% { opacity: 0; }
+		100% { left: 60%; opacity: 0; }
+	}
+
+	@keyframes inspect-cavity-ellipse {
+		0% { width: 1em; height: 0.5em; }
+		40% { width: 1em; height: 0.5em; }
+		60% { width: 0.5em; height: 1em; }
+		100% { width: 0.5em; height: 1em; }
+	}
+
+	@keyframes inspect-cavity-dims-in {
+		0% { opacity: 1; }
+		45% { opacity: 1; }
+		55% { opacity: 0; }
+		100% { opacity: 0; }
+	}
+
+	@keyframes inspect-cavity-dims-out {
+		0% { opacity: 0; }
+		45% { opacity: 0; }
+		55% { opacity: 1; }
+		100% { opacity: 1; }
+	}
+
+	@keyframes inspect-cavity-slider {
+		0% { top: 0; }
+		20% { top: 0; }
+		30% { top: 1.2em; }
+		80% { top: 1.2em; }
+		90% { top: 0; }
+		100% { top: 0; }
+	}
+
+	@keyframes inspect-cavity-finger {
+		0% { top: 22px; opacity: 0; }
+		10% { transform: scale(1.5); opacity: 0; }
+		20% { transform: scale(1); opacity: 1; }
+		30% { top: 22px; transform: scale(1.5); opacity: 0; }
+		70% { top: 8px; transform: scale(1.5); opacity: 0; }
+		80% { transform: scale(1); opacity: 1; }
+		90% { transform: scale(1.5); opacity: 0; }
+		100% { top: 8px; opacity: 0; }
+	}
+
+	.helpPanel .inspect-cavity {
+		position: relative;
+		padding: 0 8px;
+		margin: 1em 25px;
+		width: 250px;
+	}
+
+		.helpPanel .inspect-cavity .laserCanvasInspect {
+			top: 32px;
+			animation: inspect-cavity-inspector 7s infinite;
+		}
+
+			.helpPanel .inspect-cavity .laserCanvasInspect .ellipse {
+				display: inline-block;
+				animation: inspect-cavity-ellipse 7s infinite;
+			}
+
+			.helpPanel .inspect-cavity .laserCanvasInspect [data-dimension] > span:first-child {
+				position: absolute;
+				animation: inspect-cavity-dims-in 7s infinite;
+			}
+
+			.helpPanel .inspect-cavity .laserCanvasInspect [data-dimension] > span:last-child {
+				animation: inspect-cavity-dims-out 7s infinite;
+			}
+
+		.helpPanel .inspect-cavity .generalSelector {
+			position: relative;
+			margin-top: 90px;
+			font-size: 13px;
+		}
+
+			.helpPanel .inspect-cavity .generalSelector .slider::after {
+				animation: inspect-cavity-slider 7s infinite;
+			}
+
+			.helpPanel .inspect-cavity .generalSelector .finger {
+				animation: inspect-cavity-finger 7s infinite;
+			}
+
+	/* -- Sidebar -- */
+
+	@keyframes sidebar-finger {
+		0% { transform: scale(1.5); opacity: 0; }
+		5% { transform: scale(1.5); opacity: 0; }
+		10% { transform: scale(1); opacity: 1; }
+		15% { transform: scale(1.5); opacity: 0; }
+		55% { transform: scale(1.5); opacity: 0; }
+		60% { transform: scale(1); opacity: 1; }
+		65% { transform: scale(1.5); opacity: 0; }
+		100% { transform: scale(1.5); opacity: 0; }
+	}
+
+	@keyframes sidebar-sidebar {
+		0% { left: -250px; }
+		15% { left: -250px; }
+		40% { left: 0; }
+		65% { left: 0; }
+		90% { left: -250px; }
+		100% { left: -250px; }
+	}
+
+	.helpPanel .sidebar {
+		position: relative;
+		width: 251px;
+		animation: sidebar-sidebar 7s infinite;
+	}
+
+		.helpPanel .sidebar table {
+			position: absolute;
+			right: 0;
+			font-size: 0.8em; 
+			border-right: 1px solid #333;
+		}
+
+		.helpPanel .sidebar .toggle-info {
+			position: absolute;
+			top: 4em;
+			right: -1.5em;
+			width: 1em;
+			padding: 0.7em 0.25em;
+			color: white;
+			background-color: #333;
+			text-align: center;
+			border-bottom-right-radius: 0.5em;
+			border-top-right-radius: 0.5em;
+		}
+
+			.helpPanel .sidebar .toggle-info::after {
+				content: "\203A";
+			}
+		
+			.helpPanel .sidebar .toggle-info .finger {
+				position: absolute;
+				left: 0.25em;
+				top: 1em;
+				animation: sidebar-finger 7s infinite;
+			}
+
+	/* -- About -- */
+
+	.helpPanel .about {
+		padding: 0;
+		margin: 0;
+		list-style-type: none;
+	}
+
+		.helpPanel .about li {
+			padding: 0.3em 0.2em;
+		}

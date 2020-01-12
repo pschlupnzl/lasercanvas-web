@@ -1,0 +1,32 @@
+/**
+* Styles for main menu.
+*/
+
+.mainMenuAnchor {
+	position: relative;
+	display: inline-block;
+	vertical-align: top;
+}
+
+	.mainMenuAnchor .mainMenuToggle {
+		position: relative;
+		width: 64px;
+		height: 64px;
+	}
+
+	.mainMenuAnchor .mainMenu {
+		position: absolute;
+		left: 0;
+		bottom: 64px;
+		width: 240px;
+		background: #fff;
+		border: 1px solid;
+	}
+
+		.mainMenuAnchor .mainMenu ul {
+			margin: 0;
+			padding: 0;
+			list-style-type: none;
+			
+			text-align: left;
+		}
