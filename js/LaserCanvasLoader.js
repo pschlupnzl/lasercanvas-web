@@ -96,9 +96,7 @@ window.LaserCanvas = {
 			'js/ElementLens.js',
 			'js/ElementMirror.js',
 			'js/ElementScreen.js',
-			////'File.js',
 			'js/GraphPanel.js',
-			////'Help.js',
 			'js/PropertiesPanel.js',
 			'js/InfoPanel.js',
 			'js/Render.js',
@@ -139,7 +137,6 @@ window.LaserCanvas = {
 			// TODO: Move this into constructor code elsewhere.
 			document.body.removeChild(progressFill.parentNode);
 			
-			////var g = new LaserCanvas.GraphPanel();
 			LaserCanvas.theme.set('light',
 				function () {
 					var 

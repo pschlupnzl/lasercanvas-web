@@ -183,14 +183,6 @@ window.LaserCanvas.Element.Mirror.prototype = {
 	//  Painting.
 	// ----------------------------------------------------
 
-	/////**
-	////* Determine whether this element is at a location.
-	////* @param {Point} pt Point to look at.
-	////* @param {number} tol Tolerance.
-	////* @returns {boolean} Value indicating whether this element is at given location.
-	////*/
-	////atLocation: window.LaserCanvas.Element.atLocation,
-	
 	/**
 	* Draw this object.
 	* @param {Render} render Rendering context.

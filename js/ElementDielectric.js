@@ -104,7 +104,6 @@ window.LaserCanvas.Element.Dielectric.collectGroups = function (elements) {
 					}
 					if (group[0].type === 'Dielectric') {
 						group[0].updateAngles();
-						////group[0].updateThermalLens();
 					} else {
 						group[0].updateAngles();
 					}
@@ -214,11 +213,6 @@ window.LaserCanvas.Element.Dielectric.prototype = {
 				this.prop.angleOfIncidence = A;
 				this.priv.deflectionAngle = C;
 				break;
-
-			// // case eType.Prism:
-			// // 	window.LaserCanvas.Element.Dispersion.brewsterPrism(this.prop.refractiveIndex, 0, this.priv);
-			// // 	console.log("prism priv->", this.priv);
-			// // 	break;
 		}
 			
 		// Thickness.
@@ -334,7 +328,6 @@ window.LaserCanvas.Element.Dielectric.prototype = {
 					increment: 1,
 					min: -85,
 					max: +85
-					////propertyPanel: this.prop.type === eType.Plate
 				},
 				flip: {
 					propertyName: 'flip',
@@ -347,12 +340,10 @@ window.LaserCanvas.Element.Dielectric.prototype = {
 					increment: 1,
 					min: -85,
 					max: +85
-					////propertyPanel: this.prop.type === eType.Crystal || this.prop.type === eType.Endcap
 				}, 
 				thermalLens: {
 					propertyName: 'thermalLens',
 					increment: 10
-					////propertyPanel: this.prop.type === eType.Crystal || this.prop.type === eType.Endcap
 				}
 			},
 			elementProps =
@@ -369,91 +360,6 @@ window.LaserCanvas.Element.Dielectric.prototype = {
 				props.push(allProps[elementProps[k]]);
 			}
 		}
-		
-		/*
-		// Properties all for first element in group.
-		if (this.prop.type !== eType.Endcap) {
-			props = props.concat([
-				{
-					propertyName: 'type',
-					options: ['Plate', 'Brewster', 'Crystal', 'Prism'],
-					infoPanel: false
-				}]);
-		}
-		
-		// Standard properties.
-		props = props.concat([
-			{
-				propertyName: 'refractiveIndex',
-				increment: 0.1,
-				min: 1
-			}]);
-		
-		if (this.prop.type !== eType.Prism) {
-			props = props.concat(
-				{
-					propertyName: 'groupVelocityDispersion',
-					increment: 0.001
-				});
-		}
-
-		props = props.concat({
-			propertyName: 'thickness',
-			increment: 1,
-			min: 1
-		});
-
-		// Curvatures: Not for Brewster.
-		if (this.prop.type !== eType.Brewster
-			&& this.prop.type !== eType.Prism) {
-			props = props.concat([
-			{
-				propertyName: 'curvatureFace1',
-				increment: 10
-			}, {
-				propertyName: 'curvatureFace2',
-				increment: 10
-			}]);
-		}
-			
-		// Plate.
-		if (this.prop.type === eType.Plate) {
-			props = props.concat([
-			{
-				propertyName: 'angleOfIncidence',
-				increment: 1,
-				min: -85,
-				max: +85
-				////propertyPanel: this.prop.type === eType.Plate
-			}]);
-		}
-		
-		// Brewster.
-		props = props.concat([
-		{
-			propertyName: 'flip',
-			dataType: 'boolean',
-			infoPanel: false,
-			propertyPanel: this.prop.type === eType.Brewster || this.prop.type === eType.Prism
-		}]);
-		
-		// Crystal and endcap.
-		if (this.prop.type === eType.Crystal 
-			|| this.prop.type === eType.Endcap) {
-			props = props.concat([
-			{
-				propertyName: 'faceAngle',
-				increment: 1,
-				min: -85,
-				max: +85
-				////propertyPanel: this.prop.type === eType.Crystal || this.prop.type === eType.Endcap
-			}, {
-				propertyName: 'thermalLens',
-				increment: 10
-				////propertyPanel: this.prop.type === eType.Crystal || this.prop.type === eType.Endcap
-			}]);
-		}
-		*/
 		return props;
 	},
 	
@@ -602,31 +508,6 @@ window.LaserCanvas.Element.Dielectric.prototype = {
 	* @returns {number} (fs^2/rad) Group delay dispersion.
 	*/
 	groupDelayDispersion: window.LaserCanvas.Element.groupDelayDispersion,
-	
-	////groupDelayDispersion: function (lam) {
-	////	"use strict";
-	////	// Group delay dispersion (see e.g. https://www.newport.com/n/the-effect-of-dispersion-on-ultrashort-pulses)
-	////	// 
-	////	//         lam^3      d^2 n
-	////	// GDD = ---------- --------- L.
-	////	//        2 pi c^2   d lam^2
-	////	//
-	////	// Units:
-	////	//           [nm^3]       1
-	////	//     = ------------- -------- [mm]
-	////	//        [um^2/fs^2]   [um^2]
-	////	//
-	////	//     = [nm^3 mm /um^4] [fs^2].
-	////	//
-	////	//     = -9 * 3 - 3 / -6 * 4
-	////	//     = -30 / -24
-	////	//     = -6.
-	////	
-	////	var c = 0.299792458; // {number} (um/fs) Speed of light.
-	////	return this === this.group[0]
-	////		? 1e-6 * lam * lam * lam / (2 * Math.PI * c * c) * this.prop.groupVelocityDispersion * this.loc.l
-	////		: 0;
-	////},
 	
 	/**
 	* Return the ABCD matrix for this element.

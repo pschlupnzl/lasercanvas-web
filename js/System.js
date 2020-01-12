@@ -19,7 +19,6 @@ window.LaserCanvas.System = function () {
 			groupDelayDispersion: 0, // {number} (fs^2/rad) System group delay dispersion.
 			modeSpacing: 0,          // {number} (MHz) Optical mode spacing.
 			initialWaist: 100        // {number} (um) Initial waist size.
-			////initialDistance: 0       // {number} (mm) Initial distance to waist.
 		},
 		
 		// -------------------------------------------------
@@ -91,7 +90,6 @@ window.LaserCanvas.System = function () {
 		canSetProperty = function (propertyName) {
 			return {
 				"initialWaist": true,
-				////"initialDistance": true,
 				"wavelength": true
 			}[propertyName];
 		},
@@ -106,7 +104,6 @@ window.LaserCanvas.System = function () {
 			if (newValue !== undefined) {
 				switch (propertyName) {
 					case 'initialWaist':
-					////case 'initialDistance':
 					case 'wavelength':
 						if (!isNaN(+newValue)) {
 							mprop[propertyName] = +newValue;
@@ -688,9 +685,9 @@ window.LaserCanvas.System = function () {
 							//// ['Lens', 20, { focalLength: 200 }],
 							//// ['Lens', 20, { focalLength: -200 }],
 
-							// // ['Dielectric', 50, { refractiveIndex: 1.5 }, Dielectric.eType.Plate],
-							// // ['Lens', 0, { focalLength: 200 }],
-							// // ['Dielectric', 50],
+							//// ['Dielectric', 50, { refractiveIndex: 1.5 }, Dielectric.eType.Plate],
+							//// ['Lens', 0, { focalLength: 200 }],
+							//// ['Dielectric', 50],
 
 							['Mirror', 0, { endOptic: true, angleOfIncidence: 0, radiusOfCurvature:  200 } ]
 						]);

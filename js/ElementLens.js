@@ -156,21 +156,12 @@ window.LaserCanvas.Element.Lens.prototype = {
 	//  Painting.
 	// ----------------------------------------------------
 
-	/////**
-	////* Determine whether this element is at a location.
-	////* @param {Point} pt Point to look at.
-	////* @param {number} tol Tolerance.
-	////* @returns {boolean} Value indicating whether this element is at given location.
-	////*/
-	////atLocation: window.LaserCanvas.Element.atLocation,
-	
 	/**
 	* Draw this object.
 	* @param {Render} render Rendering context.
 	* @param {LaserCanvas.renderLayer} layer Rendering layer.
 	*/
 	draw: function (render, layer) {
-		////return this.wireframe(render, layer);
 		"use strict";
 		var image, 
 			f = this.prop.focalLength,

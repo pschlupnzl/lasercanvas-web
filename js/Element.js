@@ -6,7 +6,6 @@ window.LaserCanvas.Element.inputProperties = (function () {
 	var
 		LaserCanvas = window.LaserCanvas,  // {object} Namespace.
 		kpropertyNames = ['propertyName', 'increment', 'max', 'min', 'standard', 'wrap'], // {Array<string>} Properties to set.
-		////props = element.userProperties(),  // {Array<object>} User properties for given object.
 		
 		handlers = {
 			// Attach an event handler that blurs the input
@@ -186,13 +185,6 @@ window.LaserCanvas.Element.propertyStep = function (input, action, step, element
 		max = input.hasAttribute('data-max') ? +input.getAttribute('data-max') : null, // {number?} Maximum value.
 		value = +input.value; // {number} Current value.
 		
-	////std = tr.getAttribute('data-' + action); // {string} Standard values.
-	////wrap = +tr.getAttribute('data-wrap');    // {number=} Wrapping.
-	////min = tr.hasAttribute('data-min') ? +tr.getAttribute('data-min') : null; // {number?} Minimum value.
-	////max = tr.hasAttribute('data-max') ? +tr.getAttribute('data-max') : null; // {number?} Maximum value.
-	////input = tr.querySelector('input');
-	////value = +input.value;
-	
 	if (!isNaN(value) || action === 'set') {
 		if (action === 'set') {
 			value = step;

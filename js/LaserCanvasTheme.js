@@ -15,7 +15,7 @@ window.LaserCanvas.theme.dark = {
 	mirrorConvexMore: 'Mirror-Convex-More.png',
 	mirrorPlane: 'Mirror-Plane.png',
 	screen: 'Screen.png',
-	mode: ['#990033', '#181875'] //// ?? ['#f99','#99c']
+	mode: ['#990033', '#181875']
 };
 
 window.LaserCanvas.theme.light = {
@@ -57,7 +57,7 @@ window.LaserCanvas.theme.line = {
 window.LaserCanvas.theme.set = (function () {
 	"use strict";
 
-	// See https://davidwalsh.name/essential-javascript-functions
+	// See e.g. https://davidwalsh.name/essential-javascript-functions
 	// and http://www.hunlock.com/blogs/Totally_Pwn_CSS_with_Javascript.
 	var style = document.createElement('style');    // Create new style sheet.
 	style.appendChild(document.createTextNode('')); // Webkit hack.

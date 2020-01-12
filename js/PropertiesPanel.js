@@ -107,18 +107,6 @@ window.LaserCanvas.PropertiesPanel = function (render, system) {
 			}
 		},
 		
-		/////**
-		////* Retrieve the closest property table row.
-		////* @param {HTMLElement} el Triggering element.
-		////* @returns {HTMLTRElement} Table row.
-		////*/
-		////getPropertyRow = function (el) {
-		////	while (el && !el.hasAttribute('data-property-name')) {
-		////		el = el.parentNode;
-		////	}
-		////	return el;
-		////},
-		
 		/**
 		* Retrieve the property name from the given row element.
 		* The property is stored on the table row, rather than
@@ -128,22 +116,7 @@ window.LaserCanvas.PropertiesPanel = function (render, system) {
 		*/
 		getProperty = function (el) {
 			return window.LaserCanvas.Utilities.closest(el, '[data-property-name]').getAttribute('data-property-name');
-			////var tr = getPropertyRow(el);
-			////return !tr ? null : tr.getAttribute('data-property-name'); // {string} Name of property to set on element.
 		},
-		
-		/////**
-		////* A property input value has changed.
-		////* @this {HTMLInputElement|HTMLSelectElement} Element that triggered the handler.
-		////*/
-		////onPropertyInputChange = function () {
-		////	var propertyName = getProperty(this),
-		////		val = this.value,    // {string} Current value.
-		////		newValue = +val;     // {number} Numeric value.
-		////	if (!isNaN(newValue)) {
-		////		propertyChange(propertyName, newValue);
-		////	}
-		////},
 		
 		/**
 		* A property dropdown has changed. This causes the
@@ -167,51 +140,6 @@ window.LaserCanvas.PropertiesPanel = function (render, system) {
 			propertyChange(propertyName, val);
 		},
 		
-		/////**
-		////* A property step button (increment, decrement) is clicked.
-		////* @this {HTMLButtonElement} Clicked button.
-		////*/
-		////onPropertyStep = function () {
-		////	propertyStep(getProperty(this),
-		////		this.getAttribute('data-action'),
-		////		+this.getAttribute('data-step'));
-		////},
-		////
-		/////**
-		////* Attach an event handler that blurs the input
-		////* field when the enter key is pressed.
-		////* @this {HTMLInptElement} Triggering input field.
-		////* @param {KeyboardEvent} e Triggering event.
-		////*/
-		////onKeydown = function (e) {
-		////	var tr, propertyName, step;
-		////	switch (e.keyCode) {
-		////		case 10: // Enter.
-		////		case 13: // Return.
-		////			this.blur();
-		////			break;
-		////		case 38: // Up.
-		////		case 40: // Down.
-		////			tr = getPropertyRow(this);
-		////			if (tr) {
-		////				propertyName = getProperty(tr);
-		////				step = e.keyCode === 38 ? +1 : -1;
-		////				if ((e.ctrlKey || e.metaKey)
-		////					&& tr.hasAttribute('data-standard')) {
-		////					propertyStep(propertyName, 'standard', step);
-		////				} else if (tr.hasAttribute('data-increment')) {
-		////					if (e.ctrlKey || e.metaKey || e.shiftKey) {
-		////						propertyStep(propertyName, 'increment', 10 * step);
-		////					} else {
-		////						propertyStep(propertyName, 'increment', step);
-		////					}
-		////				}
-		////				e.preventDefault();
-		////			}
-		////			break;
-		////	}
-		////},
-		
 		// -------------------------------------------------
 		//  Manipulate element.
 		// -------------------------------------------------
@@ -226,68 +154,6 @@ window.LaserCanvas.PropertiesPanel = function (render, system) {
 			currentElement.property(propertyName, newValue);
 			system.update(true, systemChanged);
 		},
-
-		/////**
-		////* Increment a value or standard value.
-		////* @param {string} propertyName Name of property to change.
-		////* @param {string} action Action 'set'|'standard'|'increment'.
-		////* @param {number} step Step size to take.
-		////*/
-		////propertyStep = function (propertyName, action, step) {
-		////	var k, input, std, wrap, min, max, value,
-		////		numberFormat = window.LaserCanvas.Utilities.numberFormat, // {function} Formatting a number.
-		////		tr = panel.querySelector('[data-property-name="' + propertyName + '"]');
-      ////
-		////	if (tr) {
-		////		std = tr.getAttribute('data-' + action); // {string} Standard values.
-		////		wrap = +tr.getAttribute('data-wrap');    // {number=} Wrapping.
-		////		min = tr.hasAttribute('data-min') ? +tr.getAttribute('data-min') : null; // {number?} Minimum value.
-		////		max = tr.hasAttribute('data-max') ? +tr.getAttribute('data-max') : null; // {number?} Maximum value.
-		////		input = tr.querySelector('input');
-		////		value = +input.value;
-		////		
-		////		if (!isNaN(value)) {
-		////			if (action === 'set') {
-		////				value = step;
-		////			} else if (action === 'increment') {
-		////				value += +std * step;
-		////			} else if (action === 'standard') {
-		////				std = std.split(',');
-		////				if (step > 0) {
-		////					for (k = 0; k < std.length - step - 1; k += 1) {
-		////						if (+std[k + 1] > value) {
-		////							break;
-		////						}
-		////					}
-		////				} else {
-		////					for (k = std.length - 1; k > -step; k -= 1) {
-		////						if (+std[k - 1] < value) {
-		////							break;
-		////						}
-		////					}
-		////				}
-		////				value = +std[k + step];
-		////			}
-		////			
-		////			if (wrap) {
-		////				while (value > wrap) {
-		////					value += -2 * wrap;
-		////				}
-		////				while (value < -wrap) {
-		////					value += 2 * wrap;
-		////				}
-		////			}
-		////			if (min !== null) {
-		////				value = Math.max(value, min);
-		////			}
-		////			if (max !== null) {
-		////				value = Math.min(value, max);
-		////			}
-		////			input.value = numberFormat(value);
-		////			propertyChange(propertyName, value);
-		////		}
-		////	}
-		////},
 
 		/**
 		* The name of an element has changed.
@@ -339,15 +205,6 @@ window.LaserCanvas.PropertiesPanel = function (render, system) {
 					window.LaserCanvas.Element.propertyStep(input, 'set', value, currentElement, system);
 				}
 			});
-
-			////var propertyName;
-			////console.log(prop);
-			////for (propertyName in prop) {
-			////	if (prop.hasOwnProperty(propertyName)
-			////		&& currentElement.canSetProperty(propertyName)) {
-			////		currentElement.property(propertyName, prop[propertyName]);
-			////	}
-			////}
 		},
 		
 		// -------------------------------------------------
@@ -452,16 +309,6 @@ window.LaserCanvas.PropertiesPanel = function (render, system) {
 				} else {
 					input.value = val.toString();
 				}
-				////window.LaserCanvas.Utilities.foreach(
-				////	['increment', 'standard', 'wrap', 'min', 'max'], 
-				////	function (k, key) {
-				////	if (prop.hasOwnProperty(key)) {
-				////		tr.setAttribute('data-' + key, 
-				////			Array.isArray(prop[key]) 
-				////			? prop[key].join(',') 
-				////			: prop[key]);
-				////	}
-				////});
 			} else {
 				input.disabled = true;
 			}
@@ -505,12 +352,6 @@ window.LaserCanvas.PropertiesPanel = function (render, system) {
 		activateControls = function () {
 			var Utilities = window.LaserCanvas.Utilities;
 
-			////// Input fields.
-			////Utils.foreach(panel.querySelectorAll('tbody input[type="text"]'), function (k, input) {
-			////	input.onkeydown = onKeydown;
-			////	input.onkeyup = onPropertyInputChange;
-			////});
-			
 			// Fancy input fields.
 			window.LaserCanvas.Element.inputProperties(panel, currentElement, system);
 			
@@ -523,11 +364,6 @@ window.LaserCanvas.PropertiesPanel = function (render, system) {
 			Utilities.foreach(panel.querySelectorAll('tbody input[type="checkbox"]'), function (k, chk) {
 				chk.onchange = onPropertyCheckChange;
 			});
-			
-			////// Property step buttons.
-			////Utils.foreach(panel.querySelectorAll('button[data-action][data-step]'), function (k, but) {
-			////	but.onclick = onPropertyStep;
-			////});
 		},
 	
 		/**
@@ -574,7 +410,6 @@ window.LaserCanvas.PropertiesPanel = function (render, system) {
 			
 			// Rename field.
 			el = panel.querySelector('h1 input');
-			////el.onkeydown = onKeydown;
 			el.onchange = onNameChange;
 			
 			// Sellmeier button.
@@ -614,16 +449,8 @@ window.LaserCanvas.PropertiesPanel.html = [
 			'</tr>',
 			'<tr data-property-name="">',
 				'<td><label></label></td>',
-				////'<td>',
-				////	'<button class="lcbutton" data-action="standard" data-step="-1">&lt;</button>',
-				////	'<button class="lcbutton" data-action="increment" data-step="-1">&minus;</button>',
-				////'</td>',
 				'<td><input type="text"></td>',
 				'<td data-content="unit"></td>',
-				////'<td>',
-				////	'<button class="lcbutton" data-action="increment" data-step="+1">+</button>',
-				////	'<button class="lcbutton" data-action="standard" data-step="+1">&gt;</button>',
-				////'</td>',
 			'</tr>',
 		'</thead>',
 		'<tbody>',

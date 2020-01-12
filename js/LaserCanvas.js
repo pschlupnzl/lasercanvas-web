@@ -65,7 +65,6 @@ window.LaserCanvas.Application = function (canvas, info) {
 				sliver = 0, // {number} (px) Slice off to prevent scroll bars.
 				w = window.innerWidth - sliver,  // {number} (px) Width of window.
 				h = window.innerHeight - sliver, // {number} (px) Height of window.
-				////wp = 300,                        // {number} (px) Width of info panel.
 				ht = 80,                         // {number} (px) Height of toolbar.
 				
 				pos = {
@@ -86,14 +85,7 @@ window.LaserCanvas.Application = function (canvas, info) {
 						height: ht
 					},
 					'#LaserCanvasInfo': {
-					////	left: info ? 0 : -wp,
-					////	top: 0,
-					////	width: wp,
 						height: h - ht - 1
-					////},
-					////'#LaserCanvasToggleInfo': {
-					////	left: info ? wp : 0,
-					////	top: 0.4 * (h - ht)
 					}
 				};
 			
@@ -455,65 +447,6 @@ window.LaserCanvas.clone = function (obj) {
 	return cloneRecursive(obj);
 };
 
-// -------------------------------------------------------
-//  Element methods.
-// -------------------------------------------------------
-/*
-* Prepare additional collections.
-* The Element namespace is created in LaserCanvasLoader.js.
-*/
-////
-////// Standard algorithm for checking whether element is at the location.
-////// This gets overloaded e.g. by block element for more sophisticated
-////// overlap calculations.
-////// @this {Element} Element being checked.
-////// @param {Point} pt Point to look at.
-////// @param {number} tol Tolerance (from renderer; depends on zoom, maybe).
-////// @returns {boolean} Value indicating whether this element is at the queried location.
-////window.LaserCanvas.Element.atLocation = function (pt, tol) {
-////	"use strict";
-////	return Math.abs(this.loc.x - pt.x) < tol && Math.abs(this.loc.y - pt.y) < tol;
-////};
-////
-/////**
-////* Standard calculation of group delay dispersion given a group
-////* velocity dispersion and a length. The method is expected to
-////* be called for e.g. Dielectric or Dispersion, where there is
-////* a groupVelocityDispersion property, as well as an element 
-////* group. The GDD is only returned for the first element in the
-////* group. If the parameter L is not supplied, the element's
-////* loc.l property is used as the propagation length.
-////* @this {Element} Grouped element, e.g. Dispersion or Dielectric.
-////	* @param {number} lam (nm) Wavelength (note units nm!).
-////* @param {number=} L (mm) Optional length, if different to loc.l.
-////* @returns {number} (fs^2/rad) Group delay dispersion for first element in group, otherwise 0.
-////*/
-////window.LaserCanvas.Element.groupDelayDispersion = function (lam, L) {
-////	"use strict";
-////	// Group delay dispersion (see e.g. https://www.newport.com/n/the-effect-of-dispersion-on-ultrashort-pulses)
-////	// 
-////	//         lam^3      d^2 n
-////	// GDD = ---------- --------- L.
-////	//        2 pi c^2   d lam^2
-////	//
-////	// Units:
-////	//           [nm^3]       1
-////	//     = ------------- -------- [mm]
-////	//        [um^2/fs^2]   [um^2]
-////	//
-////	//     = [nm^3 mm /um^4] [fs^2].
-////	//
-////	//     = -9 * 3 - 3 / -6 * 4
-////	//     = -30 / -24
-////	//     = -6.
-////	var c = window.LaserCanvas.constant.c; // {number} (um/fs) Speed of light.
-////	return this === this.group[0]
-////		? 1e-6 * lam * lam * lam / (2 * Math.PI * c * c) 
-////			* this.prop.groupVelocityDispersion 
-////			* (L !== undefined ? L : this.loc.l)
-////		: 0;
-////};
-
 /**
 * Scientific constants.
 */
@@ -536,7 +469,6 @@ window.LaserCanvas.unit = {
 	groupVelocityDispersion: '&micro;m&#8315;&#178;',
 	indexDispersion: '&micro;m&#8315;&#185;',
 	indexSecondDerivative: '&micro;m&#8315;&#178;',
-	////initialDistance: 'mm',
 	initialWaist: '&micro;m',
 	modeSize: '&micro;m',
 	modeSpacing: 'MHz',

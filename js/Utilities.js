@@ -19,7 +19,6 @@ window.LaserCanvas.Utilities = {
 	foreach: function (objs, fn, extraArg) {
 		"use strict";
 		var k, n = objs.length;
-		////if (Array.isArray(objs)) {
 		if (objs.hasOwnProperty('length')) {
 			for (k = 0; k < n; k += 1) {
 				if (fn.call(objs[k], k, objs[k], extraArg) === false) {
@@ -319,34 +318,7 @@ window.LaserCanvas.Utilities = {
 			handle.addEventListener('touchstart', tstart, false);
 			handle.setAttribute('data-draggable', 'true');
 		}
-	},
-
-	// -----------------------------------------
-	//  Other utilities.
-	// -----------------------------------------
-
-	// /**
-	//  * Request a file via XHR, returning a promise that is
-	//  * resolved when the request completes.
-	//  * @param {string} url Address to request.
-	//  */
-	// xhr: function (url) {
-	// 	return new Promise(function (resolve, reject) {
-	// 		const xhr = new XMLHttpRequest();
-	// 		xhr.onreadystatechange = function () {
-	// 			if (xhr.readyState === 4) {
-	// 				if (xhr.status === 200) {
-	// 					resolve(xhr.responseText);
-	// 				} else {
-	// 					reject(xhr.responseText);
-	// 				}
-	// 			}
-	// 		};
-	// 		xhr.open('get', url);
-	// 		xhr.send();
-	// 	});
-	// }
-
+	}
 };
 
 /**

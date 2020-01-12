@@ -37,17 +37,9 @@ window.LaserCanvas.Sellmeier.formula = (function () {
 					var k,
 						l2 = l * l,
 						n2_1 = c[0];
-							////+ c[1] * l2 / (l2 - c[2] * c[2])
-							////+ c[3] * l2 / (l2 - c[4] * c[4]);
 					for (k = 1; k < c.length - 1; k += 2) {
 						n2_1 += c[k] * l2 / (l2 - c[k + 1] * c[k + 1]);
 					}
-					////if (c.length > 6) n2_1 += c[5] * l2 / (l2 - c[6] * c[6]);
-					////if (c.length > 8) n2_1 += c[7] * l2 / (l2 - c[8] * c[8]);
-					////if (c.length > 10) n2_1 += c[9] * l2 / (l2 - c[10] * c[10]);
-					////if (c.length > 12) n2_1 += c[11] * l2 / (l2 - c[12] * c[12]);
-					////if (c.length > 14) n2_1 += c[13] * l2 / (l2 - c[14] * c[14]);
-					////if (c.length > 16) n2_1 += c[15] * l2 / (l2 - c[16] * c[16]);
 					return Math.sqrt(n2_1 + 1);
 				};
 			},
@@ -60,18 +52,9 @@ window.LaserCanvas.Sellmeier.formula = (function () {
 					var k, 
 						l2 = l * l,
 						n2_1 = c[0];
-							////+ c[1] * l2 / (l2 - c[2])
-							////+ c[3] * l2 / (l2 - c[4]);
 					for (k = 1; k < c.length - 1; k += 2) {
 						n2_1 += c[k] * l2 / (l2 - c[k + 1]);
 					}
-					////if (c.length > 4) n2_1 += c[3] * l2 / (l2 - c[4]);
-					////if (c.length > 6) n2_1 += c[5] * l2 / (l2 - c[6]);
-					////if (c.length > 8) n2_1 += c[7] * l2 / (l2 - c[8]);
-					////if (c.length > 10) n2_1 += c[9] * l2 / (l2 - c[10]);
-					////if (c.length > 12) n2_1 += c[11] * l2 / (l2 - c[12]);
-					////if (c.length > 14) n2_1 += c[13] * l2 / (l2 - c[14]);
-					////if (c.length > 16) n2_1 += c[15] * l2 / (l2 - c[16]);
 					return Math.sqrt(n2_1 + 1);
 				};
 			},
@@ -89,10 +72,6 @@ window.LaserCanvas.Sellmeier.formula = (function () {
 					for (k = 9; k < c.length - 1; k += 2) {
 						n2 += c[k] * Math.pow(l, c[k + 1]);
 					}
-					////if (c.length > 10) n2 += c[9] * Math.pow(l, c[10]);
-					////if (c.length > 12) n2 += c[11] * Math.pow(l, c[12]);
-					////if (c.length > 14) n2 += c[13] * Math.pow(l, c[14]);
-					////if (c.length > 16) n2 += c[15] * Math.pow(l, c[16]);
 					return Math.sqrt(n2);
 				};
 			},
@@ -150,14 +129,6 @@ window.LaserCanvas.Sellmeier.prototype = {
 			self.search = this.value;
 			self.updateBooks();
 		};
-		
-		////// Select book and source.
-		////this.panel.querySelector('select[data-field="book"]').onchange = function () {
-		////	self.selectBook(this.value);
-		////};
-		////this.panel.querySelector('select[data-field="source"]').onchange = function () {
-		////	self.selectSource(this.value);
-		////};
 		
 		// Change in wavelength.
 		this.panel.querySelector('input[data-field="wavelength"]').onkeyup = function () {
@@ -459,18 +430,11 @@ window.LaserCanvas.Sellmeier.prototype = {
 				self.setPanelElement('[data-value="' + propertyName + '"]', value.toPrecision(6));
 			}, this);
 		}
-		////if (n && !isNaN(l)) {
-		////	this.setPanelElement('[data-value="refractiveIndex"]', n(l).toPrecision(6));
-		////	this.setPanelElement('[data-value="indexDispersion"]', ().toFixed(6));
-		////	this.setPanelElement('[data-value="groupVelocityDispersion"]', ().toFixed(6));
-		////}
 		
 		// Return calculation.
 		return prop;
 	}
 };
-
-////setTimeout(function () { s = new window.LaserCanvas.Sellmeier(); }, 300); ////**DEBUG** Remove debug.
 
 /**
 * Panel contents.
@@ -525,5 +489,3 @@ window.LaserCanvas.Sellmeier.panelHtml = [
 	'<button class="lcbutton" data-action="apply" data-localize="Apply"></button>',
 	'<a class="attribution" href="https://refractiveindex.info" target="_blank">Data from RefractiveIndex.INFO</a>'
 ].join('');
-
-////setTimeout(function () { var s = new window.LaserCanvas.Sellmeier(); }, 300);

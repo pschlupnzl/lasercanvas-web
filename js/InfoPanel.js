@@ -65,7 +65,6 @@ window.LaserCanvas.InfoPanel.createPanel = function (system, info) {
 			// Content.
 			tr.querySelector('[data-cell="label"]').innerHTML = label;
 			tr.querySelector('[data-cell="unit"]').innerHTML = unit || '';
-			////tr.querySelector('[data-cell="label"]').innerHTML = '<input type="checkbox" /> <input type="radio" /> ' + label;
 			tbody.appendChild(tr);
 			return tr;
 		},

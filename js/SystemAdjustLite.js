@@ -234,9 +234,7 @@ window.LaserCanvas.systemAdjust = function (melements, calculateCartesianCoordin
 				&& dragData.prev.construct.A.dot(dragData.prev.construct.B) < 0)
 				|| (dragData.next.construct
 				&& dragData.next.construct.A.dot(dragData.next.construct.B) < 0);
-			
-			////if (dragData.stretchOnly) console.log('stretch only'); ////TODO: Debug code.
-				
+
 			// Return drag construct.
 			return dragData;
 		},
