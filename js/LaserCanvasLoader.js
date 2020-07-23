@@ -105,6 +105,7 @@ window.LaserCanvas = {
 			'js/system/SystemAbcd.js',
 			'js/system/SystemAdjustLite.js',
 			'js/system/SystemNew.js',
+			'js/system/SystemLoad.js',
 			'js/Utilities.js',
 
 			'js/panel/HelpPanel.js',

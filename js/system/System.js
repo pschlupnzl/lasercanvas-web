@@ -574,8 +574,8 @@ window.LaserCanvas.System = function () {
 		*/
 		createNew = function (configuration, elementsInfo, loc) {
 			var LaserCanvas = window.LaserCanvas,            // {object} Namespace.
-				System = LaserCanvas.System;                 // {object} System namespace.
-			System.createNew(configuration, elementsInfo, loc, mprop, melements);
+				SystemUtil = LaserCanvas.SystemUtil;         // {object} System namespace.
+			SystemUtil.createNew(configuration, elementsInfo, loc, mprop, melements);
 
 			// Calculate Cartesian coordinates.
 			updateElementNames();
