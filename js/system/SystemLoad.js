@@ -98,17 +98,19 @@
 						element = new LaserCanvas.Element.Screen();
 						break;
 
-					// case "BrewsterInput":
-					// 	element = new LaserCanvas.Element.Dielectric(LaserCanvas.Element.Dielectric.eType.Crystal);
-					// 	props = {
-					// 		refractiveIndex: toNumber(src.RefractiveIndex, variables),
-					// 	};
-					// 	element.loc.l = toNumber(src.Thickness, variables);
-					// 	break;
+					case "BrewsterInput":
+						element = new LaserCanvas.Element.Dielectric(LaserCanvas.Element.Dielectric.eType.Brewster);
+						props = {
+							refractiveIndex: toNumber(src.RefractiveIndex, variables),
+						};
+						element.loc.l = toNumber(src.Thickness, variables);
+						break;
 
-					// case "BrewsterOutput":
-					// 	element = new LaserCanvas.Element.Dielectric(LaserCanvas.Element.Dielectric.eType.Crystal);
-					// 	break;
+					case "BrewsterOutput":
+						// TODO: Check for thermal lens in source
+						melements.push(new LaserCanvas.Element.Lens());
+						element = new LaserCanvas.Element.Dielectric(LaserCanvas.Element.Dielectric.eType.Brewster);
+						break;
 
 					default:
 						// Accumulate skipped element spacing.
