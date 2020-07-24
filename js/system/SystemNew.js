@@ -61,11 +61,7 @@
 			'System');
 
 		// Prepare system.
-		while (element = melements.pop()) {
-			if (element.destroy) {
-				element.destroy();
-			}
-		}
+		resetElements(melements);
 
 		if (elementsInfo) {
 			addElements(elementsInfo);
@@ -131,14 +127,29 @@
 						['Mirror', 0, { endOptic: true, angleOfIncidence: 0, radiusOfCurvature:  200 } ]
 					]);
 					loc = { x: -125 };
+LaserCanvas.SystemUtil.demoTextFile(mprop, melements);
 					break;
 			}
 		}
 
 		// Initial location.
-		window.LaserCanvas.Utilities.extend(melements[0].loc, loc);
+		LaserCanvas.Utilities.extend(melements[0].loc, loc);
+	};
+
+	/**
+	 * Clears existing elements, destroying them as needed.
+	 * @param {Array<object:Element} melements Elements array to clear.
+	 */
+	var resetElements = function (melements) {
+		var element;
+		while (element = melements.pop()) {
+			if (element.destroy) {
+				element.destroy();
+			}
+		}
 	};
 
 	LaserCanvas.SystemUtil = LaserCanvas.SystemUtil || {};
 	LaserCanvas.SystemUtil.createNew = createNew;
+	LaserCanvas.SystemUtil.resetElements = resetElements;
 }(window.LaserCanvas));
