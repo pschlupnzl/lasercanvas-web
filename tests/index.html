@@ -1,0 +1,103 @@
+<!doctype html>
+<html>
+<head>
+<title>LaserCanvas Tests</title>
+<style type="text/css">
+	#test-runner-results {
+		/* border-collapse: collapse; */
+	}
+
+		#test-runner-results tr.pass td {
+			background-color: #9c9;
+		}
+		
+		#test-runner-results tr.fail td {
+			background-color: #f99;
+		}
+
+		#test-runner-results .template-row {
+			display: none;
+		}	
+
+		#test-runner-results .success > span {
+			display: none;
+		}
+
+		#test-runner-results tr.fail .success > span.fail,
+		#test-runner-results tr.pass .success > span.pass {
+			display: unset;
+		}
+</style>
+<script src="../js/LaserCanvas.js"></script>
+<!-- <script src="../js/LaserCanvasTheme.js"></script> -->
+<!-- <script src="../js/Localize.js"></script> -->
+<script src="../js/Math.js"></script>
+<script src="../js/element/Element.js"></script>
+<script src="../js/element/ElementDielectric.js"></script>
+<script src="../js/element/ElementDispersion.js"></script>
+<script src="../js/element/ElementLens.js"></script>
+<script src="../js/element/ElementMirror.js"></script>
+<script src="../js/element/ElementScreen.js"></script>
+<!-- <script src="../js/panel/GraphPanel.js"></script> -->
+<!-- <script src="../js/panel/PropertiesPanel.js"></script> -->
+<!-- <script src="../js/panel/InfoPanel.js"></script> -->
+<script src="../js/Render.js"></script>
+<script src="../js/Sellmeier.js"></script>
+<script src="../js/system/System.js"></script>
+<script src="../js/system/SystemAbcd.js"></script>
+<script src="../js/system/SystemAdjustLite.js"></script>
+<script src="../js/system/SystemNew.js"></script>
+<script src="../js/system/SystemLoad.js"></script>
+<script src="../js/Utilities.js"></script>
+<!-- <script src="../js/panel/HelpPanel.js"></script> -->
+<!-- <script src="css/HelpPanel.css"></script> -->
+
+<script src="TestRunner.js"></script>
+<script src="testSystemLoad.js"></script>
+</head>
+<body>
+	<table id="test-runner-results">
+		<thead>
+			<tr>
+				<th class="label">Label</th>
+				<th class="success">Success</th>
+				<th class="message">Message</th>
+			</tr>
+		</thead>
+		<tbody>
+			<tr class="template-row">
+				<td class="label">Label</td>
+				<td class="success">
+					<span class="pass">Pass</span>
+					<span class="fail">Fail</span>
+				</td>
+				<td class="message"></td>
+			</tr>
+		</tbody>
+	</table>
+
+	<script>
+		(function () {
+			/** Logger that adds rows to the table. */
+			var tableLogger = {
+				log: function (res) {
+					var table = document.querySelector("#test-runner-results"),
+						tr = table.querySelector("tr.template-row").cloneNode(true);
+					tr.querySelector(".label").innerText = res.label || "Unknown test";
+					tr.querySelector(".message").innerText = res.message || "-";
+					if (res.success === true) {
+						tr.classList.add("pass");
+					} else if (res.success === false) {
+						tr.classList.add("fail");
+					}
+					tr.classList.remove("template-row");
+					table.querySelector("tbody").appendChild(tr);
+				}
+			};
+
+			var runner = new TestRunner(tableLogger);
+			runner.run();
+		}());
+	</script>
+</body>
+</html>
