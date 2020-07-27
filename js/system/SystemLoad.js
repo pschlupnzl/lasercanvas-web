@@ -118,7 +118,7 @@
 						if (src.type === "CrystalInput") {
 							props.faceAngle = toNumber(src.FaceAngle, variables) * Math.PI / 180;
 						} else if (src.type === "PlateInput") {
-							props.faceAngle = toNumber(src.FaceAngle, variables) * Math.PI / 180;
+							props.angleOfIncidence = toNumber(src.FaceAngle, variables) * Math.PI / 180;
 						}
 						
 						// groupVelocityDispersion: 0,// {number} (um^-2) Group velocity dispersion for ultrafast calculations.
@@ -142,7 +142,9 @@
 						// TODO: Search backwards.
 						linkedElement = elements[index - 1];
 						props = {};
-						if (src.type === "CrystalOutput" || src.type === "PlateOutput") {
+						if (src.type === "CrystalOutput") {
+							props.faceAngle = toNumber(linkedElement.FaceAngle, variables), Math.PI / 180;
+						} else if (src.type === "PlateOutput") {
 							props.angleOfIncidence = toNumber(linkedElement.FaceAngle, variables) * Math.PI / 180;
 						}
 // console.log("BBB", props)
