@@ -163,9 +163,10 @@ window.LaserCanvas.Element.Mirror.prototype = {
 	* Mirror:
 	*    R = radius of curvature (mm). Concave R > 0.
 	*    q = angle of incidence (rad).
-	*          Sagittal            Tangential
-	*    [      1        0 ]    [     1         0 ]
-	*    [-2 / R cos q   1 ]    [-2 cos q / R   1 ]
+	*    ABCD = [    1    0 ]
+	*           [ -2 / R' 1 ]
+	*    where R' = | R cos q     in Tangential plane
+	*               | R / cos q   in Sagittal plane
 	* @param {number} dir Direction -1:backwards|+1:forwards
 	* @param {number.Enum:modePlane} plane Sagittal or tangential plane.
 	* @returns {Matrix2x} Transfer matrix.
@@ -173,9 +174,11 @@ window.LaserCanvas.Element.Mirror.prototype = {
 	elementAbcd: function (dir, plane) {
 		var R = this.prop.radiusOfCurvature,            // {number} (mm) Radius of curvature.
 			cosq = Math.cos(this.prop.angleOfIncidence), // {number} Projection of angle of incidence.
-			abcd = plane === LaserCanvas.Enum.modePlane.sagittal ?
-				new LaserCanvas.Math.Matrix2x2(1, 0, R === 0 ? 0 : -2 / (R * cosq), 1) :
-				new LaserCanvas.Math.Matrix2x2(1, 0, R === 0 ? 0 : -2 * cosq / R, 1);
+			Re = plane === LaserCanvas.Enum.modePlane.sagittal
+				? R / cosq // Sagittal
+				: R * cosq, // Tangential
+			c2_Re = R === 0 ? 0 : -2 / Re, // Flat mirror has R = 0 rather than R = Infinity
+			abcd = new LaserCanvas.Math.Matrix2x2(1, 0, c2_Re, 1);
 		return abcd;
 	},
 	
