@@ -1,6 +1,12 @@
 /**
 * Laser Canvas - main application controller.
 */
+
+/** When included without UI, e.g. tests. */
+window.LaserCanvas = window.LaserCanvas || {
+	Element: {},    // {Namespace} Elements.
+};
+
 // @param {HTMLCanvasElement} canvas Canvas element where system is drawn.
 // @param {HTMLDivElement} info Panel where to write information.
 window.LaserCanvas.Application = function (canvas, info) {

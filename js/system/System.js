@@ -655,6 +655,14 @@ window.LaserCanvas.System = function () {
 
 			}(this));
 			*/
+		},
+
+		/**
+		 * Load a LaserCanvas 5 text file.
+		 * @param {string} src Source text file.
+		 */
+		fromTextFile = function (src) {
+			LaserCanvas.SystemUtil.fromTextFile(src, mprop, melements);
 		};
 	
 	/**
@@ -673,6 +681,7 @@ window.LaserCanvas.System = function () {
 		elementAtLocation: elementAtLocation,     // Find an element at the given mouse location.
 		element: element,                         // Returns the element at the given index.
 		elements: elements,                       // Retrieve elements for this system.
+		fromTextFile: fromTextFile,               // Load a LaserCanvas 5 text file.
 		insertElement: insertElement,             // Insert a new element near the given point.
 		inspectSegment: inspectSegment,           // Inspect beam on a segment (from segmentNearLocation).
 		iterateElements: iterateElements,         // Iterate all elements in the system.

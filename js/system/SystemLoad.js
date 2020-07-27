@@ -56,6 +56,15 @@
 		//  Elements.
 		// -----------
 
+		toBlockType = {
+			"CrystalInput": LaserCanvas.Element.Dielectric.eType.Crystal,
+			"CrystalOutput": LaserCanvas.Element.Dielectric.eType.Crystal,
+			"BrewsterInput": LaserCanvas.Element.Dielectric.eType.Brewster,
+			"BrewsterOutput": LaserCanvas.Element.Dielectric.eType.Brewster,
+			"PlateInput": LaserCanvas.Element.Dielectric.eType.Plate,
+			"PlateOutput": LaserCanvas.Element.Dielectric.eType.Plate,
+		},
+
 		/**
 		 * Create the system elements into the given array.
 		 * @param {Array<Element>} melements Array of elements to be filled.
@@ -75,7 +84,7 @@
 			for (var index = 0; index < elements.length; index += 1) {
 				var src = elements[index];
 				var name = src.name;
-				var props, element;
+				var props, element, linkedElement;
 
 				switch (src.type) {
 					case "Mirror":
@@ -86,11 +95,11 @@
 						};
 						break;
 
-					case "Lens":
+					case "ThinLens":
 						// TODO: Check lens format in data file.
 						element = new LaserCanvas.Element.Lens();
 						props = {
-							focalLength: toNumber(src.FocalLength, variables)
+							focalLength: toNumber(src.FL, variables)
 						};
 						break;
 
@@ -99,17 +108,44 @@
 						break;
 
 					case "BrewsterInput":
-						element = new LaserCanvas.Element.Dielectric(LaserCanvas.Element.Dielectric.eType.Brewster);
+					case "CrystalInput":
+					case "PlateInput":
+						element = new LaserCanvas.Element.Dielectric(toBlockType[src.type]);
 						props = {
 							refractiveIndex: toNumber(src.RefractiveIndex, variables),
+							flip: src.Flipped || false,
 						};
+						if (src.type === "CrystalInput") {
+							props.faceAngle = toNumber(src.FaceAngle, variables) * Math.PI / 180;
+						} else if (src.type === "PlateInput") {
+							props.faceAngle = toNumber(src.FaceAngle, variables) * Math.PI / 180;
+						}
+						
+						// groupVelocityDispersion: 0,// {number} (um^-2) Group velocity dispersion for ultrafast calculations.
+						// angleOfIncidence: 0,       // {number} (rad) Angle of incidence. Auto-calculated for Brewster and Crystal.
+						// faceAngle: 0,              // {number} (rad) Face angle relative to internal propagation for Crystal (also used for painting).
+						// flip: false,               // {boolean} Value indicating whether Brewster angle is flipped.
+						// curvatureFace1: 0,         // {number} (mm) Radius of curvature for input interface, or 0 for flat.
+						// curvatureFace2: 0,         // {number} (mm) Radius of curvature for output interface, or 0 for flat.
+						// thermalLens: 0             // {number} (mm) Focal length of thermal lens, or 0 for none.
+// console.log(toBlockType[src.type], props)
 						element.loc.l = toNumber(src.Thickness, variables);
 						break;
 
 					case "BrewsterOutput":
+					case "CrystalOutput":
+					case "PlateOutput":
 						// TODO: Check for thermal lens in source
 						melements.push(new LaserCanvas.Element.Lens());
-						element = new LaserCanvas.Element.Dielectric(LaserCanvas.Element.Dielectric.eType.Brewster);
+						element = new LaserCanvas.Element.Dielectric(toBlockType[src.type]);
+
+						// TODO: Search backwards.
+						linkedElement = elements[index - 1];
+						props = {};
+						if (src.type === "CrystalOutput" || src.type === "PlateOutput") {
+							props.angleOfIncidence = toNumber(linkedElement.FaceAngle, variables) * Math.PI / 180;
+						}
+// console.log("BBB", props)
 						break;
 
 					default:
@@ -152,8 +188,13 @@ console.log("Skipping element type " + src.type);
 			melements[0].startOptic = true;
 			melements[melements.length - 1].endOptic = true;
 
-			// Collect into groups.
+			// Collect dielectrics into groups and force angle calculations.
 			LaserCanvas.Element.Dielectric.collectGroups(melements);
+			for (var element of elements) {
+				if (element.updateAngles) {
+					element.updateAngles();
+				}
+			}
 		},
 
 		// ----------
@@ -167,14 +208,17 @@ console.log("Skipping element type " + src.type);
 		reSystemType = /^(Resonator)$/m,
 
 		/** Regular expression matching lines to ignore. */
-		reIgnore = /^\s*(?:Selected|)\s*$/m,
+		reIgnore = /^\s*(?:Selected|Astigmatic|)\s*$/m,
 
 		/** Regular expression matching a property declaration: Property = Expression */
 		rePropertyDeclaration = /^\s*([A-Za-z][^\s]*)\s*=\s*(.*)$/m,
 
-		/** Regular expression matching an element declaration: Element @ Name = { */
-		reElementDeclaration = /^(Mirror|Lens|Screen|BrewsterInput|BrewsterOutput|PrismA|PrismB)\s*@\s*([^\s]+)\s*{$/m,
+		/** Regular expression matching boolan properties for elements. */
+		reBooleanProperty = /^(Flipped)$/m,
 
+		/** Regular expression matching an element declaration: Element @ Name = { */
+		reElementDeclaration = /^(Mirror|ThinLens|Screen|BrewsterInput|BrewsterOutput|CrystalInput|CrystalOutput|PlateInput|PlateOutput|PrismA|PrismB)\s*@\s*([^\s]+)\s*{$/m,
+	
 		/** Regular expression matching a renderer declaration: Renderer 2d { */
 		reRendererDeclaration = /^Renderer\s+(SystemGraph|2d)\s*\{$/m,
 		/**
@@ -232,6 +276,10 @@ console.log("Skipping element type " + src.type);
 						expr = match[2];
 					curr[prop] = expr;
 
+				} else if (!!(match = reBooleanProperty.exec(line))) {
+					// Boolean value set to TRUE if statement is included.
+					curr[match[1]] = true;
+
 				} else if (!!(match = reElementDeclaration.exec(line))) {
 					// Element blocks.
 					curr = {
@@ -274,16 +322,12 @@ console.log("Skipping element type " + src.type);
 		var root = parseTextFile(text),
 			variables = getVariables(root);
 
-console.log(root, variables);
-
 		// System properties.
 		mprop.name = root.name;
 		mprop.wavelength = toNumber(root.Wavelength, variables);
-console.log(mprop);
 
 		// Elements.
 		createElements(melements, root.elements, variables);
-console.log(melements);
 
 		// Initial location.
 		LaserCanvas.Utilities.extend(melements[0].loc, {
