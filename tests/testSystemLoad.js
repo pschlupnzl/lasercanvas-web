@@ -961,13 +961,124 @@ Renderer SystemGraph {
    Variable = x
    Function = Stability
 }
+`},
+
+{ label: "test_lensmaker_lens", expectAbcd: [[-1.36, -167, 0.00848, 0.302]], src: 
+`[Sys_022f86e0]
+Resonator
+Variable(x) = 0
+Range(x) = 0, 1
+Variable(y) = 0
+Range(y) = 0, 1
+Variable(z) = 0
+Range(z) = 0, 1
+Wavelength = 1064
+MSquared = 1
+MSquareTan = 1
+InputwSag = 200
+InputwTan = 300
+InputRzSag = 0
+InputRzTan = 0
+Rotation = 0
+StartX = 0
+StartY = 0
+Mirror @ M1 {
+   DistanceToNext = 125
+   FaceAngle = 0
+   ROC = 200
+   ROC_tan = 200
+}
+ThinLens @ L3 {
+   Selected
+   DistanceToNext = 125
+   FL = 200
+   FL_tan = 200
+}
+Mirror @ M2 {
+   DistanceToNext = 0
+   FaceAngle = 0
+   ROC = 200
+   ROC_tan = 200
+}
+
+Renderer 2d {
+   System = Sys_022f86e0
+   Window = 26, 26, 500, 200
+   XMiddle = 125
+   YMiddle = 0
+   Zoom = 1
+   OpticScale = 50
+   ModeScale = 20
+   GridSize = 10
+   Flags = 10
+}
+`},
+
+{ label: "test_lensmaker_plate", expectAbcd: [[-1.36, -157, 0.00819, 0.211]], src: 
+`[Sys_022f97ec]
+Resonator
+Variable(x) = 0
+Range(x) = 0, 1
+Variable(y) = 0
+Range(y) = 0, 1
+Variable(z) = 0
+Range(z) = 0, 1
+Wavelength = 1064
+MSquared = 1
+MSquareTan = 1
+InputwSag = 200
+InputwTan = 300
+InputRzSag = 0
+InputRzTan = 0
+Rotation = 0
+StartX = 0
+StartY = 0
+Mirror @ M1 {
+   DistanceToNext = 120
+   FaceAngle = 0
+   ROC = 200
+   ROC_tan = 200
+}
+PlateInput @ PI3 {
+   LinkedTo = PO4
+   RefractiveIndex = 2
+   FaceAngle = 0
+   ROC = -400
+   ROC_tan = -400
+   Thickness = 10
+}
+PlateOutput @ PO4 {
+   Selected
+   LinkedTo = PI3
+   DistanceToNext = 120
+   ROC = -400
+   ROC_tan = -400
+}
+Mirror @ M2 {
+   DistanceToNext = 0
+   FaceAngle = 0
+   ROC = 200
+   ROC_tan = 200
+}
+
+Renderer 2d {
+   System = Sys_022f97ec
+   Window = 20, 233, 500, 200
+   XMiddle = 125
+   YMiddle = 0
+   Zoom = 1
+   OpticScale = 50
+   ModeScale = 20
+   GridSize = 10
+   Flags = 10
+}
 `}
 ];
 
 collection.systemload = {
 	label: "System load",
 	cases: testCases,
-	cases: [testCases[6]],
+	// cases: [testCases[9]],
 
 	/**
 	 * Run a single test, returning a value indicating whether the

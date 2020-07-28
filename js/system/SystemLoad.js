@@ -56,13 +56,22 @@
 		//  Elements.
 		// -----------
 
-		toBlockType = {
-			"CrystalInput": LaserCanvas.Element.Dielectric.eType.Crystal,
-			"CrystalOutput": LaserCanvas.Element.Dielectric.eType.Crystal,
-			"BrewsterInput": LaserCanvas.Element.Dielectric.eType.Brewster,
-			"BrewsterOutput": LaserCanvas.Element.Dielectric.eType.Brewster,
-			"PlateInput": LaserCanvas.Element.Dielectric.eType.Plate,
-			"PlateOutput": LaserCanvas.Element.Dielectric.eType.Plate,
+		/**
+		 * Returns the dielectric element eType for the type.
+		 * @param {string} type Type label from data file.
+		 */
+		toBlockType = function (type) {
+			switch (type) {
+				case "CrystalInput":
+				case "CrystalOutput":
+					return LaserCanvas.Element.Dielectric.eType.Crystal;
+				case "BrewsterInput":
+				case "BrewsterOutput":
+					return LaserCanvas.Element.Dielectric.eType.Brewster;
+				case "PlateInput":
+				case "PlateOutput":
+					return LaserCanvas.Element.Dielectric.eType.Plate;
+			}
 		},
 
 		/**
@@ -110,11 +119,16 @@
 					case "BrewsterInput":
 					case "CrystalInput":
 					case "PlateInput":
-						element = new LaserCanvas.Element.Dielectric(toBlockType[src.type]);
+						element = new LaserCanvas.Element.Dielectric(toBlockType(src.type));
 						props = {
 							refractiveIndex: toNumber(src.RefractiveIndex, variables),
 							flip: src.Flipped || false,
+							curvatureFace1: toNumber(src.ROC, variables),
+							// TODO: Search linked element.
+							curvatureFace2: toNumber(elements[index + 1].ROC, variables),
+							// curvatureFace1: 200,
 						};
+
 						if (src.type === "CrystalInput") {
 							props.faceAngle = toNumber(src.FaceAngle, variables) * Math.PI / 180;
 						} else if (src.type === "PlateInput") {
@@ -137,7 +151,7 @@
 					case "PlateOutput":
 						// TODO: Check for thermal lens in source
 						melements.push(new LaserCanvas.Element.Lens());
-						element = new LaserCanvas.Element.Dielectric(toBlockType[src.type]);
+						element = new LaserCanvas.Element.Dielectric(toBlockType(src.type));
 
 						// TODO: Search backwards.
 						linkedElement = elements[index - 1];
