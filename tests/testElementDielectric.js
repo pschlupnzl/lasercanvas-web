@@ -108,7 +108,7 @@ window.testCollection = window.testCollection || {};
 		isFace1: false,
 		dir: 1,
 		plane: "sagittal",
-		expectAbcd: [[1, 0], [1/400, 1]]
+		expectAbcd: [[1, 0], [-1/400, 1]]
 	}, {
 		label: "Plate )--> n=2 tan",
 		type: "Plate",
@@ -118,7 +118,7 @@ window.testCollection = window.testCollection || {};
 		isFace1: false,
 		dir: 1,
 		plane: "tangential",
-		expectAbcd: [[1, 0], [1/400, 1]]
+		expectAbcd: [[1, 0], [-1/400, 1]]
 	}, 
 	// Down.
 	{
@@ -150,7 +150,7 @@ window.testCollection = window.testCollection || {};
 		isFace1: false,
 		dir: -1,
 		plane: "sagittal",
-		expectAbcd: [[1, 0], [1/400, 1]]
+		expectAbcd: [[1, 0], [-1/400, 1]]
 	}, {
 		label: "Plate )<-- n=2 tan",
 		type: "Plate",
@@ -160,7 +160,7 @@ window.testCollection = window.testCollection || {};
 		isFace1: false,
 		dir: -1,
 		plane: "tangential",
-		expectAbcd: [[1, 0], [1/400, 1]]
+		expectAbcd: [[1, 0], [-1/400, 1]]
 	}];
 
 	// ------------------

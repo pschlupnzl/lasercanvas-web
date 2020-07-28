@@ -528,14 +528,14 @@ window.LaserCanvas.Element.Dielectric.prototype = {
 			qint = Math.asin(Math.sin(qext) / nint), // {number} (rad) Internal angle.
 			roc = isFace1                       // {number} (mm) Radius of curvature to use.
 				? prop.curvatureFace1
-				: -prop.curvatureFace2,
+				: prop.curvatureFace2,
 			dnR = 0;                            // {number} (1/mm) Scaled inverse curvature.
 
 		// Endcap: Normal incidence non-astigmatic curved mirror.
 		if (isFace1 && prop.type === LaserCanvas.Element.Dielectric.eType.Endcap) {
 			return new Matrix2x2(1, 0, roc === 0 ? 0 : 2 / roc, 1);
 		}
-// console.log(isFace1 ? "Face 1" : "Face 2", nint, qint, qext, roc, dir, plane)
+
 		// Refractive index and angles.
 		// Curvature and refractive indices
 		//  - Always R < 0 for focusing

@@ -301,8 +301,19 @@ window.LaserCanvas.Math = {};
 			if (tol === undefined) {
 				tol = 1e-15;
 			}
+			if (this.length !== mx.length) {
+				// Mismatch number of rows.
+				return false;
+			}
 			for (var r = 0; r < this.length; r += 1) {
+				if (this[r].length !== mx[r].length) {
+					// Mismatch number of columns.
+					return false;
+				}
 				for (var c = 0; c < this[r].length; c += 1) {
+					if (isNaN(this[r][c]) || isNaN(mx[r][c])) {
+						return false;
+					}
 					if (
 						// Tolerance by decimal places.
 						(tol < 1 && Math.abs(this[r][c] - mx[r][c]) > tol)
