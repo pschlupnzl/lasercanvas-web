@@ -523,8 +523,9 @@ window.LaserCanvas.Element.Dielectric.prototype = {
 			n1, n2, q1, q2, cosq1, cosq2, dn,   // Temporary variables.
 			prop = this.group[0].prop,          // Starting element with all the properties.
 			isFace1 = this === this.group[0],   // {boolean} Value indicating whether this is face 1 (false means face 2).
-			n = prop.refractiveIndex,           // {number} Refractive index within dielectric block.
-			q0 = prop.angleOfIncidence,         // {number} (rad) Angle of incidence (assume parallel faces).
+			nint = prop.refractiveIndex,        // {number} Refractive index within dielectric block.
+			qext = prop.angleOfIncidence,       // {number} (rad) (External) Angle of incidence (assume parallel faces).
+			qint = Math.asin(Math.sin(qext) / nint), // {number} (rad) Internal angle.
 			roc = isFace1                       // {number} (mm) Radius of curvature to use.
 				? prop.curvatureFace1
 				: -prop.curvatureFace2,
@@ -534,34 +535,80 @@ window.LaserCanvas.Element.Dielectric.prototype = {
 		if (isFace1 && prop.type === LaserCanvas.Element.Dielectric.eType.Endcap) {
 			return new Matrix2x2(1, 0, roc === 0 ? 0 : 2 / roc, 1);
 		}
-			
-		// We work off the external angle of incidence.
-		if ((dir > 0 && isFace1) || (dir < 0 && !isFace1)) {
-			// ! C++ LaserCanvas does not distinguish the ABCD transfer !
-			// ! matrix based on propagation direction, which I think   !
-			// ! now is wrong. It's equivalent to   if (isFace1)        !
-			n1 = 1.0;   // Incident from air.
-			n2 = n;     // Going into dielectric.
-			q1 = q0;    // {number} (rad) External angle of incidence.
-			q2 = Math.asin(Math.sin(q0) / n); // {number} (rad) Internal angle of refraction.
+// console.log(isFace1 ? "Face 1" : "Face 2", nint, qint, qext, roc, dir, plane)
+		// Refractive index and angles.
+		// Curvature and refractive indices
+		//  - Always R < 0 for focusing
+		//  - Always n2 = n; n1 = 1.00
+		// Angles
+		//  - Input  -->--  q2 = qInt, q1 = qExt
+		//  - Input  --<--  q2 = qExt, q1 = qInt
+		//  - Output -->--  q2 = qExt, q1 = qInt
+		//  - Output --<--  q2 = qInt, q1 = qExt
+		if (isFace1) {
+			// Input face.
+			n1 = 1.00;
+			q1 = dir > 0 ? qext : qint;
+			n2 = nint;
+			q2 = dir > 0 ? qint : qext;
 		} else {
-			n1 = n;     // Incident from dielectric.
-			n2 = 1.0;   // Going into air.
-			q1 = Math.asin(Math.sin(q0) / n); // {number} (rad) Internal angle of refraction.
-			q2 = q0;    // {number} (rad) External angle of incidence.
+			// Output face.
+			n1 = 1.00;
+			q1 = dir > 0 ? qint : qext;
+			n2 = nint;
+			q2 = dir > 0 ? qext : qint;
 		}
+
+		// // ! C++ LaserCanvas does not distinguish the ABCD transfer !
+		// // ! matrix based on propagation direction, which I think   !
+		// // ! now is wrong. It's equivalent to   if (isFace1)        !
+		// // if (true || (dir > 0 && isFace1) || (dir < 0 && !isFace1)) {
+		// if (isFace1) {
+		// 	n1 = 1.0;   // Incident from air.
+		// 	n2 = n;     // Going into dielectric.
+		// } else {
+		// 	n1 = n;     // Incident from dielectric.
+		// 	n2 = 1.0;   // Going into air.
+		// }
+
+		// // Angles.
+		// // We work off the external angle of incidence.
+		// if ((dir > 0 && isFace1) || (dir < 0 && !isFace1)) {
+		// 	q1 = q0;    // {number} (rad) External angle of incidence.
+		// 	q2 = Math.asin(Math.sin(q0) / n); // {number} (rad) Internal angle of refraction.
+		// } else {
+		// 	q1 = Math.asin(Math.sin(q0) / n); // {number} (rad) Internal angle of refraction.
+		// 	q2 = q0;    // {number} (rad) External angle of incidence.
+		// }
 		cosq1 = Math.cos(q1);
 		cosq2 = Math.cos(q2);
 		
 		// Sagittal or tangential.
+		//  n1 sin q1 = n2 sin q2
+		//     dn_sag = n2 cos q2 - n1 cos q1 
+		//               n2 cos q2 - n1 cos q1
+		//     dn_tan = -----------------------
+		//                   cos q1 cos q2
+		//    Sagittal             Tangential
+		//    [              ]     [  cos q2             ]
+		//    [    1       0 ]     [ --------      0     ]
+		//    [              ]     [  cos q1             ]
+		//    [              ]     [                     ]
+		//    [  dn_sag      ]     [  dn_tan     cos q1  ]
+		//    [ --------   1 ]     [ --------   -------- ]
+		//    [     R        ]     [     R       cos q2  ]
 		if (plane === LaserCanvas.Enum.modePlane.sagittal) {
-			if (roc !== 0) {
+			if (roc === 0) {
+				dnR = 0;
+			} else {
 				dn = n2 * cosq2 - n1 * cosq1;
 				dnR = dn / roc;
 			}
 			abcd = new Matrix2x2(1, 0, dnR, 1);
 		} else {
-			if (roc !== 0) {
+			if (roc === 0) {
+				dnR = 0;
+			} else {
 				dn = (n2 * cosq2 - n1 * cosq1) / (cosq1 * cosq2);
 				dnR = dn / roc;
 			}
