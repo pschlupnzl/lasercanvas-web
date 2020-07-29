@@ -72,6 +72,18 @@ body {
 		background-color: #aaa;
 	}
 	
+	.laserCanvasNewPanel button[data-action="openFile"] {
+		position: relative;
+		overflow: hidden;
+	}
+
+		.laserCanvasNewPanel button[data-action="openFile"] > input[type="file"] {
+			position: absolute;
+			right: 0;
+			top: 0;
+			font-size: 100px;
+			opacity: 0;
+		}
 /*
 * Toolbar.
 */

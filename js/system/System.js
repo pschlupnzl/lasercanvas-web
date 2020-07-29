@@ -663,6 +663,11 @@ window.LaserCanvas.System = function () {
 		 */
 		fromTextFile = function (src) {
 			LaserCanvas.SystemUtil.fromTextFile(src, mprop, melements);
+			// Calculate Cartesian coordinates.
+			updateElementNames();
+			calculateCartesianCoordinates();
+			fireEventListeners('change');
+			fireEventListeners('update');
 		};
 	
 	/**

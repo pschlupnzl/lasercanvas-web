@@ -237,6 +237,11 @@ window.LaserCanvas.Application = function (canvas, info) {
 				attachClickHandler('.toggleHelp', window.LaserCanvas.showHelp);
 				attachClickHandler('[data-action="toggleRender"]', toggleRenderProperty);
 				attachClickHandler('[data-action="toggleInfopanel"]', toggleInfoAttribute);
+
+				// Listener for file Open button.
+				window.LaserCanvas.SystemUtil.attachLoadListener(
+					document.querySelector("[data-action='openFile'] > input"),
+					msystem, mrender);
 				document.querySelector('button[data-action="download-svg"]').onclick = function () {
 					LaserCanvas.getScript('RenderSvg.js', function () {
 						window.globalRenderSvg = new window.LaserCanvas.RenderSvg(msystem)

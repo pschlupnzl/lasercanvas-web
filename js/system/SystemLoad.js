@@ -325,132 +325,72 @@ console.log("Skipping element type " + src.type);
 				}
 			}
 			return root;
-		};
+		},
 		
-	/**
-	 * Parse the text file, assumed to be in LaserCanvas 5
-	 * data format, to create a system.
-	 * @param {string} text Source of text file.
-	 * @param {object} mprop System properties to set.
-	 * @param {Array<Element>} melements System elements to update.
-	 */
-	function fromTextFile (text, mprop, melements) {
-		var root = parseTextFile(text),
-			variables = getVariables(root);
+		/**
+		 * Parse the text file, assumed to be in LaserCanvas 5
+		 * data format, to create a system.
+		 * @param {string} text Source of text file.
+		 * @param {object} mprop System properties to set.
+		 * @param {Array<Element>} melements System elements to update.
+		 */
+		fromTextFile =function (text, mprop, melements) {
+			var root = parseTextFile(text),
+				variables = getVariables(root);
 
-		// System properties.
-		mprop.name = root.name;
-		mprop.wavelength = toNumber(root.Wavelength, variables);
+			// System properties.
+			mprop.name = root.name;
+			mprop.wavelength = toNumber(root.Wavelength, variables);
 
-		// Elements.
-		createElements(melements, root.elements, variables);
+			// Elements.
+			createElements(melements, root.elements, variables);
 
-		// Initial location.
-		LaserCanvas.Utilities.extend(melements[0].loc, {
-			x: toNumber(root.StartX, variables),
-			y: FLIP * toNumber(root.StartY, variables),
-			q: FLIP * toNumber(root.Rotation, variables) * Math.PI / 180,
-		});
-	};
+			// Initial location.
+			LaserCanvas.Utilities.extend(melements[0].loc, {
+				x: toNumber(root.StartX, variables),
+				y: FLIP * toNumber(root.StartY, variables),
+				q: FLIP * toNumber(root.Rotation, variables) * Math.PI / 180,
+			});
+		},
+
+		// --------------
+		//  UI handling.
+		// --------------
+
+		/**
+		 * Attach a listener to the given element to trigger a system
+		 * load when the file changes.
+		 * @param {HTMLInputElement} input Element where to attach listener.
+		 * @param {System} system System whose load to trigger.
+		 * @param {Render} render Renderer.
+		 */
+		attachLoadListener = function (input, system, render) {
+			var
+				/** Load the text into the system. */
+				loadText = function (src) {
+					render.resetTransform();
+					system.fromTextFile(src);
+				},
+
+				/** Completion function for text reader. */
+				onload = function () {
+					var src = this.result;
+					loadText(src);
+				},
+
+				/** Respond to a change in the file by loading it. */
+				change = function () {
+					var file = this.files[0],
+						reader = new FileReader();
+					if (file && (file.type === "" || file.type === "text/plain")) {
+						reader.onload = onload;
+						text = reader.readAsText(file);
+					}
+				};
+			input.addEventListener("change", change);
+		};
 
 	LaserCanvas.SystemUtil = LaserCanvas.SystemUtil || {};
 	LaserCanvas.SystemUtil.fromTextFile = fromTextFile;
+	LaserCanvas.SystemUtil.attachLoadListener = attachLoadListener;
 }(window.LaserCanvas));
-
-// (function () {
-window.LaserCanvas.SystemUtil.demoTextFile = function (mprop, melements) {
-	var text =
-`[Sys_023075d0]
-Resonator
-Variable(x) = 105.99
-Range(x) = 80, 150
-Variable(y) = 0
-Range(y) = 0, 1
-Variable(z) = 0
-Range(z) = 0, 1
-Wavelength = 1064
-MSquared = 1
-MSquareTan = 1
-InputwSag = 200
-InputwTan = 300
-InputRzSag = 0
-InputRzTan = 0
-Rotation = -21.8858
-StartX = -88
-StartY = 64
-Mirror @ M3 {
-   DistanceToNext = 146.932
-   FaceAngle = 0
-   ROC = 0
-   ROC_tan = 0
-}
-Screen @ I9 {
-   DistanceToNext = 231.33
-}
-Mirror @ M2 {
-   DistanceToNext = x
-   FaceAngle = -11.0658
-   ROC = 200
-   ROC_tan = 200
-}
-BrewsterInput @ BI5 {
-   LinkedTo = BO6
-   RefractiveIndex = 1.5
-   ROC = 0
-   ROC_tan = 0
-   Thickness = 10
-}
-BrewsterOutput @ BO6 {
-   Selected
-   LinkedTo = BI5
-   DistanceToNext = x
-   ROC = 0
-   ROC_tan = 0
-}
-Mirror @ M1 {
-   DistanceToNext = 203.38
-   FaceAngle = -12.8854
-   ROC = 200
-   ROC_tan = 200
-}
-PrismA @ Pa7 {
-   LinkedTo = Pb8
-   DistanceToNext = 64.1979
-   RefractiveIndex = 1.5
-}
-PrismB @ Pb8 {
-   LinkedTo = Pa7
-   DistanceToNext = 113.342
-}
-Mirror @ M4 {
-   DistanceToNext = 0
-   FaceAngle = 0
-   ROC = 0
-   ROC_tan = 0
-}
-
-Renderer 2d {
-   System = Sys_023075d0
-   Window = 0, 0, 717, 446
-   XMiddle = 125
-   YMiddle = 0
-   Zoom = 1
-   OpticScale = 50
-   ModeScale = 20
-   GridSize = 10
-   Flags = 10
-}
-Renderer SystemGraph {
-   System = Sys_023075d0
-   Window = 26, 26, 500, 369
-   XMin = 80
-   XMax = 150
-   YMin = -1
-   YMax = 1
-   Variable = x
-   Function = Stability
-}
-`;
-	window.LaserCanvas.SystemUtil.fromTextFile(text, mprop, melements);
-};
-// }());
