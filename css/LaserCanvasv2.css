@@ -34,17 +34,31 @@ body {
 .helpButton {
 	position: fixed;
 	right: 0;
-	top: 0;
 	width: 2em;
 	height: 1.5em;
 	background: #f1f52e;
 	font-size: 20px;
 	font-weight: bold;
 	text-align: center;
+	border-top-left-radius: 1em;
 	border-bottom-left-radius: 1em;
 	border: none;
 	cursor: pointer;
 }
+
+	.helpButton.help {
+		top: 0.5em;
+
+	}
+
+	.helpButton.feedback {
+		top: 2.5em;
+	}
+
+		.helpButton.feedback svg {
+			width: 1.2em;
+			height: 1.3em;
+		}
 
 /**
 * New system panel.
