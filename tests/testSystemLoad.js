@@ -1072,13 +1072,272 @@ Renderer 2d {
    GridSize = 10
    Flags = 10
 }
-`}
+`},
+
+{ label: "test_thermal_lens_brewster", expectAbcd: [[-0.494, 246, -0.00307, -0.494], [3.47, 167, 0.066, 3.47]], src: 
+`[Sys_022f844c]
+Resonator
+Variable(x) = 0
+Range(x) = 0, 1
+Variable(y) = 0
+Range(y) = 0, 1
+Variable(z) = 0
+Range(z) = 0, 1
+Wavelength = 1064
+MSquared = 1
+MSquareTan = 1
+InputwSag = 200
+InputwTan = 300
+InputRzSag = 0
+InputRzTan = 0
+Rotation = 0
+StartX = 0
+StartY = 0
+Mirror @ M1 {
+   DistanceToNext = 120
+   FaceAngle = 0
+   ROC = 0
+   ROC_tan = 0
+}
+BrewsterInput @ BI3 {
+   Selected
+   LinkedTo = BO4
+   RefractiveIndex = 2
+   ROC = 0
+   ROC_tan = 0
+   Thickness = 30
+}
+ThermalLens @ TL5 {
+   LinkedTo = BI3
+   FL = 200
+   FL_tan = 200
+}
+BrewsterOutput @ BO4 {
+   LinkedTo = BI3
+   DistanceToNext = 120
+   ROC = 0
+   ROC_tan = 0
+}
+Mirror @ M2 {
+   DistanceToNext = 0
+   FaceAngle = 0
+   ROC = -500
+   ROC_tan = -500
+}
+
+Renderer 2d {
+   System = Sys_022f844c
+   Window = 4, 124, 500, 200
+   XMiddle = 125
+   YMiddle = 0
+   Zoom = 1
+   OpticScale = 50
+   ModeScale = 20
+   GridSize = 10
+   Flags = 10
+}
+` },
+
+{ label: "test_thermal_lens_plate", expectAbcd: [[-0.509, 246, -0.00301, -0.509]], src: 
+`[Sys_022fe1ec]
+Resonator
+Variable(x) = 0
+Range(x) = 0, 1
+Variable(y) = 0
+Range(y) = 0, 1
+Variable(z) = 0
+Range(z) = 0, 1
+Wavelength = 1064
+MSquared = 1
+MSquareTan = 1
+InputwSag = 200
+InputwTan = 300
+InputRzSag = 0
+InputRzTan = 0
+Rotation = 0
+StartX = 0
+StartY = 0
+Mirror @ M1 {
+   DistanceToNext = 120
+   FaceAngle = 0
+   ROC = 0
+   ROC_tan = 0
+}
+PlateInput @ PI3 {
+   LinkedTo = PO4
+   RefractiveIndex = 1.5
+   FaceAngle = 0
+   ROC = 0
+   ROC_tan = 0
+   Thickness = 30
+}
+ThermalLens @ TL5 {
+   LinkedTo = PI3
+   FL = 200
+   FL_tan = 200
+}
+PlateOutput @ PO4 {
+   LinkedTo = PI3
+   DistanceToNext = 120
+   ROC = 0
+   ROC_tan = 0
+}
+Mirror @ M2 {
+   Selected
+   DistanceToNext = 0
+   FaceAngle = 0
+   ROC = -500
+   ROC_tan = -500
+}
+
+Renderer 2d {
+   System = Sys_022fe1ec
+   Window = 0, 119, 500, 200
+   XMiddle = 125
+   YMiddle = 0
+   Zoom = 1
+   OpticScale = 50
+   ModeScale = 20
+   GridSize = 10
+   Flags = 10
+}
+` },
+
+{ label: "test_thermal_lens_crystal", expectAbcd: [[-0.486, 247, -0.0031, -0.486], [-0.622, 208, -0.00295, -0.622]], src: 
+`[Sys_022ff05c]
+Resonator
+Variable(x) = 0
+Range(x) = 0, 1
+Variable(y) = 0
+Range(y) = 0, 1
+Variable(z) = 0
+Range(z) = 0, 1
+Wavelength = 1064
+MSquared = 1
+MSquareTan = 1
+InputwSag = 200
+InputwTan = 300
+InputRzSag = 0
+InputRzTan = 0
+Rotation = 0
+StartX = 0
+StartY = 0
+Mirror @ M1 {
+   DistanceToNext = 120
+   FaceAngle = 0
+   ROC = 0
+   ROC_tan = 0
+}
+CrystalInput @ CI3 {
+   Selected
+   LinkedTo = CO4
+   RefractiveIndex = 2
+   FaceAngle = 10
+   ROC = 0
+   ROC_tan = 0
+   Thickness = 30
+}
+ThermalLens @ TL5 {
+   LinkedTo = CI3
+   FL = 200
+   FL_tan = 200
+}
+CrystalOutput @ CO4 {
+   LinkedTo = CI3
+   DistanceToNext = 120
+   ROC = 0
+   ROC_tan = 0
+}
+Mirror @ M2 {
+   DistanceToNext = 0
+   FaceAngle = 0
+   ROC = -500
+   ROC_tan = -500
+}
+
+Renderer 2d {
+   System = Sys_022ff05c
+   Window = 0, 161, 500, 200
+   XMiddle = 125
+   YMiddle = 0
+   Zoom = 1
+   OpticScale = 50
+   ModeScale = 20
+   GridSize = 10
+   Flags = 10
+}
+` },
+
+{ label: "test_screen_in_plate", expectAbcd: [[-1.56, -143, -0.0056, -0.126], [-1.56, -142, 0.00556, -0.134]], src: 
+`[Sys_022fd1c0]
+Resonator
+Variable(x) = 0
+Range(x) = 0, 1
+Variable(y) = 0
+Range(y) = 0, 1
+Variable(z) = 0
+Range(z) = 0, 1
+Wavelength = 1064
+MSquared = 1
+MSquareTan = 1
+InputwSag = 200
+InputwTan = 300
+InputRzSag = 0
+InputRzTan = 0
+Rotation = 0
+StartX = 0
+StartY = 0
+Mirror @ M1 {
+   DistanceToNext = 120
+   FaceAngle = 0
+   ROC = 200
+   ROC_tan = 200
+}
+PlateInput @ PI3 {
+   LinkedTo = PO4
+   RefractiveIndex = 2.5
+   FaceAngle = 10
+   ROC = 0
+   ROC_tan = 0
+   Thickness = 40
+}
+Screen @ I5 {
+   Selected
+   LinkedTo = PI3
+   DistanceToNext = 10.0242
+}
+PlateOutput @ PO4 {
+   LinkedTo = PI3
+   DistanceToNext = 120
+   ROC = 0
+   ROC_tan = 0
+}
+Mirror @ M2 {
+   DistanceToNext = 0
+   FaceAngle = 0
+   ROC = 200
+   ROC_tan = 200
+}
+
+Renderer 2d {
+   System = Sys_022fd1c0
+   Window = 0, 0, 500, 200
+   XMiddle = 125
+   YMiddle = 0
+   Zoom = 1
+   OpticScale = 50
+   ModeScale = 20
+   GridSize = 10
+   Flags = 10
+}
+` },
+
 ];
 
 collection.systemload = {
 	label: "System load",
-	cases: testCases,
-	// cases: [testCases[9]],
+   cases: testCases,
+   // cases: testCases.filter(c => c.label === "test_linear_block_angled_curved"),
 
 	/**
 	 * Run a single test, returning a value indicating whether the
