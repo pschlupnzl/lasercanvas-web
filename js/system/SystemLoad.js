@@ -123,6 +123,11 @@
 						break;
 
 					case "Screen":
+						if (src.LinkedTo) {
+							console.warn("Screen inside block not supported.");
+							// melements[melements.length - 1].loc.l += toNumber(src.DistanceToNext, variables);
+							continue;
+						}
 						element = new LaserCanvas.Element.Screen();
 						break;
 
