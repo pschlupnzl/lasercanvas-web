@@ -1,0 +1,153 @@
+<HTML>
+<HEAD>
+<TITLE>Common Properties</TITLE>
+<LINK REL=StyleSheet HREF="style.css" TYPE="text/css">
+</HEAD>
+<BODY>
+<P><A HREF="lc5_cont.html">LaserCanvas 5</A> &gt; <A HREF="opt_intro.html">Optics</A> &gt;
+<H2>Common Properties</H2>
+<HR>
+
+<P>The following properties are displayed irrespective of the type of optic that is selected.</P>
+
+
+
+<H3>Tag</H3>
+
+<P>Tags are used to uniquely identify each optic in the system. By default, each optic is assigned a tag that consists of one, two, or three letters designating the type of optic, as listed in the table below, followed by a number.</P>
+
+<TABLE BORDER=0 ALIGN="CENTER">
+<TR><TD COLSPAN=2><HR></TD></TR>
+<TR><TD><B>Letter</B></TD><TD><B>Optic Type</B></TD></TR>
+<TR><TD COLSPAN=2><HR></TD></TR>
+<TR VALIGN=“TOP”><TD>
+<TT>BI</TT>
+</TD><TD>
+Brewster Plate entrance face
+</TD></TR><TR VALIGN=“TOP”><TD>
+<TT>BO</TT>
+</TD><TD>
+Brewster Plate exit face
+</TD></TR><TR VALIGN=“TOP”><TD>
+<TT>CI</TT>
+</TD><TD>
+Crystal entrance face
+</TD></TR><TR VALIGN=“TOP”><TD>
+<TT>CO</TT>
+</TD><TD>
+Crystal exit face
+</TD></TR><TR VALIGN=“TOP”><TD>
+<TT>FM</TT>
+</TD><TD>
+Flat Mirror
+</TD></TR><TR VALIGN=“TOP”><TD>
+<TT>I</TT>
+</TD><TD>
+Screen
+</TD></TR><TR VALIGN=“TOP”><TD>
+<TT>L</TT>
+</TD><TD>
+Lens
+</TD></TR><TR VALIGN=“TOP”><TD>
+<TT>M</TT>
+</TD><TD>
+Mirror
+</TD></TR><TR VALIGN=“TOP”><TD>
+<TT>OC</TT>
+</TD><TD>
+Output Coupler
+</TD></TR><TR VALIGN=“TOP”><TD>
+<TT>Pa</TT>
+</TD><TD>
+Prism A
+</TD></TR><TR VALIGN=“TOP”><TD>
+<TT>Pb</TT>
+</TD><TD>
+Prism B
+</TD></TR><TR VALIGN=“TOP”><TD>
+<TT>PI</TT>
+</TD><TD>
+Plate entrance face
+</TD></TR><TR VALIGN=“TOP”><TD>
+<TT>PO</TT>
+</TD><TD>
+Plate exit face
+</TD></TR><TR VALIGN=“TOP”><TD>
+<TT>Src</TT>
+</TD><TD>
+Source
+</TD></TR><TR VALIGN=“TOP”><TD>
+<TT>TL</TT>
+</TD><TD>
+Thermal Lens
+</TD></TR>
+<TR><TD COLSPAN=2><HR></TD></TR>
+</TABLE>
+
+
+
+<P>You may assign a different tag to any optic, up to 31 characters. If you will be using the <A HREF="intfce_solv.html">Solver</A> to access the optic's properties, the Tag must conform to the style rules of variable names, thus contain no spaces and commence with a letter.</P>
+
+<P>Optic Tags are used as follows:</P>
+
+<UL>
+<LI><A HREF="intfce_2d.html">Canvas</A>: when the Annotations check box is selected.</LI>
+<LI><A HREF="intfce_inv.html">Inventory</A>: In the Optics column.</LI>
+<LI><A HREF="intfce_solv.html">Solver</A>: When properties of the optic are used in the optimization equation.</LI>
+<LI><A HREF="intfce_save.html">Saved files</A>: If a file being loaded does not specify a Tag for one or more optics, the default Tags are created for those optics.</LI>
+</UL>
+
+
+
+<H3>Distance to Next (mm)</H3>
+<P>Limit: &gt; 0.</P>
+
+<P>The Distance to Next value or equation determines the length of the segment immediately following the optic. This is the segment that is highlighted when the optic is selected.</P>
+
+<P>The spacing of optics in the system is governed by the Distance to Next properties, since LaserCanvas does not include specific space elements.</P>
+
+<P>The Distance to Next property is not available for the following optics:</P>
+
+<UL>
+<LI>Entrance faces for the refractive <A HREF="opt_plat.html">elements</A> Plate, Brewster Plate, and Crystal.</LI>
+<LI><A HREF="opt_lens.htmL">Thermal Lenses</A> and <A HREF="opt_scrn.html">Screens</A> internal to refractive elements.</LI>
+<LI>The last optic in the system.</LI>
+</UL>
+
+
+
+<H3>Spot Size (um)</H3>
+
+<P>Limit: &gt; 0.</P>
+
+<P>For stable Resonators and Propagation systems, specifies the mode radius, in units of µm (<NOBR>10<SUP>-6</SUP></NOBR> m), for respectively sagittal (red) and tangential (blue) planes of the system. This value is read-only.</P>
+
+<P>The mode size is given just after the optic. For entrance faces of refractive elements, the spot size is internal to the material. For exit faces, the spot size refers to that outside the material.</P>
+
+
+
+<H3>Curvature (mm)</H3>
+
+<P>For stable Resonators and Propagation systems, specifies the wave front radius of curvature, in units of mm (<NOBR>10<SUP>-3</SUP></NOBR> m), for respectively sagittal (red) and tangential (blue) planes of the system. This value is read-only.</P>
+
+<P>The wave front radius of curvature is given just after the optic. For entrance faces of refractive <A HREF="opt_plat.html">elements</A>, the value is internal to the material. For exit faces, the value refers to that outside the material.</P>
+
+<P>Due to computational round-off errors, flat wave fronts are often approximated by large radii of curvature, such as <NOBR>10<SUP>14</SUP></NOBR>.</P>
+
+
+
+<H3>Astigmatism (mm)</H3>
+
+<P>For stable Resonators and Propagation systems, specifies the relative distance between the real or virtual waists in the sagittal and tangential planes. This value is read-only. The focal astigmatism is given in units of mm (<NOBR>10<SUP>-3</SUP></NOBR> m). The value applies to the segment following the optic that is highlighted when the optic is selected.</P>
+
+
+
+<H3>ABCD (Sagittal) and ABCD (Tangential)</H3>
+
+<P>These two items display the 2x2 matrices used for the <I>ABCD</I> calculations. A list of the matrices can be found in the Reference section.</P>
+
+
+
+
+</BODY>
+</HTML>

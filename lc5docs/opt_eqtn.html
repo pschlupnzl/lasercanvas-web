@@ -1,0 +1,65 @@
+<HTML>
+<HEAD>
+<TITLE>Equations and Variables</TITLE>
+<LINK REL=StyleSheet HREF="style.css" TYPE="text/css">
+</HEAD>
+<BODY>
+<P><A HREF="lc5_cont.html">LaserCanvas 5</A> &gt; <A HREF="opt_intro.html">Optics</A> &gt;
+<H2><IMG SRC="but_eqtn.png" WIDTH=40 HEIGHT=40> Equations and Variables</H2>
+<HR>
+
+<P>Using equations and variables provides a very flexible way to design a cavity in a specific way. Many optic and system properties can be defined using equations that depend on any of the LaserCanvas variables.</P>
+
+
+
+<H3>Variables</H3>
+
+<P>LaserCanvas provides three variables, called "<TT>x</TT>", "<TT>y</TT>", and "<TT>z</TT>". Each of these variables has a specific value at any given time. The value is the same for all systems that are open at the same time. The system that results for the given variable values is the one that is displayed in the <A HREF="intfce_2d.html">Canvas</A>.</P>
+
+<P>Each variable also has an associated range. You can create graphs of <A HREF="intfce_sgraph.html">system</A> or <A HREF="intfce_vxgraph.html">optic</A> properties as a function of the variables. When the system is changed, for example when you drag optics with the mouse, each variable is scanned through its range, and the graphs update to show the effect of the variable sweep in the new system.</P>
+
+
+
+<H3>Equations</H3>
+
+<P>Properties that can be entered as equations are displayed with a green font in the <A HREF="intfce_propmgr.html">Property Manager<A>. The value displayed in the Property Manager is the equation value for the given variable values. You can choose to have the source equations displayed by selecting menu <U>T</U>ools | Property E<U>q</U>uations or clicking the <NOBR><IMG SRC="but_eqtn.png" WIDTH=20 HEIGHT=20>&nbsp;Show</NOBR> Equations button on the toolbar.</P>
+
+<P>An equation can consist of operators, functions, values, variable names, constants, and brackets. The recognized symbols are listed in the table below.</P>
+
+<TABLE BORDER=0 ALIGN="CENTER">
+<TR><TD COLSPAN=2><HR></TD></TR>
+<TR><TD><B>Type</B></TD><TD><B>Recognized Symbols</B></TD></TR>
+<TR><TD COLSPAN=2><HR></TD></TR>
+<TR VALIGN="TOP"><TD>Binary Operators</TD><TD>+, –, *, /, ^</TD></TR>
+<TR VALIGN="TOP"><TD>Functions</TD><TD><TT>abs</TT>, <TT>acos</TT>, <TT>asin</TT>, <TT>atan</TT>, <TT>ceil</TT>, <TT>cos</TT>, <TT>cosh</TT>, <TT>exp</TT>, <TT>floor</TT>, <TT>log</TT>, <TT>log10</TT>, <TT>sin</TT>, <TT>sinh</TT>, <TT>sqrt</TT>, <TT>tan</TT>, <TT>tanh</TT></TD></TR>
+<TR VALIGN="TOP"><TD>Constants</TD><TD><TT>pi</TT></TD></TR>
+<TR VALIGN="TOP"><TD>Comparators</TD><TD><TT>&lt;</TT>, <TT>&lt;=</TT>, <TT>==</TT>, <TT>&gt;=<TT>, <TT>&gt;</TT>, <TT>!=</TT></TD></TR>
+<TR VALIGN="TOP"><TD>Logical Operators</TD><TD><TT>&amp;</TT>, <TT>&amp;&amp;</TT>, <TT>|</TT>, <TT>||</TT>, <TT>!()</TT></TD></TR>
+<TR VALIGN="TOP"><TD>Variables</TD><TD>Any allowed variable name</TD></TR>
+<TR><TD COLSPAN=2><HR></TD></TR>
+</TABLE>
+
+<P>An example of a valid equation is</P>
+
+<P ALIGN="CENTER"><TT>x^2 + (cos(3*pi*y) – (z &gt; 0)*floor(z))/2</TT></P>
+
+<P>Any spaces in the equation are ignored.</P>
+
+
+
+<H3>Constant Equations</H3>
+
+<P>If an expression evaluates to a constant value, i.e., if the equation does not contain any references to LaserCanvas variables, you can enter it into any field that expects a constant. For example, entering </P>
+
+<P ALIGN="CENTER"><TT>0.707</TT> &nbsp; and &nbsp; <TT>sqrt(2)/2</TT></P>
+
+<P>are interchangeable.</P>
+
+<P>The exception is in fields that expect two values separated by a comma, for example the Variable Range field in the <A HREF="intfce_propmgr.html">Property Manager</A>.</P>
+
+
+
+
+
+</BODY>
+</HTML>

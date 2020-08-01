@@ -55,7 +55,12 @@ body {
 		top: 2.5em;
 	}
 
-		.helpButton.feedback svg {
+	.helpButton.docs {
+		top: 4.5em;
+	}
+
+		.helpButton.feedback svg,
+		.helpButton.docs svg {
 			width: 1.2em;
 			height: 1.3em;
 		}

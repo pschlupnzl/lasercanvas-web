@@ -1,0 +1,85 @@
+<HTML>
+<HEAD>
+<TITLE>System Graph</TITLE>
+<LINK REL=StyleSheet HREF="style.css" TYPE="text/css">
+</HEAD>
+<BODY>
+<P><A HREF="lc5_cont.html">LaserCanvas 5</A> &gt; <A HREF="intfce_intro.html">Interface</A> &gt;
+<H2><IMG SRC="but_rsg.png" WIDTH=40 HEIGHT=40> System Graph</H2>
+<HR>
+
+<P>A System Graph displays the evolution of a system parameter as a function of a variable. For a System Graph to be useful, one or more system or optic property should be defined as an equation including the selected ordinate variable.</P>
+
+<P ALIGN="CENTER"><IMG SRC="rsg01.png" WIDTH=400 HEIGHT=230></P>
+
+<P>To change the system property being graphed, click on the graph title and select the desired property from the popup menu. Or, select it from the System Property list in the <A HREF="intfce_propmgr.html">Property Manager</A>.</P>
+
+<P>To change the variable against which the property should be plotted, click on the X-axis label and select the desired variable from the popup menu. Or, select it from the Ordinate Variable list in the <A HREF="intfce_propmgr.html">Property Manager</A>.</P>
+
+<P>The X-axis range does not automatically change when the variable range is changed in the <A HREF="intfce_propmgr.html">Property Manager</A>. To update the graph to show the entire span of the variable range, click on the ordinate variable radio button.</P>
+
+
+
+<H3>System Graph Properties</H3>
+
+<TABLE ALIGN="CENTER">
+<TR><TD COLSPAN=2><HR></TD></TR>
+<TR VALIGN="TOP"><TD><B>Property</B></TD><TD><B>Description</B></TD></TR>
+<TR><TD COLSPAN=2><HR></TD></TR>
+<TR VALIGN="TOP"><TD>
+System Property
+</TD><TD>
+Specifies which system property value should be plotted on the Y-axis. See table below.
+</TD></TR><TR VALIGN="TOP"><TD>
+Ordinate Variable
+</TD><TD>
+Specifies the variable against which the system property should be plotted. Any of the LaserCanvas variables can be used.
+</TD></TR><TR VALIGN="TOP"><TD>
+X-Axis Range
+</TD><TD>
+Specifies the minimum and maximum of the horizontal (ordinate variable) axis.
+</TD></TR><TR VALIGN="TOP"><TD>
+Y-Axis Range
+</TD><TD>
+Specifies the minimum and maximum of the vertical (system property) axis.
+</TD></TR><TR VALIGN="TOP"><TD>
+Points
+</TD><TD>
+Gives the number of points that should be plotted. The number of points is the same for all graphs that plot the same LaserCanvas variable. Note that specifying a large point number can lead to increased calculation times and an unresponsive interface.
+</TD></TR>
+<TR><TD COLSPAN=2><HR></TD></TR>
+</TABLE>
+
+
+
+<P>The System Property can be one of the following.</P>
+
+<TABLE ALIGN="CENTER>
+<TR><TD COLSPAN=2><HR></TD></TR>
+<TR VALIGN="TOP"><TD><B>System Property</B></TD><TD><B>Description</B></TD></TR>
+<TR><TD COLSPAN=2><HR></TD></TR>
+<TR VALIGN="TOP"><TD>
+Physical Length (mm)
+</TD><TD>
+The physical length of the system. This is the sum of all of the geometrical separations between the optics.
+</TD></TR><TR VALIGN="TOP"><TD>
+Optical Length (mm)
+</TD><TD>
+The optical length of the system. This is the sum of all of the optical lengths, defined as nL for refractive optics, where n is the refractive index and L the geometrical length. In free space, the optical and physical lengths are identical.
+</TD></TR><TR VALIGN="TOP"><TD>
+Mode Spacing (MHz)
+</TD><TD>
+For resonators, adjacent longitudinal cavity modes are separated by c/2nL where c is the speed of light and nL the optical length of the resonator.
+</TD></TR><TR VALIGN="TOP"><TD>
+Stability
+</TD><TD>
+The stability parameter of the optical system. For more information, see the Reference section.
+</TD></TR>
+<TR><TD COLSPAN=2><HR></TD></TR>
+</TABLE>
+
+<P>For the Physical Length, Optical Length, and Mode Spacing properties, the System Graph displays a single line. For the Stability property, two lines are shown for the sagittal (red) and tangential (blue) planes.</P>
+
+
+</BODY>
+</HTML>

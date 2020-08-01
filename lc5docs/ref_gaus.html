@@ -1,0 +1,80 @@
+<HTML>
+<HEAD>
+<TITLE>Gaussian Beams</TITLE>
+<LINK REL=StyleSheet HREF="style.css" TYPE="text/css">
+</HEAD>
+<BODY>
+<P><A HREF="lc5_cont.html">LaserCanvas 5</A> &gt; <A HREF="ref_intro.html">Reference</A> &gt; </P>
+<H2>Gaussian Beams</H2>
+<HR>
+
+
+<H3>Fundamental Mode</H3>
+<P>The beam propagation, i.e., the evolution of the laser mode <NOBR><I>w</I>(<I>z</I>)</NOBR> as a function of distance <I>z</I> from the waist, is given for the fundamental <NOBR>TEM<SUB>00</SUB> Gaussian beam by</P>
+
+<P ALIGN="CENTER"><IMG SRC="ref_eq01.png" WIDTH=181 HEIGHT=50></P>
+
+<P>where <NOBR><I>w</I><SUB>0</SUB></NOBR> is the mode size at the waist, and <IMG SRC="ref_lambda.png" WIDTH=11 HEIGHT=13 ALT="L"> is the laser wavelength. This equation is sometimes expressed in terms of the Rayleigh length</P>
+
+<P ALIGN="CENTER"><IMG SRC="ref_eq02.png" WIDTH=62 HEIGHT=36></P>
+
+<P>For large distances <I>z</I> &gt;&gt; 1, this leads to a far-field divergence of</P>
+
+<P ALIGN="CENTER"><IMG SRC="ref_eq03.png" WIDTH=102 HEIGHT=37></P>
+
+<P>Similarly, the wave front radius of curvature evolves according to</P>
+
+<P ALIGN="CENTER"><IMG SRC="ref_eq04.png" WIDTH=150 HEIGHT=45></P>
+
+
+
+
+<H3>Embedded Gaussian and <NOBR><I>M</I><SUP>2</SUP></NOBR></H3>
+
+<P>The propagation of a non-perfect fundamental Gaussian beam can be described using the beam propagation factor <NOBR><I>M</I><SUP>2</SUP></NOBR>. This parameter is sometimes colloquially referred to as the beam quality. For physical beams, <NOBR><I>M</I><SUP>2</SUP></NOBR> &gt; 1, with the limit <NOBR><I>M</I><SUP>2</SUP></NOBR> = 1 for perfect <NOBR>TEM<SUB>00</SUB></NOBR> beams.</P>
+
+<P>
+The propagation of a beam with beam propagation factor <NOBR><I>M</I><SUP>2</SUP></NOBR> is established as follows:</P>
+
+<UL>
+<LI>From the beam waist <NOBR><I>w</I><SUB>0</SUB></NOBR>, we construct a virtual embedded Gaussian beam with waist <NOBR><I>w</I><SUB>0</SUB></NOBR> = <NOBR><I>W</I><SUB>0</SUB></NOBR> / <I>M</I>.</LI>
+
+<LI>The embedded Gaussian mode <NOBR><I>w</I>(<I>z</I>)</NOBR> is propagated according to the formula above.</LI>
+
+<LI>The full beam mode at any position is given by <NOBR><I>W</I>(<I>z</I>)</NOBR> = <NOBR><I>w</I>(<I>z</I>)</NOBR> <I>M</I>.</LI>
+</UL>
+
+<P>
+For laser resonators, deriving the resonant mode using the <I>ABCD</I> self-consistency argument yields the embedded Gaussian mode.</I>
+
+<P>From the definition of the Rayleigh length, that the mode <NOBR><I>W</I>(<I>z</I>)</NOBR> is <NOBR>(2<SUP>1/2</SUP>)</NOBR> <NOBR><I>W</I><SUB>0</SUB></NOBR>, it can easily be shown that the Rayleigh length is the same for the full beam as for the embedded Gaussian.</P>
+
+
+
+
+<H3>Internal Representation</H3>
+<P>LaserCanvas includes the <NOBR><I>M</I><SUP>2</SUP></NOBR> beam propagation factor in its calculations. Since the embedded Gaussian is rarely of interest, the formula</P>
+
+<P ALIGN="CENTER"><IMG SRC="ref_eq05.png" WIDTH=185 HEIGHT=48></P>
+
+
+<P>is used directly when calculating mode sizes.</P>
+
+<P>
+The beam evolution from one optic to the next is performed by calculating the <I>q</I> parameter using the optic and space <I>ABCD</I> matrices.</P>
+
+<P>The spot sizes reported by the <NOBR><IMG SRC="but_meas.png" WIDTH=20 HEIGHT=20>&nbsp;Measurement</NOBR> tool use the formula above directly.</P>
+
+
+<P>
+For painting, the mode evolution can be divided into near-field and far-field. In the near field, the mode exhibits a characteristic curving, approaching the far-field asymptote.</P>
+
+<P>
+To minimise the number of drawing cycles required, LaserCanvas scales a tabulated near-field mode evolution up to a distance of <NOBR>10<I>z</I><SUB>R</SUB></NOBR>. In the far field, a single data point is plotted at the end of each segment.</P>
+
+<P ALIGN="CENTER"><IMG SRC="refgaus1.png" WIDTH=249 HEIGHT=164></P>
+
+
+
+</BODY>
+</HTML>

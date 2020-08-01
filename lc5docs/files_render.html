@@ -1,0 +1,248 @@
+<HTML>
+<HEAD>
+<TITLE>Renderer Statements</TITLE>
+<LINK REL=StyleSheet HREF="style.css" TYPE="text/css">
+</HEAD>
+<BODY>
+<A NAME="top"></A>
+<P><A HREF="lc5_cont.html">LaserCanvas 5</A> &gt; <A HREF="files_intro.html">Data Files</A> &gt;</P>
+<H2>Renderer Statements</H2>
+<HR>
+
+<P>Renderer statements are typically placed at the end of a file. A Renderer is any interface component that occupies a separate window such as the <A HREF="intfce_2d.html">Canvas</A> editor or a <A HREF="intfce_sgraph.html">System Graph</A>.</P>
+
+<P>
+LaserCanvas creates Renderer windows in the order in which the statements appear in the file. Thus, the last-created window is active when the file finishes loading.</P>
+
+<P>
+If no renderers are defined within a file, LaserCanvas automatically creates a <A HREF="intfce_2d.html">Canvas</A> window.
+</P>
+
+<P>Information about renderer statements:</P>
+<UL>
+<LI><A HREF="#format">Format and Type</A></LI>
+<LI><A HREF="#common">Common Properties</A></LI>
+<LI><A HREF="#1d"><NOBR><TT>Renderer 1d</TT></NOBR></A></LI>
+<LI><A HREF="#2d"><NOBR><TT>Renderer 2d</TT></NOBR></A></LI>
+<LI><A HREF="#3d"><NOBR><TT>Renderer 3d</TT></NOBR></A></LI>
+<LI><A HREF="#inv"><NOBR><TT>Renderer Inventory</TT></NOBR></A></LI>
+<LI><A HREF="#solv"><NOBR><TT>Renderer Solver</TT></NOBR></A></LI>
+<LI><A HREF="#sgraph"><NOBR><TT>Renderer SystemGraph</TT></NOBR></A></LI>
+<LI><A HREF="#vxgraph"><NOBR><TT>Renderer VertexGraph</TT></NOBR></A></LI>
+</UL>
+
+
+<A NAME="format"><H3>Format and Type</H3></A>
+
+<P>Each renderer statement starts with the Renderer keyword, followed by the renderer type. The remaining lines defining the renderer are bracketed by <TT>{</TT> ... <TT>}</TT> braces. For example,</P>
+
+<P><PRE>
+   Renderer 2d {
+      System = Sys_00966444
+      Window = 75, 70, 690, 200
+   }
+</PRE></P>
+
+<P>
+The renderer type keyword must be one of the following: <TT>1d</TT>, <TT>2d</TT>, <TT>3d</TT>, <TT>Inventory</TT>, <TT>Solver</TT>, <TT>SystemGraph</TT>, <TT>VertexGraph</TT>. See the following sections for information about each renderer type. The renderer statement must include at least the System definition.</P>
+
+<P>
+Unlike optic properties, renderer properties must be constant expressions or equations that evaluate to constants.</P>
+
+<P><A HREF="#top">^ Top</A></P>
+
+
+
+<A NAME="common"><H3>Common Properties</H3></A>
+<P>The following properties apply to all renderers.</P>
+
+<TABLE BORDER=0 ALIGN="CENTER">
+<TR><TD COLSPAN=2><HR></TD></TR>
+<TR VALIGN="TOP"><TD><B>Property</B></TD><TD><B>Description</B></TD></TR>
+<TR><TD COLSPAN=2><HR></TD></TR>
+<TR VALIGN="TOP"><TD><TT>System</TT></TD><TD>Defines the system that the renderer applies to. The <TT>System</TT> line must specify the tag of a system defined within the file. If the specified system tag cannot be found, the renderer statement is ignored.</TD></TR>
+<TR VALIGN="TOP"><TD><TT>Window</TT></TD><TD>Defines the position of the renderer window, in pixels. The first two numbers specify the horizontal and vertical offset from the upper left-hand corner of the LaserCanvas window. The last two numbers are the width and height of the renderer window, respectively.</TD></TR>
+<TR><TD COLSPAN=2><HR></TD></TR>
+</TABLE>
+
+<P><A HREF="#top">^ Top</A></P>
+
+
+
+<A NAME="1d"><H3>Renderer 1d Properties</H3></A>
+<P>The <NOBR><TT>Renderer 1d</TT></NOBR> statement creates a window of a cavity <A HREF="intfce_1d.html">Mode plot</A>.</P>
+
+<TABLE BORDER=0 ALIGN="CENTER">
+<TR><TD COLSPAN=2><HR></TD></TR>
+<TR VALIGN="TOP"><TD><B>Property</B></TD><TD><B>Description</B></TD></TR>
+<TR><TD COLSPAN=2><HR></TD></TR>
+<TR VALIGN="TOP"><TD><TT>Flags</TT></TD><TD>The sum of any or none of the following:</TD></TR>
+<TR VALIGN="TOP"><TD></TD><TD><TT>1</TT>: Display optic icons on the graph</TD></TR>
+<TR VALIGN="TOP"><TD></TD><TD><TT>2</TT>: Highlight beam waists with a vertical line.</TD></TR>
+<TR VALIGN="TOP"><TD><TT>XMax</TT></TD><TD>Maximum X-axis (Cavity Position) value.</TD></TR>
+<TR VALIGN="TOP"><TD><TT>XMin</TT></TD><TD>Minimum X-axis (Cavity Position) value.</TD></TR>
+<TR VALIGN="TOP"><TD><TT>YMax</TT></TD><TD>Maximum Y-Axis (Mode Size) value.</TD></TR>
+<TR VALIGN="TOP"><TD><TT>YMin</TT></TD><TD>Minimum Y-axis (Mode Size) value.</TD></TR>
+<TR><TD COLSPAN=2><HR></TD></TR>
+</TABLE>
+
+<P><A HREF="#top">^ Top</A></P>
+
+
+
+
+<A NAME="2d"><H3>Renderer 2d Properties</H3></A>
+<P>The <NOBR><TT>Renderer 2d</TT></NOBR> statement creates a <A HREF="intfce_2d.html">Canvas</A> editor window. If the a <NOBR><TT>Renderer 2d</TT></NOBR> statement is not supplied for each system defined in the file, LaserCanvas creates a Canvas window with default values.</P>
+
+<TABLE BORDER=0 ALIGN="CENTER">
+<TR><TD COLSPAN=2><HR></TD></TR>
+<TR VALIGN="TOP"><TD><B>Property</B></TD><TD><B>Description</B></TD></TR>
+<TR><TD COLSPAN=2><HR></TD></TR>
+<TR VALIGN="TOP"><TD><TT>Flags</TT></TD><TD>The sum of any or none of the following:</TD></TR>
+<TR VALIGN="TOP"><TD></TD><TD><TT>1</TT>: Show the grid and snap to it when dragging optics.</TD></TR>
+<TR VALIGN="TOP"><TD></TD><TD><TT>2</TT>: Display distances between optics.</TD></TR>
+<TR VALIGN="TOP"><TD></TD><TD><TT>4</TT>: Display annotations for optics.</TD></TR>
+<TR VALIGN="TOP"><TD></TD><TD><TT>8</TT>: Highlight beam waists with a vertical line.</TD></TR>
+<TR VALIGN="TOP"><TD><TT>GridSize</TT></TD><TD>The size of the grid, in mm. The grid is only used if flag <TT>1</TT> is specified.</TD></TR>
+<TR VALIGN="TOP"><TD><TT>ModeScale</TT></TD><TD>The display scale factor for the laser mode.</TD></TR>
+<TR VALIGN="TOP"><TD><TT>OpticScale</TT></TD><TD>The display size of optics, in mm.</TD></TR>
+<TR VALIGN="TOP"><TD><TT>XMiddle</TT></TD><TD>The cavity <I>X</I> position that is to be centred within the <A HREF="intfce_2d.html">Canvas</A> window, in mm.</TD></TR>
+<TR VALIGN="TOP"><TD><TT>YMiddle</TT></TD><TD>The cavity <I>Y</I> position that is to be centred within the Canvas window, in mm.</TD></TR>
+<TR VALIGN="TOP"><TD><TT>Zoom</TT></TD><TD>The display zoom factor. A zoom factor of 1 corresponds to 100% zoom.</TD></TR>
+<TR><TD COLSPAN=2><HR></TD></TR>
+</TABLE>
+
+<P><A HREF="#top">^ Top</A></P>
+
+
+
+<A NAME="3d"><H3>Renderer 3d Properties</H3></A>
+<P>The <NOBR><TT>Renderer 3d</TT></NOBR> statement creates a <A HREF="intfce_3d.html">wireframe</A> window.</P>
+
+<TABLE BORDER=0 ALIGN="CENTER">
+<TR><TD COLSPAN=2><HR></TD></TR>
+<TR VALIGN="TOP"><TD><B>Property</B></TD><TD><B>Description</B></TD></TR>
+<TR><TD COLSPAN=2><HR></TD></TR>
+<TR VALIGN="TOP"><TD><TT>CameraAngle</TT></TD><TD>Tthe camera viewing angle, in degrees.</TD></TR>
+<TR VALIGN="TOP"><TD><TT>CameraX</TT></TD><TD>The camera <I>X</I> position, in mm.</TD></TR>
+<TR VALIGN="TOP"><TD><TT>CameraY</TT></TD><TD>The camera <I>Y</I> (elevation) position, in mm.</TD></TR>
+<TR VALIGN="TOP"><TD><TT>CameraZ</TT></TD><TD>The camera <I>Z</I> position, in mm.</TD></TR>
+<TR VALIGN="TOP"><TD><TT>ModeScale</TT></TD><TD>The display scale factor for the laser mode.</TD></TR>
+<TR VALIGN="TOP"><TD><TT>OpticScale</TT></TD><TD>The display size of optics, in mm.</TD></TR>
+<TR VALIGN="TOP"><TD><TT>OriginX</TT></TD><TD>The cavity <I>Y</I> position of the view centred in the window.</TD></TR>
+<TR VALIGN="TOP"><TD><TT>OriginZ</TT></TD><TD>The cavity <I>X</I> position of the view centred in the window.</TD></TR>
+<TR VALIGN="TOP"><TD><TT>Flags</TT></TD><TD>This property is currently not used.</TD></TR>
+<TR><TD COLSPAN=2><HR></TD></TR>
+</TABLE>
+
+<P><A HREF="#top">^ Top</A></P>
+
+
+
+
+<A NAME="inv"><H3>Renderer Inventory Properties</H3></A>
+<P>The <NOBR><TT>Renderer Inventory</TT></NOBR> statement creates an <A HREF="intfce_inv.html">Inventory</A> window.</P>
+<TABLE BORDER=0 ALIGN="CENTER">
+<TR><TD COLSPAN=2><HR></TD></TR>
+<TR VALIGN="TOP"><TD><B>Property</B></TD><TD><B>Description</B></TD></TR>
+<TR><TD COLSPAN=2><HR></TD></TR>
+<TR VALIGN="TOP"><TD><TT>Width0<BR>Width1<BR>Width2<BR>Width3<BR>Width4<BR>Width5<BR>Width6<BR></TT></TD><TD>Specifies the column width for each column. The width is nominally in pixels, but the displayed column widths are adjusted so that the entire Inventory fits within the window.</TD></TR>
+<TR VALIGN="TOP"><TD><TT>XScroll</TT></TD><TD>This property is currently not used.</TD></TR>
+<TR VALIGN="TOP"><TD><TT>YScroll</TT></TD><TD>The vertical offset, in pixels, for the Inventory rows.</TD></TR>
+<TR><TD COLSPAN=2><HR></TD></TR>
+</TABLE>
+
+<P><A HREF="#top">^ Top</A></P>
+
+
+
+<A NAME="solv"><H3>Renderer Solver Properties</H3></A>
+<P>The <NOBR><TT>Renderer Solver</TT></NOBR> statement creates a <A HREF="intfce_solv.html">Solver</A> window.</P>
+
+<TABLE BORDER=0 ALIGN="CENTER">
+<TR><TD COLSPAN=2><HR></TD></TR>
+<TR VALIGN="TOP"><TD><B>Property</B></TD><TD><B>Description</B></TD></TR>
+<TR><TD COLSPAN=2><HR></TD></TR>
+<TR VALIGN="TOP"><TD><TT>Equation</TT></TD><TD>The function equation to be optimized. Unlike other equations, the <TT>Equation</TT> is enclosed in double quotation marks (") and can span multiple lines.</TD></TR>
+<TR VALIGN="TOP"><TD><TT>FunctionTolerance</TT></TD><TD>The accuracy to which the function is to be optimized.</TD></TR>
+<TR VALIGN="TOP"><TD><TT>MaxIterations</TT></TD><TD>The maximum number of iterations.</TD></TR>
+<TR VALIGN="TOP"><TD><TT>SolveMode</TT></TD><TD>Solve strategy. Can be one of the following: </TD></TR>
+<TR VALIGN="TOP"><TD></TD><TD><TT>0</TT>: Solve for function minimum.</TD></TR>
+<TR VALIGN="TOP"><TD></TD><TD><TT>1</TT>: Solve for function maximum.</TD></TR>
+<TR><TD COLSPAN=2><HR></TD></TR>
+</TABLE>
+
+<P><A HREF="#top">^ Top</A></P>
+
+
+
+<A NAME="sgraph"><H3>Renderer SystemGraph Properties</H3></A>
+<P>The <NOBR><TT>Renderer SystemGraph</TT></NOBR> statement creates a new <A HREF="intfce_sgraph.html">system graph</A> window.</P>
+
+<TABLE BORDER=0 ALIGN="CENTER">
+<TR><TD COLSPAN=2><HR></TD></TR>
+<TR VALIGN="TOP"><TD><B>Property</B></TD><TD><B>Description</B></TD></TR>
+<TR><TD COLSPAN=2><HR></TD></TR>
+<TR VALIGN="TOP"><TD><TT>Function</TT></TD><TD>The system property to be plotted, see table below.</TD></TR>
+<TR VALIGN="TOP"><TD><TT>Variable</TT></TD><TD>The variable against which the <TT>Function</TT> is to be plotted. Must be one of the LaserCanvas variable names.</TD></TR>
+<TR VALIGN="TOP"><TD><TT>XMax</TT></TD><TD>Maximum X-Axis (variable) value.</TD></TR>
+<TR VALIGN="TOP"><TD><TT>XMin</TT></TD><TD>Minimum X-Axis (variable) value.</TD></TR>
+<TR VALIGN="TOP"><TD><TT>YMax</TT></TD><TD>Maximum Y-Axis (function) value.</TD></TR>
+<TR VALIGN="TOP"><TD><TT>YMin</TT></TD><TD>Minimum Y-Axis (function) value.</TD></TR>
+<TR><TD COLSPAN=2><HR></TD></TR>
+</TABLE>
+
+<P>The <TT>Function</TT> property must specify one of the following system properties to plot.</P>
+
+<TABLE BORDER=0 ALIGN="CENTER">
+<TR><TD COLSPAN=2><HR></TD></TR>
+<TR VALIGN="TOP"><TD><B>System Property</B></TD><TD><B>Description</B></TD></TR>
+<TR><TD COLSPAN=2><HR></TD></TR>
+<TR VALIGN="TOP"><TD><TT>PhysicalLength</TT></TD><TD>The physical cavity length of the system, in mm.</TD></TR>
+<TR VALIGN="TOP"><TD><TT>OpticalLength</TT></TD><TD>The optical cavity length of the system, in mm.</TD></TR>
+<TR VALIGN="TOP"><TD><TT>ModeSpacing</TT></TD><TD>The frequency spacing of adjacent cavity modes, in MHz.</TD></TR>
+<TR VALIGN="TOP"><TD><TT>Stability</TT></TD><TD>The system stability parameter <I>g</I>.</TD></TR>
+<TR><TD COLSPAN=2><HR></TD></TR>
+</TABLE>
+
+<P><A HREF="#top">^ Top</A></P>
+
+
+
+<A NAME="vxgraph"><H3>Renderer VertexGraph Properties</H3></A>
+<P>The <NOBR><TT>Renderer VertexGraph</TT></NOBR> statement creates a new <A HREF="intfce_vxgraph.html">optic graph</A> window. The <TT>VertexGraph</TT> statement must specify a valid <TT>Vertex</TT> property.</P>
+
+<TABLE BORDER=0 ALIGN="CENTER">
+<TR><TD COLSPAN=2><HR></TD></TR>
+<TR VALIGN="TOP"><TD><B>Property</B></TD><TD><B>Description</B></TD></TR>
+<TR><TD COLSPAN=2><HR></TD></TR>
+<TR VALIGN="TOP"><TD><TT>Function</TT></TD><TD>The optic property to be plotted, see table below.</TD></TR>
+<TR VALIGN="TOP"><TD><TT>Variable</TT></TD><TD>The variable against which the <TT>Function</TT> is to be plotted. Must be one of the LaserCanvas variable names.</TD></TR>
+<TR VALIGN="TOP"><TD><TT>Vertex</TT></TD><TD>A tag specifying the optic whose property is to be graphed.</TD></TR>
+<TR VALIGN="TOP"><TD><TT>XMax</TT></TD><TD>Maximum X-Axis (variable) value.</TD></TR>
+<TR VALIGN="TOP"><TD><TT>XMin</TT></TD><TD>Minimum X-Axis (variable) value.</TD></TR>
+<TR VALIGN="TOP"><TD><TT>YMax</TT></TD><TD>Maximum Y-Axis (function) value.</TD></TR>
+<TR VALIGN="TOP"><TD><TT>YMin</TT></TD><TD>Minimum Y-Axis (function) value.</TD></TR>
+<TR><TD COLSPAN=2><HR></TD></TR>
+</TABLE>
+
+<P>The <TT>Function</TT> property must specify one of the following optic properties to plot.</P>
+
+<TABLE BORDER=0 ALIGN="CENTER">
+<TR><TD COLSPAN=2><HR></TD></TR>
+<TR VALIGN="TOP"><TD><B>Optic Property</B></TD><TD><B>Description</B></TD></TR>
+<TR><TD COLSPAN=2><HR></TD></TR>
+<TR VALIGN="TOP"><TD><TT>Astigmatism</TT></TD><TD>The distance between waists in the sagittal and tangential planes, in mm.</TD></TR>
+<TR VALIGN="TOP"><TD><TT>Curvature</TT></TD><TD>The wave front radius of curvature <I>R</I>, in mm, at the optic.</TD></TR>
+<TR VALIGN="TOP"><TD><TT>Distance</TT></TD><TD>The distance <NOBR><I>z</I><SUB>0</SUB></NOBR> to the waist, in mm.</TD></TR>
+<TR VALIGN="TOP"><TD><TT>Mode</TT></TD><TD>The mode size <I>w</I>, in um, at the optic.</TD></TR>
+<TR VALIGN="TOP"><TD><TT>Waist</TT></TD><TD>The waist size <NOBR><I>w</I><SUB>0</SUB></NOBR>, in um.</TD></TR>
+<TR><TD COLSPAN=2><HR></TD></TR>
+</TABLE>
+
+<P><A HREF="#top">^ Top</A></P>
+
+
+
+</BODY>
+</HTML>

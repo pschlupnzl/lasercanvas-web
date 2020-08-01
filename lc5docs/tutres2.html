@@ -1,0 +1,58 @@
+<HTML>
+<HEAD>
+<TITLE>Examine Some Properties</TITLE>
+<LINK REL=StyleSheet HREF="style.css" TYPE="text/css">
+</HEAD>
+<BODY>
+<P><A HREF="lc5_cont.html">LaserCanvas 5</A> &gt; <A HREF="tut_intro.html">Tutorials</A> &gt; <A HREF="tutres_intro.html">Simple Resonator</A> &gt; </P>
+<H2>Part 2. Examine Some Properties</H2>
+<P><A HREF="tutres1.html">&lt;&nbsp;Prev</A> | <A HREF="tutres3.html">Next&nbsp;&gt;</A></P>
+<HR>
+
+<P>At this point, let’s examine some relevant properties that are shown in the <A HREF="intfce_propmgr.html">Property Manager</A>.</P>
+
+<P ALIGN="CENTER"><IMG SRC="tutres01.png" WIDTH=256 HEIGHT=36></P>
+
+<P>In the Mirror group, LaserCanvas displays the spot size and radius of curvature of the resonant mode at the selected optic. In our case, the left-hand end mirror is selected. As a rule, the radius of curvature of the resonant mode must match the radius of curvature at an end-mirror. (The opposite sign is due to the sign conventions.)</P>
+
+<P ALIGN="CENTER"><IMG SRC="tutres02.png" WIDTH=252 HEIGHT=93></P>
+
+<P>In the System group, we find the round-trip <I>ABCD</I> matrices. Since there are no symmetry-breaking items in the cavity, all sagittal and tangential values are identical. The system stability parameter <I>g</I> is given for all resonators, including unstable ones. For a resonator to be stable, the stability parameter must satisfy |<I>g</I>| &lt; 1.</P>
+
+<P ALIGN="CENTER"><IMG SRC="tutres03.png" WIDTH=270 HEIGHT=57></P>
+
+<UL>
+<LI>Grab the right-hand mirror by clicking at the centreline.</LI>
+<LI>Drag the optic around on the Canvas.</LI>
+</UL>
+
+<P>Observe how the parameters in the Property Manager change. In particular, if the mirrors are too close together, the cavity becomes unstable; similarly if they are too far apart.</P>
+
+<P>A peculiarity of the <I>ABCD</I> treatment is that a cavity with |<I>g</I>| = 1 is not stable. If you drag the mirrors so they are exactly 200 mm apart, <I>g</I> = <NOBR>-1</NOBR> and no stable mode exists.</P>
+
+<P>To make it easier to achieve this condition:</P>
+
+<UL>
+<LI>
+<IMG SRC="tutres04.png" WIDTH=257 HEIGHT=19><BR>
+Find the Canvas group in the <A HREF="intfce_propmgr.html">Property Manager</A>. You may need to use the scroll bar.</LI>
+
+<LI>
+<IMG SRC="tutres05.png" WIDTH=256 HEIGHT=18><BR>
+Check the Snap to Grid check box. A grid is drawn behind the cavity in the <A HREF="intfce_2d.html">Canvas</A> window.</LI>
+
+<LI>
+<IMG SRC="tutres06.png" WIDTH=256 HEIGHT=18><BR>
+While we're here, we also check the Annotations check box. With this option selected, the most relevant properties of each optic are displayed on the canvas. For mirrors, the number represents the radius of curvature, in mm.</LI>
+</UL>
+
+<P ALIGN="CENTER"><IMG SRC="tutres07.png" WIDTH=331 HEIGHT=71></P>
+
+<P>Now when you drag the mirror, its position is placed to the nearest grid point. You can change the grid spacing by editing the Grid Size field in the <A HREF="intfce_propmgr.html">Property Manager</A>.</P>
+
+
+<HR>
+<P><A HREF="tutres1.html">&lt;&nbsp;Prev</A> | <A HREF="tutres3.html">Next&nbsp;&gt;</A></P>
+
+</BODY>
+</HTML>

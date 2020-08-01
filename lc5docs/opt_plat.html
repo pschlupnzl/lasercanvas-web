@@ -1,0 +1,110 @@
+<HTML>
+<HEAD>
+<TITLE>Plate, Brewster Plate, Crystal</TITLE>
+<LINK REL=StyleSheet HREF="style.css" TYPE="text/css">
+</HEAD>
+<BODY>
+<P><A HREF="lc5_cont.html">LaserCanvas 5</A> &gt; <A HREF="opt_intro.html">Optics</A> &gt;
+<H2>
+<IMG SRC="but_plat.png" WIDTH=40 HEIGHT=40>
+<IMG SRC="but_brew.png" WIDTH=40 HEIGHT=40>
+<IMG SRC="but_crys.png" WIDTH=40 HEIGHT=40>
+Plate, Brewster Plate, Crystal</H2>
+<HR>
+
+<P>LaserCanvas provides three different forms of refractive elements. These are equivalent except for the respective definitions of incidence angle.</P>
+
+<UL>
+<LI>A Plate can be inserted at arbitrary angles. The incidence angle <I>A</I> is the external angle between the face normal and the incident beam.</LI>
+<LI>A Brewster Plate is inserted at Brewster's angle <I>A</I> = atan(<I>n</I>), where <I>n</I> is the refractive index of the material. </LI>
+<LI>The angle <I>A</I> of a Refractive Crystal is defined as the angle between the face normal and the crystal centreline, within the crystal. The crystal is inserted such that the external angle <I>B</I> agrees with Snell's law, sin<I>B</I> =  <I>n</I>sin<I>A</I>, where <I>n</I> is the refractive index of the crystal, and the refractive index of the surrounding space is assumed to be unity. If the crystal cut angle is such that total internal reflection (TIR) would occur, the insertion angle is set to 90 degrees. Note that the calculated mode may be inaccurate in this case.</LI>
+</UL>
+
+<P>Each refractive element comprises at least two "optics:" An entrance face, and an exit face. The faces are linked to each other, so that deleting one also deletes the other.</P>
+
+<P>Within a refractive element, there can be at most one <A HREF="opt_lens.html">Thermal Lens</A> or one <A HREF="opt_scrn.html">Screen</A> optic. These optics are automatically centred within the refractive element thickness.</P>
+
+<P>To insert a plate, select menu <U>E</U>dit | <U>I</U>nsert | Insert <U>P</U>late or click the <NOBR><IMG SRC="but_plat.png" WIDTH=20 HEIGHT=20>&nbsp;Plate</NOBR> button on the toolbar.</P>
+
+<P>To insert a Brewster-angled plate, select menu <U>E</U>dit | <U>I</U>nsert | Insert <U>B</U>rewster or click the <NOBR><IMG SRC="but_brew.png" WIDTH=20 HEIGHT=20>&nbsp;Brewster</NOBR> Plate button on the toolbar.</P>
+
+<P>To insert a crystal, select menu <U>E</U>dit | <U>I</U>nsert | Insert <U>C</U>rystal or click the <NOBR><IMG SRC="but_crys.png" WIDTH=20 HEIGHT=20>&nbsp;Crystal</NOBR> button on the toolbar.</P>
+
+
+
+<H3>Radius Curvature (mm)</H3>
+
+<P>Specifies the radius of curvature of the entrance or exit faces of the refractive elements, in units of mm (<NOBR>10<SUP>-3</SUP></NOBR> m).</P>
+
+<P>If the Astigmatic option is checked, then separate values can be entered for the radius of curvature in the sagittal and tangential planes.</P>
+
+
+
+<H3>Face Angle (deg)</H3>
+
+<P>Limits: -90 &lt; external angle &lt 90.</P>
+
+<P>For refractive Plate optics, specifies the external angle of incidence that the ray makes to the entrance face normal, in units of degrees. A positive angle means that the normal to the entrance face surface is rotated clockwise from the input ray. </P>
+
+<P>For Crystal optics, specifies the angle within the material between the entrance face normal and the refracted beam, in units of degrees. A positive angle means that the normal to the entrance face surface is rotated clockwise to the internally refracted ray.</P>
+
+<P>The insertion angle of a Brewster Plate is calculated from its refractive index.</P>
+
+<TABLE BORDER=0 ALIGN="CENTER">
+<TR><TD COLSPAN=2><HR></TD></TR>
+<TR><TD COLSPAN=2 ALIGN="CENTER"><B>Face Angle Definition</B></TD></TR>
+<TR><TD ALIGN="CENTER"><IMG SRC="plat01.png" WIDTH=198 HEIGHT=81></TD>
+<TD ALIGN="CENTER"><IMG SRC="crys01.png" WIDTH=198 HEIGHT=75></TD></TR>
+<TR><TD ALIGN="CENTER">Plate</TD><TD ALIGN="CENTER">Crystal</TD></TR>
+<TR><TD COLSPAN=2><HR></TD></TR>
+</TABLE>
+
+<P>The Face Angle is, by definition, a rotation in the tangential plane. The angle of the exit face is equal and opposite to that of the entrance face. </P>
+
+<P>This property is not available for exit faces.</P>
+
+<P>This property is not available for Brewster Plate optics.</P>
+
+
+
+<H3>Refractive Index</H3>
+
+<P>Limit: &gt; 1.</P>
+
+<P>Specifies the refractive index of the material. For Brewster Plate optics, this determines the incidence and refraction angles at the interfaces.</P>
+
+<P>This property is not available for exit faces.</P>
+
+
+
+<H3>Thickness (mm)</H3>
+
+<P>Limit: &gt; 0.</P>
+
+<P>Specifies the thickness, or crystal length, of the refractive element. If the element contains an internal <A HREF="opt_lens.html">Thermal Lens</A> or <A HREF="opt_scrn.html">Screen</A>, they are automatically centred within the element.</P>
+
+<P ALIGN="CENTER"><IMG SRC="crys02.png" WIDTH=179 HEIGHT=94></P>
+
+<P>The actual distance traversed within the element may be larger than the optic thickness. The thickness is to be interpreted as the distance between the parallel faces of the element. The internal distance travelled will be larger for non-normal incidence due to refraction.</P>
+
+<P>This property is not available for exit faces.</P>
+
+
+
+
+<H3>Direction: Flip</H3>
+
+<P>For Brewster plates, the Flip toggle command inverts the sense of the Brewster angle. It is equivalent to a negative Brewster angle.</P>
+
+<P>This property is not available for exit faces.</P>
+
+
+
+
+<H3>Astigmatic</H3>
+
+<P>Checking the Astigmatic box allows separate sagittal and tangential values to be entered for the refractive element face’s Radius Curvature property.</H3>
+
+
+</BODY>
+</HTML>

@@ -1,0 +1,55 @@
+<HTML>
+<HEAD>
+<TITLE>Complex Beam Parameter q</TITLE>
+<LINK REL=StyleSheet HREF="style.css" TYPE="text/css">
+</HEAD>
+<BODY>
+<P><A HREF="lc5_cont.html">LaserCanvas 5</A> &gt; <A HREF="ref_intro.html">Reference</A> &gt; </P>
+<H2>Complex Beam Parameter <I>q</I></H2>
+<HR>
+
+
+<P>For Gaussian beams, the complex beam parameter <I>q</I> is defined to as</P>
+
+<P ALIGN="CENTER"><IMG SRC="reqrecq1.png" WIDTH=93 HEIGHT=36></P>
+
+<P>
+where <I>R</I> is the wave-front radius of curvature, <I>w</I> the mode size, and <IMG SRC="ref_lambda.png" WIDTH=10 HEIGHT=13 ALT="l"> the wavelength. At a waist, <I>R</I> is infinite and <I>q</I> is purely imaginary.</P>
+
+<P>
+After passing through an optical element whose transfer matrix elements are <I>A</I>, <I>B</I>, <I>C</I> and <I>D</I>, the complex beam parameter becomes</P>
+
+<P ALIGN="CENTER"><IMG SRC="reqrecq2.png" WIDTH=82 HEIGHT=57></P>
+
+<P>If the matrix represents the round-trip matrix of a resonator, then a self-consistency argument requires that <NOBR><I>q</I>'</NOBR> = <I>q</I>, from which we can derive <I>q</I> as</P>
+
+<P ALIGN="CENTER"><IMG SRC="reqrecq3.png" WIDTH=209 HEIGHT=39></P>
+
+
+
+<H3>Internal Representation</H3>
+
+<P>Information about the reciprocal complex beam parameter <NOBR>1/<I>q</I></NOBR> is stored in a custom class using the four elements listed in the following table. The elements and their definitions are chosen to minimise calculation cycles, especially division, while at the same time providing some protection from division-by-zero errors.</P>
+
+
+<TABLE BORDER=0 ALIGN="CENTER">
+<TR><TD COLSPAN=2><HR></TD></TR>
+<TR><TD><B>Symbol</B></TD><TD><B>Definition</B></TD></TR>
+<TR><TD COLSPAN=2><HR></TD></TR>
+<TR VALIGN="TOP"><TD><IMG SRC="reqrecq4.png" WIDTH=37 HEIGHT=34></TD><TD>
+The reciprocal of the wave front radius of curvature.</TD></TR>
+<TR VALIGN="TOP"><TD><IMG SRC="reqrecq5.png" WIDTH=53 HEIGHT=37></TD><TD>
+A scaled waist, equal to the Rayleigh length at the waist.</TD></TR>
+<TR VALIGN="TOP"><TD><IMG SRC="reqrecq6.png" WIDTH=37 HEIGHT=15></TD><TD>
+The wavelength, in nm.</TD></TR>
+<TR VALIGN="TOP"><TD><IMG SRC="reqrecq7.png" WIDTH=54 HEIGHT=16></TD><TD>
+The beam propagation factor.</TD></TR>
+<TR><TD COLSPAN=2><HR></TD></TR>
+</TABLE>
+
+<P>As with optic curvatures, a wave front curvature of 0 is used to represent a plane wave front. However, since the calculations are performed using IEEE double-precision floating point arithmetic, round-off errors can lead to curvatures on the order of <NOBR>10<SUP>18</SUP></NOBR>, which should be interpreted as flat wave fronts.</P>
+
+
+
+</BODY>
+</HTML>

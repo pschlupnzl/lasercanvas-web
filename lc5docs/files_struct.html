@@ -1,0 +1,29 @@
+<HTML>
+<HEAD>
+<TITLE>File Structure</TITLE>
+<LINK REL=StyleSheet HREF="style.css" TYPE="text/css">
+</HEAD>
+<BODY>
+<P><A HREF="lc5_cont.html">LaserCanvas 5</A> &gt; <A HREF="files_intro.html">Data Files</A> &gt;</P>
+<H2>File Structure</H2>
+<HR>
+
+<P>The file contains at least one <A HREF="files_system.html">system block</A>, each containing at least two <A HREF="files_optics.html">optic statements</A>. At the end of the file is a list of <A HREF="files_render.html">renderer statements</A>. Each optic or renderer statement includes one or more definition lines and flags. The file is case-sensitive.</P>
+
+<UL>
+<LI>A <A HREF="files_system.html">system block</A> takes the form: <TT>[Sys_00966444]</TT></LI>
+
+<LI>A statement takes the form: <TT>Mirror @ M1 { ... }</TT></LI>
+
+<LI>A definition takes the form: <TT>Wavelength = 1064</TT></LI>
+<LI>A flag takes the form: <TT>Flipped</TT></LI>
+</UL>
+
+<P>In general, most definitions can be omitted. Any property that isn't defined in the data file is given a default value as described in the following sections.</P>
+
+<P>Many lines define properties that can be described by equations. In these cases, the equation string follows the '=' sign of the line, without further formatting.</P>
+
+<P>The preferred formatting is to have each definition on a separate line. However, the file format is designed to be largely independent of white space such as empty lines and carriage returns. The end-of-line is marked by the return and new-line characters <TT>0x0D</TT>, <TT>0x0A</TT>.
+
+</BODY>
+</HTML>

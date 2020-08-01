@@ -1,0 +1,82 @@
+<HTML>
+<HEAD>
+<TITLE>System Block</TITLE>
+<LINK REL=StyleSheet HREF="style.css" TYPE="text/css">
+</HEAD>
+<BODY>
+<P><A HREF="lc5_cont.html">LaserCanvas 5</A> &gt; <A HREF="files_intro.html">Data Files</A> &gt;</P>
+<H2>System Block</H2>
+<HR>
+
+<P>The data file must start with a system block declaring the top-level system in the file.</P>
+
+
+
+<H3>System Tag</H3>
+<P>Each system block commences with a heading containing the system Tag in square brackets, such as</P>
+
+<P ALIGN="CENTER"><TT>[Sys_00966444]</TT></P>
+
+<P>The Tag must uniquely identify the system within the file, but is not visible, and cannot be edited, by the user through the LaserCanvas interface.</P>
+
+
+
+<H3>System Type</H3>
+<P>For the top-level system, the second line must declare one of the following system type keywords:</P>
+<P ALIGN="CENTER"><TT>Resonator<BR>Propagation</TT></P>
+
+<P>All subsequent systems in the file are assumed to be <A HREF="opt_spwn.html">out-coupled systems</A>.</P>
+
+
+
+<H3>System Variables</H3>
+<P>For the top-level system, the requested variable values and ranges are listed next. For example, the <I>x</I> variable could be described by the lines</P>
+
+<P ALIGN="CENTER"><TT>Variable(x) = 50.000<BR>Range(x) = 0, 100</TT></P>
+
+<P>If another system is already open, the variable values and ranges are ignored from any subsequently opened files. See the section on <A HREF="opt_eqtn.html">Equations and Variables</A>.</P>
+
+<P>The variable names must match those pre-defined by LaserCanvas, viz. '<TT>x</TT>', '<TT>y</TT>', and '<TT>z</TT>'.</P>
+
+
+
+<H3>Top System Properties</H3>
+<P>The system header concludes with a list of system properties. All of these properties can be defined as constants or equations.</P>
+
+<TABLE BORDER=0 ALIGN="CENTER">
+<TR><TD COLSPAN=3><HR></TD></TR>
+<TR VALIGN="TOP"><TD><B>Property</B></TD><TD><B>Default</B></TD><TD><B>Description</B></TD></TR>
+<TR><TD COLSPAN=3><HR></TD></TR>
+<TR VALIGN="TOP"><TD><TT>Wavelength</TT></TD><TD>1064</TD><TD>The laser wavelength, in nm.</TD></TR>
+<TR VALIGN="TOP"><TD><TT>MSquared</TT></TD><TD>1</TD><TD>The beam propagation factor.</TD></TR>
+<TR VALIGN="TOP"><TD><TT>InputType</TT></TD><TD>0</TD><TD>For propagation systems, specifies how <TT>Input-</TT> parameters are to be interpreted.</TD></TR>
+<TR VALIGN="TOP"><TD></TD><TD></TD><TD>If <TT>InputType</TT> is 0, <TT>wSag</TT> and <TT>wTan</TT> specify the waist (in um) and <TT>RzSag</TT> and <TT>RzTan</TT> the distance (in mm) to the waist. </TD></TR>
+<TR VALIGN="TOP"><TD></TD><TD></TD><TD>If <TT>InputType</TT> is 1, <TT>wSag</TT> and <TT>wTan</TT> specify the mode size (in um) at the <A HREF="opt_srce.html">Source</A> optic, and <TT>RzSag</TT> and <TT>RzTan</TT> the wave front radius of curvature (in mm).</TD></TR>
+<TR VALIGN="TOP"><TD><TT>InputwSag</TT></TD><TD>200</TD><TD>The input beam waist or mode size in the sagittal plane, in µm.</TD></TR>
+<TR VALIGN="TOP"><TD><TT>InputwTan</TT></TD><TD>300</TD><TD>The input beam waist or mode size in the tangential plane, in µm.</TD></TR>
+<TR VALIGN="TOP"><TD><TT>InputRzSag</TT></TD><TD>0</TD><TD>The distance to the input beam waist, or the wave front radius of curvature, in the sagittal plane, in mm.</TD></TR>
+<TR VALIGN="TOP"><TD><TT>InputRzTan</TT></TD><TD>0</TD><TD>The distance to the input beam waist, or the wave front radius of curvature, in the tangential plane, in mm.</TD></TR>
+<TR><TD COLSPAN=3><HR></TD></TR>
+</TABLE>
+
+
+
+<H3>System Properties</H3>
+
+<P>The remaining system properties are available for all system types, including output coupled systems.</P>
+
+
+<TABLE BORDER=0 ALIGN="CENTER">
+<TR><TD COLSPAN=3><HR></TD></TR>
+<TR VALIGN="TOP"><TD><B>Property</B></TD><TD><B>Default</B></TD><TD><B>Description</B></TD></TR>
+<TR><TD COLSPAN=3><HR></TD></TR>
+<TR VALIGN="TOP"><TD><TT>Rotation</TT></TD><TD>0</TD><TD>The Canvas rotation of the first optic in the system, in degrees.</TD></TR>
+<TR VALIGN="TOP"><TD><TT>StartX</TT></TD><TD>0</TD><TD>The Canvas <I>X</I> location of the first optic, in mm.</TD></TR>
+<TR VALIGN="TOP"><TD><TT>StartY</TT></TD><TD>0</TD><TD>The Canvas <I>Y</I> location of the first optic, in mm.</TD></TR>
+<TR><TD COLSPAN=3><HR></TD></TR>
+</TABLE>
+
+
+
+</BODY>
+</HTML>
