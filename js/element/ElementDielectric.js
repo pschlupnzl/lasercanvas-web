@@ -22,6 +22,9 @@ window.LaserCanvas.Element.Dielectric = function (blockType) {
 	this.abcdQ = {}; // {object<object>}} ABCD propagation coefficient after this optic.
 };
 
+/** Element type name to identify a dielectric element. */
+window.LaserCanvas.Element.Dielectric.Type = "Dielectric";
+
 // Types of dielectric block elements (affects angle calculations).
 window.LaserCanvas.Element.Dielectric.eType = {
 	Plate: 'Plate',        // Plate at arbitrary incidence angle.
@@ -397,7 +400,7 @@ window.LaserCanvas.Element.Dielectric.prototype = {
 	* Gets or sets internal parameters to match new property value.
 	* @param {string} propertyName Name of property to set 'distanceToNext' etc.
 	* @param {number|boolean=} newValue (mm|rad) New target value to set, if any.
-	* @param {...=} arg Additional argument, if needed.
+	* @param {...=} arg Additional argument, if needed (e.g. outgoing angle).
 	* @returns {number=} The current value, if retrieving only.
 	*/
 	property: function (propertyName, newValue, arg) {

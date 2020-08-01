@@ -22,6 +22,9 @@ window.LaserCanvas.Element.Lens = function () {
 	this.abcdQ = {}; // {object<object>}} ABCD propagation coefficient after this optic.
 };
 
+/** Element type name to identify a lens element. */
+window.LaserCanvas.Element.Lens.Type = "Lens";
+
 // Standard focal lengths.
 window.LaserCanvas.Element.Lens.standard = [
 	-1000, -750, -500, -400, -300, -250, -200, -175, -150, -125, -100,  -75,  -50,   -25,

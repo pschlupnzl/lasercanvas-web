@@ -75,6 +75,16 @@
 		},
 
 		/**
+		 * Search the array of source elements for an element of the 
+		 * given name, returning the found element.
+		 * @param {Array<object>} elements Source elements to search.
+		 * @param {string} name Name of element to return.
+		 */
+		findElement = function (elements, name) {
+			return elements.find(function (element) { return element.name === name });
+		},
+
+		/**
 		 * Create the system elements into the given array.
 		 * @param {Array<Element>} melements Array of elements to be filled.
 		 * @param {Array<object>} elements Source element data.
@@ -120,13 +130,15 @@
 					case "CrystalInput":
 					case "PlateInput":
 						element = new LaserCanvas.Element.Dielectric(toBlockType(src.type));
+						linkedElement = findElement(elements, src.LinkedTo);
+						if (!linkedElement) {
+							throw "Unable to find linked output element " + src.LinkedTo + ".";
+						}
 						props = {
 							refractiveIndex: toNumber(src.RefractiveIndex, variables),
 							flip: src.Flipped || false,
 							curvatureFace1: toNumber(src.ROC, variables),
-							// TODO: Search linked element.
-							curvatureFace2: toNumber(elements[index + 1].ROC, variables),
-							// curvatureFace1: 200,
+							curvatureFace2: toNumber(linkedElement.ROC, variables),
 						};
 
 						if (src.type === "CrystalInput") {
@@ -134,26 +146,29 @@
 						} else if (src.type === "PlateInput") {
 							props.angleOfIncidence = toNumber(src.FaceAngle, variables) * Math.PI / 180;
 						}
+
+						if (elements[index + 1].type === "ThermalLens") {
+							props.thermalLens = toNumber(elements[index + 1].FL, variables);
+						}
 						
 						// groupVelocityDispersion: 0,// {number} (um^-2) Group velocity dispersion for ultrafast calculations.
-						// angleOfIncidence: 0,       // {number} (rad) Angle of incidence. Auto-calculated for Brewster and Crystal.
-						// faceAngle: 0,              // {number} (rad) Face angle relative to internal propagation for Crystal (also used for painting).
-						// flip: false,               // {boolean} Value indicating whether Brewster angle is flipped.
-						// curvatureFace1: 0,         // {number} (mm) Radius of curvature for input interface, or 0 for flat.
-						// curvatureFace2: 0,         // {number} (mm) Radius of curvature for output interface, or 0 for flat.
-						// thermalLens: 0             // {number} (mm) Focal length of thermal lens, or 0 for none.
 						element.loc.l = toNumber(src.Thickness, variables);
 						break;
 
+						case "ThermalLens":
+							// Thermal lens handled at input face.
+							continue;
+	
 					case "BrewsterOutput":
 					case "CrystalOutput":
 					case "PlateOutput":
-						// TODO: Check for thermal lens in source
+						// Add thermal lens placeholder. The focal length is handled at input face.
 						melements.push(new LaserCanvas.Element.Lens());
 						element = new LaserCanvas.Element.Dielectric(toBlockType(src.type));
-
-						// TODO: Search backwards.
-						linkedElement = elements[index - 1];
+						linkedElement = findElement(elements, src.LinkedTo);
+						if (!linkedElement) {
+							throw "Unable to find linked input element " + src.LinkedTo + ".";
+						}
 						props = {};
 						if (src.type === "CrystalOutput") {
 							props.faceAngle = toNumber(linkedElement.FaceAngle, variables), Math.PI / 180;
@@ -231,7 +246,7 @@ console.log("Skipping element type " + src.type);
 		reBooleanProperty = /^(Flipped)$/m,
 
 		/** Regular expression matching an element declaration: Element @ Name = { */
-		reElementDeclaration = /^(Mirror|ThinLens|Screen|BrewsterInput|BrewsterOutput|CrystalInput|CrystalOutput|PlateInput|PlateOutput|PrismA|PrismB)\s*@\s*([^\s]+)\s*{$/m,
+		reElementDeclaration = /^(Mirror|ThinLens|Screen|BrewsterInput|BrewsterOutput|CrystalInput|CrystalOutput|PlateInput|PlateOutput|ThermalLens|PrismA|PrismB)\s*@\s*([^\s]+)\s*{$/m,
 	
 		/** Regular expression matching a renderer declaration: Renderer 2d { */
 		reRendererDeclaration = /^Renderer\s+(SystemGraph|2d)\s*\{$/m,
