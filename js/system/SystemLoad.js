@@ -142,7 +142,6 @@
 						// curvatureFace1: 0,         // {number} (mm) Radius of curvature for input interface, or 0 for flat.
 						// curvatureFace2: 0,         // {number} (mm) Radius of curvature for output interface, or 0 for flat.
 						// thermalLens: 0             // {number} (mm) Focal length of thermal lens, or 0 for none.
-// console.log(toBlockType[src.type], props)
 						element.loc.l = toNumber(src.Thickness, variables);
 						break;
 
@@ -161,7 +160,6 @@
 						} else if (src.type === "PlateOutput") {
 							props.angleOfIncidence = toNumber(linkedElement.FaceAngle, variables) * Math.PI / 180;
 						}
-// console.log("BBB", props)
 						break;
 
 					default:
@@ -245,7 +243,7 @@ console.log("Skipping element type " + src.type);
 		parseTextFile = function (text) {
 			var match,
 				/** Text file split into lines. */
-				lines = text.replace(/\n\r/g, "\n").split("\n"),
+				lines = text.replace(/\n\r/g, "\n").replace(/\r\n/g, "\n").split("\n"),
 				/** First line, used as a check. */
 				firstLines = lines.splice(0, 2),
 				/** Root object being assembled. */
