@@ -167,7 +167,7 @@ window.testCollection = window.testCollection || {};
 	//  Test collection.
 	// ------------------
 	collection.element = {
-		label: "Elements",
+		label: "Dielectric Elements",
 		cases: testCases,
 		test: function (testCase) {
 			const Matrix2x2 = LaserCanvas.Math.Matrix2x2;
@@ -186,7 +186,6 @@ window.testCollection = window.testCollection || {};
 			face1.group = face2.group = [face1, face2];
 			const element = testCase.isFace1 ? face1 : face2;
 			const modePlane = LaserCanvas.Enum.modePlane[testCase.plane];
-console.log(LaserCanvas.Enum.modePlane)
 			const abcd = LaserCanvas.Element.Dielectric.prototype.elementAbcd.call(element, testCase.dir, modePlane);
 			const success = abcd.isEqual(testCase.expectAbcd, 1e-5);
 

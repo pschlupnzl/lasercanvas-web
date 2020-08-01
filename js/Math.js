@@ -314,12 +314,16 @@ window.LaserCanvas.Math = {};
 					if (isNaN(this[r][c]) || isNaN(mx[r][c])) {
 						return false;
 					}
-					if (
+					if (tol < 1) {
 						// Tolerance by decimal places.
-						(tol < 1 && Math.abs(this[r][c] - mx[r][c]) > tol)
+						if (tol < 1 && Math.abs(this[r][c] - mx[r][c]) > tol) {
+							return false;
+						}
+					} else {
 						// Or, tolerance by significant figures.
-						|| (tol >= 1 && this[r][c].toPrecision(tol) !== mx[r][c].toPrecision(tol))) {
-						return false;
+						if (tol >= 1 && this[r][c].toPrecision(tol) !== mx[r][c].toPrecision(tol)) {
+							return false;
+						}
 					}
 				}
 			}

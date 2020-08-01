@@ -127,7 +127,6 @@
 						['Mirror', 0, { endOptic: true, angleOfIncidence: 0, radiusOfCurvature:  200 } ]
 					]);
 					loc = { x: -125 };
-LaserCanvas.SystemUtil.demoTextFile(mprop, melements);
 					break;
 			}
 		}

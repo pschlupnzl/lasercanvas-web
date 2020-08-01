@@ -1332,12 +1332,557 @@ Renderer 2d {
 }
 ` },
 
+{ label: "test_plate", expectAbcd: [[-2.07, -327, 0.0107, 1.2]], src:
+`[Sys_02357410]
+Resonator
+Variable(x) = 0
+Range(x) = 0, 1
+Variable(y) = 0
+Range(y) = 0, 1
+Variable(z) = 0
+Range(z) = 0, 1
+Wavelength = 1064
+MSquared = 1
+MSquareTan = 1
+InputwSag = 200
+InputwTan = 300
+InputRzSag = 0
+InputRzTan = 0
+Rotation = 0
+StartX = 0
+StartY = 0
+Mirror @ M1 {
+   DistanceToNext = 120
+   FaceAngle = 0
+   ROC = 200
+   ROC_tan = 200
+}
+PlateInput @ PI3 {
+   Selected
+   LinkedTo = PO4
+   RefractiveIndex = 1.5
+   FaceAngle = 0
+   ROC = 0
+   ROC_tan = 0
+   Thickness = 100
+}
+PlateOutput @ PO4 {
+   LinkedTo = PI3
+   DistanceToNext = 120
+   ROC = 0
+   ROC_tan = 0
+}
+Mirror @ M2 {
+   DistanceToNext = 0
+   FaceAngle = 0
+   ROC = 200
+   ROC_tan = 200
+}
+
+Renderer 2d {
+   System = Sys_02357410
+   Window = 0, 0, 500, 200
+   XMiddle = 125
+   YMiddle = 0
+   Zoom = 1
+   OpticScale = 50
+   ModeScale = 20
+   GridSize = 10
+   Flags = 10
+}
+`},
+
+{ label: "test_plate_refractive_index", expectAbcd: [[-1.8, -224, 0.008, 0.44]], src:
+`[Sys_02357410]
+Resonator
+Variable(x) = 0
+Range(x) = 0, 1
+Variable(y) = 0
+Range(y) = 0, 1
+Variable(z) = 0
+Range(z) = 0, 1
+Wavelength = 1064
+MSquared = 1
+MSquareTan = 1
+InputwSag = 200
+InputwTan = 300
+InputRzSag = 0
+InputRzTan = 0
+Rotation = 0
+StartX = 0
+StartY = 0
+Mirror @ M1 {
+   DistanceToNext = 120
+   FaceAngle = 0
+   ROC = 200
+   ROC_tan = 200
+}
+PlateInput @ PI3 {
+   Selected
+   LinkedTo = PO4
+   RefractiveIndex = 2.5
+   FaceAngle = 0
+   ROC = 0
+   ROC_tan = 0
+   Thickness = 100
+}
+PlateOutput @ PO4 {
+   LinkedTo = PI3
+   DistanceToNext = 120
+   ROC = 0
+   ROC_tan = 0
+}
+Mirror @ M2 {
+   DistanceToNext = 0
+   FaceAngle = 0
+   ROC = 200
+   ROC_tan = 200
+}
+
+Renderer 2d {
+   System = Sys_02357410
+   Window = 0, 0, 500, 200
+   XMiddle = 125
+   YMiddle = 0
+   Zoom = 1
+   OpticScale = 50
+   ModeScale = 20
+   GridSize = 10
+   Flags = 10
+}
+`},
+
+{ label: "test_plate_face_angle", expectAbcd: [[-1.82, -230, 0.00817, 0.485], [-1.63, -165, 0.00627, 0.0193]], src:
+`[Sys_02357410]
+Resonator
+Variable(x) = 0
+Range(x) = 0, 1
+Variable(y) = 0
+Range(y) = 0, 1
+Variable(z) = 0
+Range(z) = 0, 1
+Wavelength = 1064
+MSquared = 1
+MSquareTan = 1
+InputwSag = 200
+InputwTan = 300
+InputRzSag = 0
+InputRzTan = 0
+Rotation = 0
+StartX = 0
+StartY = 0
+Mirror @ M1 {
+   DistanceToNext = 120
+   FaceAngle = 0
+   ROC = 200
+   ROC_tan = 200
+}
+PlateInput @ PI3 {
+   Selected
+   LinkedTo = PO4
+   RefractiveIndex = 2.5
+   FaceAngle = 45
+   ROC = 0
+   ROC_tan = 0
+   Thickness = 100
+}
+PlateOutput @ PO4 {
+   LinkedTo = PI3
+   DistanceToNext = 120
+   ROC = 0
+   ROC_tan = 0
+}
+Mirror @ M2 {
+   DistanceToNext = 0
+   FaceAngle = 0
+   ROC = 200
+   ROC_tan = 200
+}
+
+Renderer 2d {
+   System = Sys_02357410
+   Window = 0, 0, 500, 200
+   XMiddle = 125
+   YMiddle = 0
+   Zoom = 1
+   OpticScale = 50
+   ModeScale = 20
+   GridSize = 10
+   Flags = 10
+}
+`},
+
+{ label: "test_plate_input_curved", expectAbcd: [[-0.768, -158, 0.0103, 0.81]], src:
+`[Sys_02357410]
+Resonator
+Variable(x) = 0
+Range(x) = 0, 1
+Variable(y) = 0
+Range(y) = 0, 1
+Variable(z) = 0
+Range(z) = 0, 1
+Wavelength = 1064
+MSquared = 1
+MSquareTan = 1
+InputwSag = 200
+InputwTan = 300
+InputRzSag = 0
+InputRzTan = 0
+Rotation = 0
+StartX = 0
+StartY = 0
+Mirror @ M1 {
+   DistanceToNext = 120
+   FaceAngle = 0
+   ROC = 200
+   ROC_tan = 200
+}
+PlateInput @ PI3 {
+   Selected
+   LinkedTo = PO4
+   RefractiveIndex = 2.5
+   FaceAngle = 0
+   ROC = -200
+   ROC_tan = -200
+   Thickness = 100
+}
+PlateOutput @ PO4 {
+   LinkedTo = PI3
+   DistanceToNext = 120
+   ROC = 0
+   ROC_tan = 0
+}
+Mirror @ M2 {
+   DistanceToNext = 0
+   FaceAngle = 0
+   ROC = 200
+   ROC_tan = 200
+}
+
+Renderer 2d {
+   System = Sys_02357410
+   Window = 0, 0, 500, 200
+   XMiddle = 125
+   YMiddle = 0
+   Zoom = 1
+   OpticScale = 50
+   ModeScale = 20
+   GridSize = 10
+   Flags = 10
+}
+`},
+
+{ label: "test_plate_both_curved", expectAbcd: [[0.0267, -102, 0.00953, 1.05]], src:
+`[Sys_02357410]
+Resonator
+Variable(x) = 0
+Range(x) = 0, 1
+Variable(y) = 0
+Range(y) = 0, 1
+Variable(z) = 0
+Range(z) = 0, 1
+Wavelength = 1064
+MSquared = 1
+MSquareTan = 1
+InputwSag = 200
+InputwTan = 300
+InputRzSag = 0
+InputRzTan = 0
+Rotation = 0
+StartX = 0
+StartY = 0
+Mirror @ M1 {
+   DistanceToNext = 120
+   FaceAngle = 0
+   ROC = 200
+   ROC_tan = 200
+}
+PlateInput @ PI3 {
+   LinkedTo = PO4
+   RefractiveIndex = 2.5
+   FaceAngle = 0
+   ROC = -200
+   ROC_tan = -200
+   Thickness = 100
+}
+PlateOutput @ PO4 {
+   Selected
+   LinkedTo = PI3
+   DistanceToNext = 120
+   ROC = -300
+   ROC_tan = -300
+}
+Mirror @ M2 {
+   DistanceToNext = 0
+   FaceAngle = 0
+   ROC = 200
+   ROC_tan = 200
+}
+
+Renderer 2d {
+   System = Sys_02357410
+   Window = 0, 0, 500, 200
+   XMiddle = 125
+   YMiddle = 0
+   Zoom = 1
+   OpticScale = 50
+   ModeScale = 20
+   GridSize = 10
+   Flags = 10
+}
+`},
+
+{ label: "test_plate_output_curved", expectAbcd: [[-1.58, -265, 0.0102, 1.07]], src:
+`[Sys_02357410]
+Resonator
+Variable(x) = 0
+Range(x) = 0, 1
+Variable(y) = 0
+Range(y) = 0, 1
+Variable(z) = 0
+Range(z) = 0, 1
+Wavelength = 1064
+MSquared = 1
+MSquareTan = 1
+InputwSag = 200
+InputwTan = 300
+InputRzSag = 0
+InputRzTan = 0
+Rotation = 0
+StartX = 0
+StartY = 0
+Mirror @ M1 {
+   DistanceToNext = 120
+   FaceAngle = 0
+   ROC = 200
+   ROC_tan = 200
+}
+PlateInput @ PI3 {
+   Selected
+   LinkedTo = PO4
+   RefractiveIndex = 2.5
+   FaceAngle = 0
+   ROC = 0
+   ROC_tan = 0
+   Thickness = 100
+}
+PlateOutput @ PO4 {
+   LinkedTo = PI3
+   DistanceToNext = 120
+   ROC = -300
+   ROC_tan = -300
+}
+Mirror @ M2 {
+   DistanceToNext = 0
+   FaceAngle = 0
+   ROC = 200
+   ROC_tan = 200
+}
+
+Renderer 2d {
+   System = Sys_02357410
+   Window = 0, 0, 500, 200
+   XMiddle = 125
+   YMiddle = 0
+   Zoom = 1
+   OpticScale = 50
+   ModeScale = 20
+   GridSize = 10
+   Flags = 10
+}
+`},
+
+{ label: "test_plate_face_angle_input_curved", expectAbcd: [[-0.558, -142, 0.0104, 0.861], [1.53, 48, 0.0125, 1.05]], src:
+`[Sys_02357410]
+Resonator
+Variable(x) = 0
+Range(x) = 0, 1
+Variable(y) = 0
+Range(y) = 0, 1
+Variable(z) = 0
+Range(z) = 0, 1
+Wavelength = 1064
+MSquared = 1
+MSquareTan = 1
+InputwSag = 200
+InputwTan = 300
+InputRzSag = 0
+InputRzTan = 0
+Rotation = 0
+StartX = 0
+StartY = 0
+Mirror @ M1 {
+   DistanceToNext = 120
+   FaceAngle = 0
+   ROC = 200
+   ROC_tan = 200
+}
+PlateInput @ PI3 {
+   LinkedTo = PO4
+   RefractiveIndex = 2.5
+   FaceAngle = 45
+   ROC = -200
+   ROC_tan = -200
+   Thickness = 100
+}
+PlateOutput @ PO4 {
+   Selected
+   LinkedTo = PI3
+   DistanceToNext = 120
+   ROC = 0
+   ROC_tan = 0
+}
+Mirror @ M2 {
+   DistanceToNext = 0
+   FaceAngle = 0
+   ROC = 200
+   ROC_tan = 200
+}
+
+Renderer 2d {
+   System = Sys_02357410
+   Window = 0, 0, 500, 200
+   XMiddle = 125
+   YMiddle = 0
+   Zoom = 1
+   OpticScale = 50
+   ModeScale = 20
+   GridSize = 10
+   Flags = 10
+}
+`},
+
+{ label: "test_plate_face_angle_both_curved", expectAbcd: [[0.404, -64.4, 0.00897, 1.05], [4.98, 419, 0.00694, 0.785]], src:
+`[Sys_02357410]
+Resonator
+Variable(x) = 0
+Range(x) = 0, 1
+Variable(y) = 0
+Range(y) = 0, 1
+Variable(z) = 0
+Range(z) = 0, 1
+Wavelength = 1064
+MSquared = 1
+MSquareTan = 1
+InputwSag = 200
+InputwTan = 300
+InputRzSag = 0
+InputRzTan = 0
+Rotation = 0
+StartX = 0
+StartY = 0
+Mirror @ M1 {
+   DistanceToNext = 120
+   FaceAngle = 0
+   ROC = 200
+   ROC_tan = 200
+}
+PlateInput @ PI3 {
+   LinkedTo = PO4
+   RefractiveIndex = 2.5
+   FaceAngle = 45
+   ROC = -200
+   ROC_tan = -200
+   Thickness = 100
+}
+PlateOutput @ PO4 {
+   Selected
+   LinkedTo = PI3
+   DistanceToNext = 120
+   ROC = -300
+   ROC_tan = -300
+}
+Mirror @ M2 {
+   DistanceToNext = 0
+   FaceAngle = 0
+   ROC = 200
+   ROC_tan = 200
+}
+
+Renderer 2d {
+   System = Sys_02357410
+   Window = 0, 0, 500, 200
+   XMiddle = 125
+   YMiddle = 0
+   Zoom = 1
+   OpticScale = 50
+   ModeScale = 20
+   GridSize = 10
+   Flags = 10
+}
+`},
+
+{ label: "test_plate_face_angle_output_curved", expectAbcd: [[-1.5, -266, 0.0103, 1.16], [-0.325, -133, 0.00996, 1.01]], src:
+`[Sys_02357410]
+Resonator
+Variable(x) = 0
+Range(x) = 0, 1
+Variable(y) = 0
+Range(y) = 0, 1
+Variable(z) = 0
+Range(z) = 0, 1
+Wavelength = 1064
+MSquared = 1
+MSquareTan = 1
+InputwSag = 200
+InputwTan = 300
+InputRzSag = 0
+InputRzTan = 0
+Rotation = 0
+StartX = 0
+StartY = 0
+Mirror @ M1 {
+   DistanceToNext = 120
+   FaceAngle = 0
+   ROC = 200
+   ROC_tan = 200
+}
+PlateInput @ PI3 {
+   Selected
+   LinkedTo = PO4
+   RefractiveIndex = 2.5
+   FaceAngle = 45
+   ROC = 0
+   ROC_tan = 0
+   Thickness = 100
+}
+PlateOutput @ PO4 {
+   LinkedTo = PI3
+   DistanceToNext = 120
+   ROC = -300
+   ROC_tan = -300
+}
+Mirror @ M2 {
+   DistanceToNext = 0
+   FaceAngle = 0
+   ROC = 200
+   ROC_tan = 200
+}
+
+Renderer 2d {
+   System = Sys_02357410
+   Window = 0, 0, 500, 200
+   XMiddle = 125
+   YMiddle = 0
+   Zoom = 1
+   OpticScale = 50
+   ModeScale = 20
+   GridSize = 10
+   Flags = 10
+}
+`},
+
 ];
+
+let filter = null;
+// filter = "test_plate";
+// filter = "test_plate_input_curved";
+// filter = "test_plate_face_angle_input_curved";
 
 collection.systemload = {
 	label: "System load",
-   cases: testCases,
-   // cases: testCases.filter(c => c.label === "test_linear_block_angled_curved"),
+   cases: testCases.filter(c => !filter || c.label === filter),
+   // cases: testCases.filter(c => /lensmaker/.test(c.label)),
 
 	/**
 	 * Run a single test, returning a value indicating whether the
@@ -1383,3 +1928,12 @@ collection.systemload = {
 	}
 };
 }(window.testCollection));
+
+/*
+n1 = 1; n2 = 2.5; q1 = 45 * Math.PI / 180; q2 = Math.asin(Math.sin(q1) / n2);
+[[1, 0], [(n2 * Math.cos(q2) - n1 * Math.cos(q1)) / R, 1]]
+
+[[Math.cos(q2) / Math.cos(q1), 0, (n2 * Math.cos(q2) - n1 * Math.cos(q1)) / (Math.cos(q1) * Math.cos(q2) * R), Math.cos(q1) / Math.cos(q2)]]
+
+
+*/

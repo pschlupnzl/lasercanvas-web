@@ -545,44 +545,53 @@ window.LaserCanvas.Element.Dielectric.prototype = {
 		//  - Input  --<--  q2 = qExt, q1 = qInt
 		//  - Output -->--  q2 = qExt, q1 = qInt
 		//  - Output --<--  q2 = qInt, q1 = qExt
-		if (isFace1) {
-			// Input face.
+		if ((isFace1 && dir > 0) || (!isFace1 && dir < 0)) {
+			// Entering block.
 			n1 = 1.00;
-			q1 = dir > 0 ? qext : qint;
 			n2 = nint;
-			q2 = dir > 0 ? qint : qext;
+			q1 = qext;
+			q2 = qint;
 		} else {
-			// Output face.
+			// Exiting block.
+			// What new devilry is this? Why are  n1 = 1 and  n2 = n for
+			// both entering and exiting the material?
+			//
+			// It turns out this is the only way to get normal-incidence
+			// lensmaker's cavity to work, to wit:
+			//
+			// |----()----| Lens with f = 200 mm
+			// |---(::)---| Thin material with n = 2, R = 400.
+			//
+			// Lensmakers formula
+			//
+			//   1             /  1     1  \
+			//  --- = (n - 1) |  --- - ---  |
+			//   f             \ R_1   R_2 /
+			//
+			// although we're using the opposite sign convention for R_2.
+			// The implications are that angled, curved interfaces *may*
+			// not give correct results.
+			//  - The normal incidence case has been checked against the
+			//    lensmaker's formula.
+			//  - The flat face case is independent of n, since the only
+			//    elements to involve the refractive index are scaled by
+			//    1 / R;  the other (diagonal) elements depend on angles
+			//    only.  Inspection of the beam behaviour  (expansion in
+			//    the tangential plane by the projection angle) suggests
+			//    that these calculations are correct.
+			//  - I don't have an easy way to  check the curved,  angled
+			//    case. The values here do  *not*  agree with with those
+			//    calculated by the desktop LaserCanvas app, though it's
+			//    not immediately obvious how the calculations diverge.
 			n1 = 1.00;
-			q1 = dir > 0 ? qint : qext;
 			n2 = nint;
-			q2 = dir > 0 ? qext : qint;
+			q1 = qint;
+			q2 = qext
 		}
 
-		// // ! C++ LaserCanvas does not distinguish the ABCD transfer !
-		// // ! matrix based on propagation direction, which I think   !
-		// // ! now is wrong. It's equivalent to   if (isFace1)        !
-		// // if (true || (dir > 0 && isFace1) || (dir < 0 && !isFace1)) {
-		// if (isFace1) {
-		// 	n1 = 1.0;   // Incident from air.
-		// 	n2 = n;     // Going into dielectric.
-		// } else {
-		// 	n1 = n;     // Incident from dielectric.
-		// 	n2 = 1.0;   // Going into air.
-		// }
-
-		// // Angles.
-		// // We work off the external angle of incidence.
-		// if ((dir > 0 && isFace1) || (dir < 0 && !isFace1)) {
-		// 	q1 = q0;    // {number} (rad) External angle of incidence.
-		// 	q2 = Math.asin(Math.sin(q0) / n); // {number} (rad) Internal angle of refraction.
-		// } else {
-		// 	q1 = Math.asin(Math.sin(q0) / n); // {number} (rad) Internal angle of refraction.
-		// 	q2 = q0;    // {number} (rad) External angle of incidence.
-		// }
 		cosq1 = Math.cos(q1);
 		cosq2 = Math.cos(q2);
-		
+
 		// Sagittal or tangential.
 		//  n1 sin q1 = n2 sin q2
 		//     dn_sag = n2 cos q2 - n1 cos q1 
