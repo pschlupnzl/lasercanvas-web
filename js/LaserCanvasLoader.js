@@ -106,6 +106,7 @@ window.LaserCanvas = {
 			'js/system/SystemAdjustLite.js',
 			'js/system/SystemNew.js',
 			'js/system/SystemLoad.js',
+			'js/system/SystemJson.js',
 			'js/Utilities.js',
 
 			'js/panel/HelpPanel.js',
@@ -147,7 +148,6 @@ window.LaserCanvas = {
 					cnv.className = 'render2d';
 					LaserCanvas.app = new LaserCanvas.Application(cnv, info);
 					LaserCanvas.app.init();
-					LaserCanvas.app.launch(LaserCanvas.System.configuration.startup);
 				});
 		},
 		

@@ -1,7 +1,8 @@
 /**
 * LaserCanvas - Screen element for inspecting the beam.
 */
-window.LaserCanvas.Element.Screen = function () {
+(function (LaserCanvas) {
+LaserCanvas.Element.Screen = function () {
 	"use strict";
 	this.type = "Screen"; // {string} Primitive element type.
 	this.name = 'I';      // {string} Name of this element (updated by System).
@@ -21,7 +22,27 @@ window.LaserCanvas.Element.Screen = function () {
 	this.abcdQ = {};      // {object<object>} ABCD propagation coefficient after this optic.
 };
 
-window.LaserCanvas.Element.Screen.prototype = {
+/** Element type name to identify screen element. */
+LaserCanvas.Element.Screen.Type = "Screen";
+
+LaserCanvas.Element.Screen.prototype = {
+	/** Return a serializable representation of this object. */
+	toJson: function () {
+		return {
+			type: this.type,
+			name: this.name,
+			loc: LaserCanvas.Utilities.extend({}, this.loc),
+			prop: LaserCanvas.Utilities.extend({}, this.prop)
+		};
+	},
+
+	/** Load a serialized representation of this object. */
+	fromJson: function (json) {
+		this.name = json.name;
+		LaserCanvas.Utilities.extend(this.loc, json.loc);
+		LaserCanvas.Utilities.extend(this.prop, json.prop);
+	},
+
 	// ----------------------------------------------------
 	//  Information panel.
 	// ----------------------------------------------------
@@ -55,7 +76,6 @@ window.LaserCanvas.Element.Screen.prototype = {
 		"use strict";
 		var self = this,
 			el,
-			LaserCanvas = window.LaserCanvas,
 			panel = document.createElement('div');
 		panel.className = 'elementScreenPanel';
 		panel.setAttribute('data-compact-view', 'true');
@@ -100,7 +120,7 @@ window.LaserCanvas.Element.Screen.prototype = {
 			this.loc.y = ax.y;
 			this.loc.q = this.loc.p = ax.q; // {number} (rad) Incoming axis.
 		}
-		return window.LaserCanvas.clone(this.loc);
+		return LaserCanvas.clone(this.loc);
 	},
 	
 	/**
@@ -178,7 +198,6 @@ window.LaserCanvas.Element.Screen.prototype = {
 	updateAbcdQ: function (abcdQ, plane) {
 		"use strict";
 		var k, info, el,
-			LaserCanvas = window.LaserCanvas,
 			sel = '[data-column="{0}"]'.replace('{0}', plane === LaserCanvas.Enum.modePlane.sagittal ? 'sag' : 'tan'),
 			rows = this.panel.querySelectorAll('[data-info]');
 		for (k = 0; k < rows.length; k += 1) {
@@ -211,7 +230,7 @@ window.LaserCanvas.Element.Screen.prototype = {
 	* @param {number} tol Tolerance.
 	* @returns {boolean} Value indicating whether this element is at given location.
 	*/
-	atLocation: window.LaserCanvas.Element.atLocation,
+	atLocation: LaserCanvas.Element.atLocation,
 	
 	/**
 	* Draw this object.
@@ -222,7 +241,6 @@ window.LaserCanvas.Element.Screen.prototype = {
 	draw: function (render, layer, wireframe) {
 		"use strict";
 		var
-			LaserCanvas = window.LaserCanvas,
 			renderLayer = LaserCanvas.Enum.renderLayer, // {Enum} Layer to draw.
 			qc = -this.loc.q; // {number} (rad) Angle on canvas.
 		
@@ -262,13 +280,13 @@ window.LaserCanvas.Element.Screen.prototype = {
 /**
 * Drawing path for wireframe.
 */
-window.LaserCanvas.Element.Screen.wireframePath = 
+LaserCanvas.Element.Screen.wireframePath = 
 	'M {0} -{1} L 0 -{1} L 0 {1} L {0} {1} S';
 
 /**
 * Inner HTML content for the panel.
 */
-window.LaserCanvas.Element.Screen.panelHtml = [
+LaserCanvas.Element.Screen.panelHtml = [
 	'<div class="dragbar"></div>',
 	'<h1></h1>',
 	'<button data-action="compact"></button>',
@@ -323,3 +341,4 @@ window.LaserCanvas.Element.Screen.panelHtml = [
 		'</button>',
 	'</div>'
 ].join('');
+}(window.LaserCanvas));

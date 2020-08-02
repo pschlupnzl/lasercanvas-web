@@ -2,7 +2,8 @@
 * LaserCanvas - lens element.
 * Also used as thermal lens within a block.
 */
-window.LaserCanvas.Element.Lens = function () {
+(function (LaserCanvas) {
+LaserCanvas.Element.Lens = function () {
 	"use strict";
 	this.type = 'Lens'; // {string} Primitive element type.
 	this.name = 'L'; // {string} Name of this element (updated by System).
@@ -23,14 +24,31 @@ window.LaserCanvas.Element.Lens = function () {
 };
 
 /** Element type name to identify a lens element. */
-window.LaserCanvas.Element.Lens.Type = "Lens";
+LaserCanvas.Element.Lens.Type = "Lens";
 
 // Standard focal lengths.
-window.LaserCanvas.Element.Lens.standard = [
+LaserCanvas.Element.Lens.standard = [
 	-1000, -750, -500, -400, -300, -250, -200, -175, -150, -125, -100,  -75,  -50,   -25,
 	  +25,  +50,  +75, +100, +125, +150, +175, +200, +250, +300, +400, +500, +750, +1000];
 
-window.LaserCanvas.Element.Lens.prototype = {
+LaserCanvas.Element.Lens.prototype = {
+	/** Return a serializable representation of this object. */
+	toJson: function () {
+		return {
+			type: this.type,
+			name: this.name,
+			loc: LaserCanvas.Utilities.extend({}, this.loc),
+			prop: LaserCanvas.Utilities.extend({}, this.prop)
+		};
+	},
+
+	/** Load a serialized representation of this object. */
+	fromJson: function (json) {
+		this.name = json.name;
+		LaserCanvas.Utilities.extend(this.loc, json.loc);
+		LaserCanvas.Utilities.extend(this.prop, json.prop);
+	},
+
 	/**
 	* Set thermal lens attributes.
 	* @param {number} focalLength (mm) Focal length of lens to create.
@@ -71,7 +89,7 @@ window.LaserCanvas.Element.Lens.prototype = {
 			this.loc.y = ax.y;
 			this.loc.q = this.loc.p = ax.q; // {number} (rad) Incoming / outgoing axis.
 		}
-		return window.LaserCanvas.clone(this.loc);
+		return LaserCanvas.clone(this.loc);
 	},
 	
 	/**
@@ -84,7 +102,7 @@ window.LaserCanvas.Element.Lens.prototype = {
 			{
 				propertyName: 'focalLength',
 				increment: 10, // {number} Increment on up/down key.
-				standard: window.LaserCanvas.Element.Lens.standard // {Array<number>} Standard values.
+				standard: LaserCanvas.Element.Lens.standard // {Array<number>} Standard values.
 			}
 		];
 	},
@@ -152,7 +170,7 @@ window.LaserCanvas.Element.Lens.prototype = {
 	elementAbcd: function (dir_notused, plane_notused) {
 		"use strict";
 		var f = this.prop.focalLength;  // {number} (mm) Focal length.
-		return new window.LaserCanvas.Math.Matrix2x2(1, 0, f === 0 ? 0 : -1 / f, 1);
+		return new LaserCanvas.Math.Matrix2x2(1, 0, f === 0 ? 0 : -1 / f, 1);
 	},
 	
 	// ----------------------------------------------------
@@ -169,12 +187,12 @@ window.LaserCanvas.Element.Lens.prototype = {
 		var image, 
 			f = this.prop.focalLength,
 			qc = -this.loc.p, // {number} (rad) Display angle on canvas.
-			renderLayer = window.LaserCanvas.Enum.renderLayer; // {Enum} Layer to draw.
+			renderLayer = LaserCanvas.Enum.renderLayer; // {Enum} Layer to draw.
 		
 		if (!this.isThermalLens() || f !== 0) { // Don't draw an empty thermal lens.
 			switch (layer) {
 				case renderLayer.optics:
-					image = window.LaserCanvas.theme.current[
+					image = LaserCanvas.theme.current[
 						f < 0 ? 'lensConcave' :
 						'lensConvex'
 					];
@@ -198,7 +216,6 @@ window.LaserCanvas.Element.Lens.prototype = {
 	wireframe: function (render, layer) {
 		"use strict";
 		var k, dx,
-			LaserCanvas = window.LaserCanvas, // {object} Namespace.
 			renderLayer = LaserCanvas.Enum.renderLayer,    // {Enum} Layer to draw.
 			d = [], // {Array<string>} Path drawing instructions.
 			r = 8,  // {number} "Thickness" of mirror.
@@ -244,5 +261,5 @@ window.LaserCanvas.Element.Lens.prototype = {
 			}
 		}
 	}
-
 };
+}(window.LaserCanvas));

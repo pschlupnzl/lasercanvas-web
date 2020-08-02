@@ -567,6 +567,30 @@ window.LaserCanvas.System = function () {
 		// -------------------------------------------------
 		
 		/**
+		 * Reset the system to the given JSON state.
+		 * @param {function} jsonSource Function to invoke to retrieve the JSON data.
+		 */
+		fromJsonSource = function (jsonSource) {
+			try {
+				jsonSource(mprop, melements);
+			} catch (e) {
+				createNew(window.LaserCanvas.System.configuration.linear);
+			}
+			calculateCartesianCoordinates();
+			fireEventListeners("change");
+			fireEventListeners("update");
+		},
+
+		/**
+		 * Write the current system JSON to the given destination.
+		 * @param {function} jsonDestination Function invoked to create the JSON data.
+		 */
+		toJsonDestination = function (jsonDestination) {
+			var json = LaserCanvas.SystemUtil.toJson(mprop, melements);
+			jsonDestination(json);
+		},
+
+		/**
 		* Create a default system.
 		* @param {string:System.configuration} configuration Type of cavity to build 'linear'|'ring'|'endcap'.
 		* @param {Array<object>} elementsInfo Information about each element, if explicitly creating.
@@ -582,79 +606,6 @@ window.LaserCanvas.System = function () {
 			calculateCartesianCoordinates();
 			fireEventListeners('change');
 			fireEventListeners('update');
-			
-			/*
-
-			(function (self) {
-				var 
-					Utilities = window.LaserCanvas.Utilities, // {object} Utility methods.
-					
-					// Create the file from the given string.
-					// @param {string} str String containing file.
-					load = function (str) {
-						var data = null;
-						try {
-							data = JSON.parse(str);
-						} catch (ex) {
-							// NOP.
-						}
-						if (data) {
-							mprop.wavelength = data.wavelength;
-							createNew(data.configuration, data.elements, data.loc);
-						}
-					},
-					
-					// Save the system to a string.
-					// @returns {string} String containing system.
-					save = function () {
-						var k, element, txt, str,
-							data = {
-								configuration: mprop.configuration,
-								wavelength: mprop.wavelength,
-								loc: {
-									x: melements[0].loc.x,
-									y: melements[0].loc.y,
-									q: melements[0].loc.q
-								},
-								elements: []
-							};
-							
-						for (k = 0; k < melements.length; k += 1) {
-							element = melements[k];
-							////console.log(element.prop);
-							data.elements.push([
-								element.type,
-								element.property('thickness') || element.loc.l, // Dielectric use thickness?
-								Utilities.extend({}, element.prop)
-							]);
-							
-						}
-						str = prompt('Copy / paste system data', JSON.stringify(data));
-						load(str);
-						////if (window.console && console.log) {
-						////	console.log(str);
-						////}
-						////txt = document.querySelector('textarea.saveFile');
-						////if (!txt) {
-						////	txt = document.createElement('textarea');
-						////	txt.className = 'saveFile';
-						////	txt.style.position = 'fixed';
-						////	txt.rows = 20;
-						////	txt.cols = 50;
-						////	document.body.appendChild(txt);
-						////}
-						////txt.value = JSON.stringify(data, null, 3);
-					};
-					
-				document.querySelector('.feedbackPanel label').onclick = function (e) {
-					var data;
-					if (e.shiftKey&& (e.ctrlKey || e.metaKey)) {
-						save();
-					}
-				};
-
-			}(this));
-			*/
 		},
 
 		/**
@@ -686,6 +637,7 @@ window.LaserCanvas.System = function () {
 		elementAtLocation: elementAtLocation,     // Find an element at the given mouse location.
 		element: element,                         // Returns the element at the given index.
 		elements: elements,                       // Retrieve elements for this system.
+		fromJsonSource: fromJsonSource,           // Reset the system to the given JSON state.
 		fromTextFile: fromTextFile,               // Load a LaserCanvas 5 text file.
 		insertElement: insertElement,             // Insert a new element near the given point.
 		inspectSegment: inspectSegment,           // Inspect beam on a segment (from segmentNearLocation).
@@ -694,6 +646,7 @@ window.LaserCanvas.System = function () {
 		removeElement: removeElement,             // Remove the given element.
 		removeEventListener: removeEventListener, // Remove an event handler.
 		segmentNearLocation: segmentNearLocation, // Segment point closest to point.
+		toJsonDestination: toJsonDestination,     // Write JSON to a destination.
 		update: update,                           // Update system calculation.
 		userProperties: userProperties            // Retrieve properties for read/write by user.
 	};

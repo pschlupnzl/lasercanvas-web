@@ -249,6 +249,14 @@ window.LaserCanvas.Application = function (canvas, info) {
 							.download();
 					}, this);
 				};
+
+				// On every change, store to local storage.
+				msystem.addEventListener("update", function () {
+					msystem.toJsonDestination(LaserCanvas.SystemUtil.toLocalStorage);
+				});
+
+				// Initialize from local storage, if possible.
+				msystem.fromJsonSource(LaserCanvas.SystemUtil.fromLocalStorage);
 			}());
 
 			(function () {
@@ -398,7 +406,6 @@ window.LaserCanvas.Application = function (canvas, info) {
 	this.addEventListener = addEventListener; // Add a listener for the given event 'interactionChange'|'insertElement'|etc.
 	this.fireEventListeners = fireEventListeners; // Fire listeners for an event 'interactionChange'|'insertElement'|etc.
 	this.init = init;           // Initialize the application.
-	this.launch = launch;       // Launch the application with a new cavity.
 };
 
 /**

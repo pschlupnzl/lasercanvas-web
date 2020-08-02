@@ -1,7 +1,8 @@
 /**
 * LaserCanvas - mirror element.
 */
-window.LaserCanvas.Element.Mirror = function () {
+(function (LaserCanvas) {
+LaserCanvas.Element.Mirror = function () {
 	"use strict";
 	this.type = 'Mirror'; // {string} Primitive element type.
 	this.name = 'M'; // {string} Name of this element (updated by System).
@@ -21,12 +22,32 @@ window.LaserCanvas.Element.Mirror = function () {
 	this.abcdQ = {}; // {object<object>}} ABCD propagation coefficient after this optic.
 };
 
+/** Element type name to identify a mirror element. */
+LaserCanvas.Element.Mirror.Type = "Mirror";
+
 // Standard radii of curvature.
-window.LaserCanvas.Element.Mirror.standard = [
+LaserCanvas.Element.Mirror.standard = [
 	-1000, -750, -500, -400, -300, -250, -200, -175, -150, -125, -100,  -75,  -50,   -25, 0,
 	  +25,  +50,  +75, +100, +125, +150, +175, +200, +250, +300, +400, +500, +750, +1000]
 
-window.LaserCanvas.Element.Mirror.prototype = {
+LaserCanvas.Element.Mirror.prototype = {
+
+	/** Return a serializable representation of this object. */
+	toJson: function () {
+		return {
+			type: this.type,
+			name: this.name,
+			loc: LaserCanvas.Utilities.extend({}, this.loc),
+			prop: LaserCanvas.Utilities.extend({}, this.prop)
+		};
+	},
+
+	/** Load a serialized representation of this object. */
+	fromJson: function (json) {
+		this.name = json.name;
+		LaserCanvas.Utilities.extend(this.loc, json.loc);
+		LaserCanvas.Utilities.extend(this.prop, json.prop);
+	},
 
 	// ----------------------------------------------------
 	//  Coordinates and properties.
@@ -45,7 +66,7 @@ window.LaserCanvas.Element.Mirror.prototype = {
 			this.loc.p = this.loc.q = ax.q;  // {number} (rad) Incoming axis.
 			this.loc.q += this.property('deflectionAngle'); // {number} (rad) Outgoing axis.
 		}
-		return window.LaserCanvas.clone(this.loc);
+		return LaserCanvas.clone(this.loc);
 	},
 	
 	/**
@@ -57,7 +78,7 @@ window.LaserCanvas.Element.Mirror.prototype = {
 			{
 				propertyName: 'radiusOfCurvature',
 				increment: 5, // {number} Increment on up/down key.
-				standard: window.LaserCanvas.Element.Mirror.standard // {Array<number>} Standard values.
+				standard: LaserCanvas.Element.Mirror.standard // {Array<number>} Standard values.
 			}
 		];
 		if (!(this.prop.startOptic || this.prop.endOptic)) {
@@ -201,7 +222,7 @@ window.LaserCanvas.Element.Mirror.prototype = {
 		switch (layer) {
 			case renderLayer.optics:
 				roc = this.prop.radiusOfCurvature;
-				image = window.LaserCanvas.theme.current[
+				image = LaserCanvas.theme.current[
 					roc > 300 ? 'mirrorConcave' :
 					roc < -300 ? 'mirrorConvex' :
 					roc > 0 ? 'mirrorConcaveMore' :
@@ -226,7 +247,7 @@ window.LaserCanvas.Element.Mirror.prototype = {
 	wireframe: function (render, layer) {
 		"use strict";
 		var k, dx,
-			LaserCanvas = window.LaserCanvas, // {object} Namespace.
+			LaserCanvas = LaserCanvas, // {object} Namespace.
 			renderLayer = LaserCanvas.Enum.renderLayer,    // {Enum} Layer to draw.
 			d = [], // {Array<string>} Path drawing instructions.
 			r = 8,  // {number} "Thickness" of mirror.
@@ -268,3 +289,4 @@ window.LaserCanvas.Element.Mirror.prototype = {
 		}
 	}
 };
+}(window.LaserCanvas));
