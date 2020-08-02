@@ -247,7 +247,6 @@ LaserCanvas.Element.Mirror.prototype = {
 	wireframe: function (render, layer) {
 		"use strict";
 		var k, dx,
-			LaserCanvas = LaserCanvas, // {object} Namespace.
 			renderLayer = LaserCanvas.Enum.renderLayer,    // {Enum} Layer to draw.
 			d = [], // {Array<string>} Path drawing instructions.
 			r = 8,  // {number} "Thickness" of mirror.

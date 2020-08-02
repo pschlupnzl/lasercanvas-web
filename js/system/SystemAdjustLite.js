@@ -1,7 +1,8 @@
 /**
 * Laser canvas system - Adjustment calculations.
 */
-window.LaserCanvas.systemAdjust = function (melements, calculateCartesianCoordinates) {
+(function (LaserCanvas) {
+LaserCanvas.systemAdjust = function (melements, calculateCartesianCoordinates) {
 	"use strict";
 	
 	/** ************************************************
@@ -284,7 +285,6 @@ window.LaserCanvas.systemAdjust = function (melements, calculateCartesianCoordin
 		*/
 		dragElementStretch = function (pt, ptStart, elDrag_notused) {
 			var a, S, P, ptEnd,
-				LaserCanvas = window.LaserCanvas,      // {object:LaserCanvas} Namespace.
 				Vector = LaserCanvas.Math.Vector,      // {function} Vector construction function.
 				prev = mdragData.prev,                 // {object} Previous construction element.
 				next = mdragData.next;                 // {object} Next construction element.
@@ -342,7 +342,6 @@ window.LaserCanvas.systemAdjust = function (melements, calculateCartesianCoordin
 		*/
 		dragElementPivot = function (pt, ptStart, elDrag_notused) {
 			var
-				LaserCanvas = window.LaserCanvas,      // {object:LaserCanvas} Namespace.
 				Vector = LaserCanvas.Math.Vector,      // {function} Vector construction function.
 				extend = LaserCanvas.Utilities.extend, // {function} Extend objects.
 				
@@ -394,7 +393,7 @@ window.LaserCanvas.systemAdjust = function (melements, calculateCartesianCoordin
 						// cheap and cheerful party trick does not seem to cause
 						// any negative side effects, so the overall verdict is:
 						// Do it.
-						a = Math.abs(a);	
+						a = Math.abs(a);
 						if (a > 0) {
 							data.stretch.element.property('distanceToNext', a);
 						
@@ -634,3 +633,4 @@ window.LaserCanvas.systemAdjust = function (melements, calculateCartesianCoordin
 		end: dragElementEnd
 	};
 };
+}(window.LaserCanvas));
