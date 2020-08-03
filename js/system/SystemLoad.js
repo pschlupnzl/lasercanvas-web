@@ -201,6 +201,21 @@
 						}
 						break;
 
+					case "PrismA":
+						elementJson.type = LaserCanvas.Element.Dispersion.Type;
+						elementJson.prop = {
+							type: LaserCanvas.Element.Dispersion.eType.Prism,
+							refractiveIndex: toNumber(src.RefractiveIndex, variables)
+						};
+						break;
+
+					case "PrismB":
+						elementJson.type = LaserCanvas.Element.Dispersion.Type;
+						elementJson.prop = {
+							type: LaserCanvas.Element.Dispersion.eType.Prism
+						};
+						break;
+
 					case "Flat":
 						// Flat mirrors only. These are most likely between two
 						// prisms, so we'll just ignore them here.

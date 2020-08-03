@@ -37,8 +37,8 @@ LaserCanvas.Element.Dispersion.propertyDefault = {
 	// Prism values:
 	prismInsertion: 0,             // {number} (mm) Prism insertion.
 	refractiveIndex: 1.5,          // {number} Refractive index (for prism).
-	indexDispersion: -0.013,       // {number} (um^-1) First derivative dn / d lam. (e.g. BK7@1um).
-	groupVelocityDispersion: 0.011 // {number} (um^-2) Second derivative d^2 n / d lam^2 (e.g. BK7@1um).
+	indexDispersion: 0,            // {number} (um^-1) First derivative dn / d lam. (e.g. BK7@1um).
+	groupVelocityDispersion: 0     // {number} (um^-2) Second derivative d^2 n / d lam^2 (e.g. BK7@1um).
 	
 	////// Grating values:
 	////gratingDensity: 600   // {number} (1/mm) Groove density per mm (for gratings).
@@ -126,6 +126,7 @@ LaserCanvas.Element.Dispersion.prototype = {
 	/** Load a serialized representation of this object. */
 	fromJson: function (json) {
 		this.name = json.name;
+		this.setDefaults(json.prop.type);
 		LaserCanvas.Utilities.extend(this.loc, json.loc);
 		LaserCanvas.Utilities.extend(this.prop, json.prop);
 		LaserCanvas.Utilities.extend(this.priv, json.priv);
