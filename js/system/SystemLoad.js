@@ -201,6 +201,10 @@
 						}
 						break;
 
+					case "Flat":
+						// Flat mirrors only. These are most likely between two
+						// prisms, so we'll just ignore them here.
+						// FALL THROUGH:
 					default:
 						// Accumulate skipped element spacing.
 						if (src.DistanceToNext) {
@@ -243,7 +247,7 @@
 		reBooleanProperty = /^(Flipped)$/m,
 
 		/** Regular expression matching an element declaration: Element @ Name = { */
-		reElementDeclaration = /^(Mirror|ThinLens|Screen|BrewsterInput|BrewsterOutput|CrystalInput|CrystalOutput|PlateInput|PlateOutput|ThermalLens|PrismA|PrismB)\s*@\s*([^\s]+)\s*{$/m,
+		reElementDeclaration = /^(Mirror|ThinLens|Screen|BrewsterInput|BrewsterOutput|CrystalInput|CrystalOutput|PlateInput|PlateOutput|ThermalLens|PrismA|PrismB|Flat)\s*@\s*([^\s]+)\s*{$/m,
 	
 		/** Regular expression matching a renderer declaration: Renderer 2d { */
 		reRendererDeclaration = /^Renderer\s+(SystemGraph|2d)\s*\{$/m,
