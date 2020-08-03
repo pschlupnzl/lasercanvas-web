@@ -1,0 +1,159 @@
+<HTML>
+<HEAD>
+<TITLE>Optic Statements</TITLE>
+<LINK REL=StyleSheet HREF="style.css" TYPE="text/css">
+</HEAD>
+<BODY>
+<A NAME="top"></A>
+<P><A HREF="lc5_cont.html">LaserCanvas 5</A> &gt; <A HREF="files_intro.html">Data Files</A> &gt;</P>
+<H2>Optic Statements</H2>
+<HR>
+
+<P>In each <A HREF="files_system.html">system block</A>, there should be at least two optics depending on the type of system:</P>
+
+<UL>
+<LI>Resonator: Two cavity end <A HREF="opt_mirr.html">mirrors</A>.</LI>
+<LI>Propagation: A <A HREF="opt_srce.html">Source</A> and a <A HREF="opt_scrn.html">Screen</A>.</LI>
+<LI>Out-coupled system: An <A HREF="opt_spwn.html">Output Coupler</A> and a <A HREF="opt_scrn.html">Screen</A>.</LI>
+</UL>
+
+<P>More information about optic statements:</P>
+<UL>
+<LI><A HREF="#format">Format</A></LI>
+<LI><A HREF="#type">Optic Type Keywords</A></LI>
+<LI><A HREF="#prop">Optic Properties</A></LI>
+<LI><A HREF="#link">Optic Linking</A></LI>
+<LI><A HREF="#flags">Optic Flag Keywords</A></LI>
+</UL>
+
+
+
+
+<A NAME="format"><H3>Format</H3></A>
+
+<P>Each optic statement starts with an optic type keyword, followed by an the optic tag delimited by an @ character. If a tag is not specified, a default tag is given to the optic. The remaining lines defining the optic parameters are bracketed by <TT>{</TT> ...  <TT>}</TT> braces. For example,</P>
+
+<P><PRE>
+   Mirror @ M1 {
+      DistanceToNext = 100
+      ROC = 200
+   }
+</PRE></P>
+
+<P><A HREF="#top">^ Top</A></P>
+
+
+
+<A NAME="type"><H3>Optic Type Keywords</H3></A>
+<P>The optic type must be one of the following keywords.</P>
+
+<TABLE BORDER=0 ALIGN="CENTER">
+<TR><TD COLSPAN=2><HR></TD></TR>
+<TR VALIGN="TOP"><TD><B>Keyword</B></TD><TD><B>Description</B></TD></TR>
+<TR><TD COLSPAN=2><HR></TD></TR>
+<TR VALIGN="TOP"><TD><TT>BrewsterInput</TT></TD><TD>Entrance face of a Brewster-angled <A HREF="opt_plat.html">plate</A>. Must be linked to a <TT>BrewsterOutput</TT> optic.</TD></TR>
+<TR VALIGN="TOP"><TD><TT>BrewsterOutput</TT></TD><TD>Exit face of a Brewster-angled plate. Must be linked to a <TT>BrewsterInput</TT> optic.</TD></TR>
+<TR VALIGN="TOP"><TD><TT>CrystalInput</TT></TD><TD>Entrance face of a <A HREF="opt_plat.html">crystal</A>. Must be linked to a <TT>CrystalOutput</TT> optic.</TD></TR>
+<TR VALIGN="TOP"><TD><TT>CrystalOutput</TT></TD><TD>Exit face of a crystal. Must be linked to a <TT>CrystalInput</TT> optic.</TD></TR>
+<TR VALIGN="TOP"><TD><TT>FlatMirr</TT></TD><TD>Flat <A HREF="opt_mirr.html">mirror</A>. Only <TT>FlatMirr</TT> and <TT>Screen</TT> optics may appear between <TT>PrismA</TT> and <TT>PrismB</TT>. If it is between prisms, must be linked to a <TT>PrismA</TT> optic. <TT>FlatMirr</TT> can also be used in place of a <TT>Mirror</TT> optic.</TD></TR>
+<TR VALIGN="TOP"><TD><TT>Mirror</TT></TD><TD>A general <A HREF="opt_mirr.html">mirror</A>.</TD></TR>
+<TR VALIGN="TOP"><TD><TT>OutputCoupler</TT></TD><TD>A special type of optic that is used at the start of <A HREF="opt_spwn.html">out-coupled</A> systems.</TD></TR>
+<TR VALIGN="TOP"><TD><TT>Screen</TT></TD><TD>An information <A HREF="opt_scrn.html">screen</A>. A screen object is used to terminate propagation systems. If the screen is within a Brewster-angled plate, a crystal, a plate, or between prisms, it must be linked to a <TT>BrewsterInput</TT>, <TT>CrystalInput</TT>, <TT>PlateInput</TT>, or <TT>PrismA</TT> optic.</TD></TR>
+<TR VALIGN="TOP"><TD><TT>Source</TT></TD><TD>Optic used to start <A HREF="opt_srce.html">propagation</A> systems.</TD></TR>
+<TR VALIGN="TOP"><TD><TT>ThermalLens</TT></TD><TD>A thin <A HREF="opt_lens.html">lens</A>. Only a <TT>ThermalLens</TT> or a <TT>Screen</TT> object may appear between the <TT>Input</TT> and <TT>Output</TT> optics. If the thermal lens is within a Brewster-angled plate, a crystal, a plate, or between prisms, it must be linked to a <TT>BrewsterInput</TT>, <TT>CrystalInput</TT>, <TT>PlateInput</TT>, or <TT>PrismA</TT> optic, respectively.</TD></TR>
+<TR VALIGN="TOP"><TD><TT>ThinLens</TT></TD><TD>A general thin <A HREF="opt_lens.html">lens</A>.</TD></TR>
+<TR VALIGN="TOP"><TD><TT>PlateInput</TT></TD><TD>Entrance face of a refractive <A HREF="opt_plat.html">plate</A>. Must be linked to a <TT>PlateOutput</TT> optic.</TD></TR>
+<TR VALIGN="TOP"><TD><TT>PlateOutput</TT></TD><TD>Exit face of a refractive plate. Must be linked to a <TT>PlateInput</TT> optic.</TD></TR>
+<TR VALIGN="TOP"><TD><TT>PrismA</TT></TD><TD>First prism in a <A HREF="opt_pris.html">prism pair</A>. Must be linked to a <TT>PrismB</TT> optic.</TD></TR>
+<TR VALIGN="TOP"><TD><TT>PrismB</TT></TD><TD>Second prism in a prism pair. Must be linked to a <TT>PrismA</TT> optic.</TD></TR>
+<TR><TD COLSPAN=2><HR></TD></TR>
+</TABLE>
+
+<P><A HREF="#top">^ Top</A></P>
+
+
+
+<A NAME="prop"><H3>Optic Properties</H3></A>
+<TABLE BORDER=0 ALIGN="CENTER">
+<TR><TD COLSPAN=2><HR></TD></TR>
+<TR VALIGN="TOP"><TD><B>Property</B></TD><TD><B>Description</B></TD></TR>
+<TR><TD COLSPAN=2><HR></TD></TR>
+<TR VALIGN="TOP"><TD><TT>DistanceToNext</TT></TD><TD>Specifies the free-space distance to the subsequent optic. This property is ignored for the last optic in the system. It cannot be used for <TT>BrewsterInput</TT>, <TT>CrystalInput</TT>, <TT>PlateInput</TT>, and <TT>ThermalLens</TT> optics, or <TT>Screen</TT> when linked to an <TT>Input</TT> optic, since the spacing of these optics is governed by the <TT>Thickness</TT> property of the entrance face optic.</TD></TR>
+<TR VALIGN="TOP"><TD><TT>FaceAngle</TT></TD><TD>The face angle of <TT>Mirror</TT>, <TT>FlatMirr</TT>, <TT>PlateInput</TT> and <TT>CrystalInput</TT> optics. See the <A HREF="opt_intro.html">Optics</A> section for information about how this value is interpreted.</TD></TR>
+<TR VALIGN="TOP"><TD><TT>FL</TT></TD><TD>The focal length of a <TT>ThinLens</TT> or <TT>ThermalLens</TT> optic. If the lens definition is astigmatic, the <TT>FL</TT> property refers to the focal length in the sagittal plane.</TD></TR>
+<TR VALIGN="TOP"><TD><TT>FL_tan</TT></TD><TD>For astigmatic <TT>ThinLens</TT> or <TT>ThermalLens</TT> optics, the focal length in the  tangential plane.</TD></TR>
+<TR VALIGN="TOP"><TD><TT>RefractiveIndex</TT></TD><TD>Specifies the refractive index. This property is only valid for <TT>BrewsterInput</TT>, <TT>CrystalInput</TT>, <TT>PlateInput</TT>, and <TT>PrismA</TT> optics.</TD></TR>
+<TR VALIGN="TOP"><TD><TT>ROC</TT></TD><TD>The radius of curvature of <TT>Mirror</TT> or any of the interface optics <TT>BrewsterInput</TT>, <TT>BrewsterOutput</TT>, <TT>CrystalInput</TT>, <TT>CrystalOutput</TT>, <TT>PlateInput</TT>, and <TT>PlateOutput</TT>. If the mirror or interface curvature is astigmatic, the <TT>ROC</TT> property refers to the radius of curvature in the sagittal plane. See the <A HREF="opt_intro.html">Optics</A> section for information about the sign conventions in each of these.</TD></TR>
+<TR VALIGN="TOP"><TD><TT>ROC_tan</TT></TD><TD>For astigmatic mirror or interface optics (see <TT>ROC</TT>), the radius of curvature in the tangential plane.</TD></TR>
+<TR VALIGN="TOP"><TD><TT>Thickness</TT></TD><TD>Defines the thickness for <TT>BrewsterInput</TT>, <TT>CrystalInput</TT>, and <TT>PlateInput</TT> optics.</TD></TR>
+<TR><TD COLSPAN=2><HR></TD></TR>
+</TABLE>
+
+<P><A HREF="#top">^ Top</A></P>
+
+
+
+
+<A NAME="link"><H3>Optic Linking</H3></A>
+<P>Two keywords are used for linking systems and optics together. If the target of a link is missing, such as when an optic of with the tag specified by <TT>LinkedTo</TT> is not specified within the file, the linking optic is removed from the system.</P>
+
+<TABLE ALIGN="CENTER" BORDER=0>
+<TR><TD COLSPAN=3><HR></TD></TR>
+<TR VALIGN="TOP"><TD><B>Keyword</B></TD><TD><B>Value</B></TD><TD><B>Description</B></TD></TR>
+<TR><TD COLSPAN=3><HR></TD></TR>
+<TR VALIGN="TOP"><TD><TT>LinkedTo</TT></TD><TD>Optic tag</TD><TD>Links to together optics including
+<UL>
+<LI><TT>BrewsterInput</TT></LI>
+<LI><TT>BrewsterOutput</TT></LI>
+<LI><TT>CrystalInput</TT></LI>
+<LI><TT>CrystalOutput</TT></LI>
+<LI><TT>PlateInput</TT></LI>
+<LI><TT>PlateOutput</TT></LI>
+<LI><TT>ThermalLens</TT></LI>
+<LI><TT>PrismA</TT></LI>
+<LI><TT>PrismB</TT></LI>
+<LI><TT>Screen</TT> when within a refractive <A HREF="opt_plat.html">element</A> or between <A HREF="opt_pris.html">prisms</A>.</LI>
+</LI>
+</TD></TR>
+<TR VALIGN="TOP"><TD><TT>Spawn</TT></TD><TD>System tag</TD><TD>Defines a new <A HREF="opt_spwn.html">out-coupled</A> system. The <TT>Spawn</TT> keyword can only be used for <TT>Mirror</TT> optics. The system block for the out-coupled system should follow after the last optic in the top-level system.</TD></TR>
+<TR><TD COLSPAN=3><HR></TD></TR>
+</TABLE>
+
+<P><A HREF="#top">^ Top</A></P>
+
+
+
+
+
+<A NAME="flags"><H3>Optic Flag Keywords</H3></A>
+<P>The following flag keywords can appear anywhere within an optic statement.</P>
+
+<TABLE BORDER=0 ALIGN="CENTER">
+<TR><TD COLSPAN=2><HR></TD></TR>
+<TR VALIGN="TOP"><TD><B>Property</B></TD><TD><B>Description</B></TD></TR>
+<TR><TD COLSPAN=2><HR></TD></TR>
+<TR VALIGN="TOP"><TD><TT>Selected</TT></TD><TD>Specifies that the optic is selected.</TD></TR>
+<TR VALIGN="TOP"><TD><TT>LockedAngle</TT></TD><TD>Specifies that the <TT>Mirror</TT> or <TT>FlatMirr</TT> optic face angle is locked, and should not be changed when optics are dragged in the <A HREF="intfce_2d.html">Canvas</A>.</TD></TR>
+<TR VALIGN="TOP"><TD><TT>Flipped</TT></TD><TD>For <TT>BrewsterInput</TT> and <TT>PrismA</TT> optics, specifies that the refraction should turn the centreline anti-clockwise. If the <TT>Flipped<TT> keyword is not specified, the centreline is turned clockwise at the Brewster-angled interface.</TD></TR>
+<TR VALIGN="TOP"><TD><TT>Astigmatic</TT></TD><TD>Specifies that the optic focal length or radius of curvature is defined separately in the sagittal and tangential planes. applies to the following optics:
+<UL>
+<LI><TT>Mirror</TT></LI>
+<LI><TT>ThinLens</TT></LI>
+<LI><TT>ThermalLens</TT></LI>
+<LI><TT>BrewsterInput</TT></LI>
+<LI><TT>BrewsterOutput</TT></LI>
+<LI><TT>CrystalInput</TT></LI>
+<LI><TT>CrystalOutput</TT></LI>
+<LI><TT>PlateInput</TT></LI>
+<LI><TT>PlateOutput</TT></LI>
+</UL>
+
+</TD></TR>
+<TR><TD COLSPAN=2><HR></TD></TR>
+</TABLE>
+
+<P><A HREF="#top">^ Top</A></P>
+
+
+</BODY>
+</HTML>

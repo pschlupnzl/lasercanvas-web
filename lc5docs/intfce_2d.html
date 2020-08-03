@@ -1,0 +1,129 @@
+<HTML>
+<HEAD>
+<TITLE>Canvas</TITLE>
+<LINK REL=StyleSheet HREF="style.css" TYPE="text/css">
+</HEAD>
+<BODY>
+<P><A HREF="lc5_cont.html">LaserCanvas 5</A> &gt; <A HREF="intfce_intro.html">Interface</A> &gt;
+<H2><IMG SRC="but_reso.png" WIDTH=40 HEIGHT=40> Canvas</H2>
+<HR>
+
+<P>The Canvas is the main window in which a system layout is edited. Each opened system is shown in a Canvas window; closing the Canvas window also closes the file. For out-coupled systems, closing the Canvas window deletes the out-coupled system from the file.</P>
+
+<P ALIGN="CENTER><IMG SRC="cnv01.png" WIDTH=336 HEIGHT=162></P>
+
+<P>The Canvas shows the optical system, with to-scale optic positions, angles, and sizes subject to the scaling properties listed below. The display includes an icon for each optic and the beam mode along the system.</P>
+
+<H3>Canvas Properties</H3>
+
+<TABLE BORDER=0>
+<TR><TD COLSPAN=2><HR></TD></TR>
+<TR VALIGN="TOP"><TD><B>Property</B></TD><TD><B>Description</B></TD></TR>
+<TR><TD COLSPAN=2><HR></TD></TR>
+<TR VALIGN="TOP"><TD>
+Zoom (%)
+</TD><TD>
+The overall magnification factor. The default value is 100%, which corresponds to 1 mm per pixel.
+</TD></TR><TR VALIGN="TOP"><TD>
+Mode Scale
+</TD><TD>
+The magnification factor for the displayed mode. For example, if the mode is 250 um and the Mode Scale is 20, then the mode is displayed as 250 um x 20 = 5 mm large.
+</TD></TR><TR VALIGN="TOP"><TD>
+Optics Size (mm)
+</TD><TD>
+The displayed diameter of the optics.
+</TD></TR><TR VALIGN="TOP"><TD>
+Grid Size (mm)
+</TD><TD>
+The spacing between adjacent grid lines. The grid lines are only displayed and movement is only constrained when the Snap to Grid box is checked.
+</TD></TR><TR VALIGN="TOP"><TD>
+Snap to Grid
+</TD><TD>
+When checked, displays the grid and constrains mouse dragging of optics to fall on the intersections of grid lines.
+</TD></TR><TR VALIGN="TOP"><TD>
+Separations
+</TD><TD>
+When checked, the separation between optics is displayed near the centreline.
+</TD></TR><TR VALIGN="TOP"><TD>
+Annotations
+</TD><TD>
+When checked, information about each optic is displayed adjacent to the optic icon.
+</TD></TR><TR VALIGN="TOP"><TD>
+Waists
+</TD><TD>
+When checked, waists in the beam are highlighted by a vertical line.
+<TR><TD COLSPAN=2><HR></TD></TR>
+</TD></TR></TABLE>
+
+<H3>Canvas Tools</H3>
+<P>The Canvas windows includes a number of editing tools, listed in the <U>C</U>anvas menu and as buttons on the toolbar.</P>
+
+<P>In general, the Control key acts as a tool modifier. </P>
+<UL>
+<LI>Holding Ctrl while dragging pans the Canvas view.</LI>
+<LI>Holding Ctrl + Shift while dragging changes the Zoom level.</LI>
+</UL>
+
+
+
+<H4><IMG SRC="but_arrw.png" WIDTH=20 HEIGHT=20> Selection Tool</H4>
+
+<P>For editing, the Selection tool is normally used. The Selection tool allows for single and multiple selections using the Shift key, as well as marquee selection by dragging across the Canvas. Selected optics can then be manipulated by dragging them at the centreline.</P>
+
+
+
+<H4><IMG SRC="but_meas.png" WIDTH=20 HEIGHT=20> Measure Tool</H4>
+
+<P>The Measure tool supports all of the functionality of the Selection tool. In addition, the Measure tool allows you to quickly examine the mode size at arbitrary points within the cavity.</P>
+
+<TABLE ALIGN="CENTER">
+<TR><TD ALIGN="CENTER"><IMG SRC="tutres16.png" WIDTH=261 HEIGHT=141></TD></TR>
+<TR><TD ALIGN="CENTER"><IMG SRC="tutres17.png" WIDTH=615 HEIGHT=20></TD></TR>
+</TABLE>
+ 
+<P>The cavity mode size at the position marked is shown in the status bar at the bottom of the LaserCanvas window. The two numbers refer to the sagittal and tangential mode size, respectively.</P>
+
+
+
+<H4><IMG SRC="but_zoom.png" WIDTH=20 HEIGHT=20> Zoom Tool</H4>
+
+<P>The Zoom tool gives a convenient way to zoom in on a particular section of the cavity. The selection dragged in the Canvas is enlarged to fill the window.</P>
+
+<TABLE ALIGN="CENTER"><TR VALIGN="MIDDLE>
+<TD><IMG SRC="tutres18.png" WIDTH=251 HEIGHT=161></TD><TD> &nbsp; </TD>
+<TD><IMG SRC="tutres19.png" WIDTH=251 HEIGHT=161></TD>
+</TR></TABLE>
+
+<IMG SRC="tutres20.png" WIDTH=256 HEIGHT=19><BR>
+<P>To zoom out, hold down Shift and click in the Canvas. Alternatively, enter the desired magnification level in the Zoom field in the Property Manager.</P>
+
+
+
+<H4><IMG SRC="but_tpan.png" WIDTH=20 HEIGHT=20> Pan Tool</H4>
+
+<P>With the Pan tool selected, clicking and dragging the Canvas scrolls the visible portions of the system in the window. The coordinates of the optics in the system remain unchanged.</P>
+
+<TABLE ALIGN="CENTER"><TR VALIGN="MIDDLE>
+<TD><IMG SRC="tutres25.png" WIDTH=251 HEIGHT=171></TD><TD> &nbsp; </TD>
+<TD><IMG SRC="tutres26.png" WIDTH=251 HEIGHT=171></TD>
+</TR></TABLE>
+
+
+
+<H4><IMG SRC="but_trot.png" WIDTH=20 HEIGHT=20> Rotate Tool</H4>
+
+<P>The Rotate tool allows you to rotate the entire system. Unlike the Pan tool, the Rotate tool changes the system directly by modifying the Rotation, Start X, and Start Y properties. </P>
+
+<TABLE ALIGN="CENTER"><TR VALIGN="MIDDLE">
+<TD><IMG SRC="tutres21.png" WIDTH=251 HEIGHT=171></TD><TD> &nbsp; </TD>
+<TD><IMG SRC="tutres23.png" WIDTH=251 HEIGHT=171></TD>
+</TR><TR>
+<TD><IMG SRC="tutres22.png" WIDTH=257 HEIGHT=55></TD><TD> &nbsp; </TD>
+<TD><IMG SRC="tutres24.png" WIDTH=256 HEIGHT=55></TD>
+</TR></TABLE>
+
+<P>The system is rotated about the centre of the window, indicated by the cross-hairs. If you wish to move the rotation axis, use the Pan tool to position the system under the cross-hairs as desired, then Rotate the system.</P>
+
+
+</BODY>
+</HTML>

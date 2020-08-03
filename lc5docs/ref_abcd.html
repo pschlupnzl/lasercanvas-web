@@ -1,0 +1,86 @@
+<HTML>
+<HEAD>
+<TITLE>ABCD Matrices</TITLE>
+<LINK REL=StyleSheet HREF="style.css" TYPE="text/css">
+</HEAD>
+<BODY>
+<P><A HREF="lc5_cont.html">LaserCanvas 5</A> &gt; <A HREF="ref_intro.html">Reference</A> &gt; </P>
+<H2><I>ABCD</I> Matrices</H2>
+<HR>
+
+<P>The <I>ABCD</I> or ray-matrix formalism is used in the paraxial approximation of geometrical optics. A ray is characterised by its lateral position <I>r</I> relative to the central axis of the system, and the slope <NOBR><I>r</I>'</NOBR>.</P>
+
+<P>
+We can then define a 2 x 2 matrix for an optic or a set of optics that maps the incident <I>r</I>, <NOBR><I>r</I>'</NOBR> to new values according to</P>
+
+<P ALIGN="CENTER"><IMG SRC="reqabcd1.png" WIDTH=146 HEIGHT=44></P>
+
+<P>
+LaserCanvas uses the reduced-angle convention described in A.E. Siegman, <I>Lasers</I>, University Science Books (1986). In this convention, the second element of the [<I>r</I>, <NOBR><I>r</I>'</NOBR>] vector is not the geometric divergence angle, but the effective divergence reduced by refraction. The resulting <I>ABCD</I> matrices have unit determinant.</P>
+
+<P>
+The <I>ABCD</I> matrices as used by LaserCanvas are listed in the following table.</P>
+
+<TABLE BORDER=0 ALIGN="CENTER">
+<TR><TD COLSPAN=4><HR></TD></TR>
+<TR><TD><B>Element</B></TD><TD><B>Parameters</B></TD><TD><B>Sagittal</B></TD><TD><B>Tangential</B></TD></TR>
+<TR><TD COLSPAN=4><HR></TD></TR>
+
+<TR VALIGN="MIDDLE">
+<TD>Space</TD>
+<TD>Distance <I>L</I><BR>Refractive index <I>n</I></TD>
+<TD COLSPAN=2 ALIGN="CENTER"><IMG SRC="reqabcd2.png" WIDTH=53 HEIGHT=61></TD>
+</TR>
+
+<TR VALIGN="MIDDLE">
+<TD>Lens</TD>
+<TD>Focal length <I>f</I></TD>
+<TD COLSPAN=2 ALIGN="CENTER"><IMG SRC="reqabcd3.png" WIDTH=60 HEIGHT=61></TD>
+</TR>
+
+<TR VALIGN="MIDDLE">
+<TD>Mirror</TD>
+<TD>Radius Curvature <I>R</I> (Concave: <I>R</I> &gt; 0)<BR>Incidence angle <IMG SRC="ref_theta.png" WIDTH=10 HEIGHT=13 ALT="q"></TD>
+<TD ALIGN="CENTER"><IMG SRC="reqabcd4.png" WIDTH=88 HEIGHT=61></TD>
+<TD ALIGN="CENTER"><IMG SRC="reqabcd5.png" WIDTH=94 HEIGHT=61></TD>
+</TR>
+
+<TR VALIGN="MIDDLE">
+<TD>Curved dielectric</TD>
+<TD>
+<NOBR><I>n</I><SUB>1</SUB>sin<IMG SRC="ref_theta.png" WIDTH=10 HEIGHT=13 ALT="q"><SUB>1</SUB></NOBR>
+=<NOBR><I>n</I><SUB>2</SUB>sin<IMG SRC="ref_theta.png" WIDTH=10 HEIGHT=13 ALT="q"><SUB>2</SUB></NOBR><BR>
+<NOBR><IMG SRC="ref_delta.png" WIDTH=10 HEIGHT=13 ALT="D"><I>n</I><SUB>SAG</SUB></NOBR>
+= <NOBR><I>n</I><SUB>2</SUB>cos<IMG SRC="ref_theta.png" WIDTH=10 HEIGHT=13 ALT="q"><SUB>2</SUB></NOBR>
+- <NOBR><I>n</I><SUB>1</SUB>cos<IMG SRC="ref_theta.png" WIDTH=10 HEIGHT=13 ALT="q"><SUB>1</SUB></NOBR><BR>
+<NOBR><IMG SRC="ref_delta.png" WIDTH=10 HEIGHT=13 ALT="D"><I>n</I><SUB>TAN</SUB></NOBR>
+= <IMG SRC="reqabcd6.png" WIDTH=115 HEIGHT=37 VALIGN="MIDDLE">
+</TD>
+<TD ALIGN="CENTER"><IMG SRC="reqabcd7.png" WIDTH=83 HEIGHT=61></TD>
+<TD ALIGN="CENTER"><IMG SRC="reqabcd8.png" WIDTH=111 HEIGHT=85></TD>
+</TR>
+
+<TR><TD COLSPAN=4><HR></TD></TR>
+</TABLE>
+
+
+
+
+<H3>Stability Parameter</H3>
+<P>For a resonator, the system stability can be calculated from the trace of the round-trip matrix <B>M</B> by</P>
+
+<P ALIGN="CENTER"><IMG SRC="reqabcd9.png" WIDTH=66 HEIGHT=32></P>
+
+<P>For stable resonators, <NOBR>|<I>g</I>|</NOBR> &lt; 1. The stability parameter gives some indication of the robustness of the resonant mode against slight changes in the cavity configuration.</P>
+
+
+
+
+<H3>Internal Representation</H3>
+<P>The <I>ABCD</I> matrices are not explicitly stored. They are calculated whenever necessary from the optic properties. Since many of the optics' properties can be defined using <A HREF="opt_eqtn.html">equations</A>, the <I>ABCD</I> matrices are, in general, not constant.</P>
+
+<P>For the resonant and propagating mode calculations, the <I>ABCD</I> matrices are represented in a custom 4-element class using IEEE double precision. The matrix pre-multiplication used in resonator calculations is explicitly expanded by element.</P>
+
+
+</BODY>
+</HTML>

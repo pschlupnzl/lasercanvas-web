@@ -1,0 +1,151 @@
+<HTML>
+<HEAD>
+<TITLE>Solver</TITLE>
+<LINK REL=StyleSheet HREF="style.css" TYPE="text/css">
+</HEAD>
+<BODY>
+<P><A HREF="lc5_cont.html">LaserCanvas 5</A> &gt; <A HREF="intfce_intro.html">Interface</A> &gt;
+<H2><IMG SRC="but_solv.png" WIDTH=40 HEIGHT=40> Solver</H2>
+<HR>
+
+<P>The Solver attempts to find optimal values for the LaserCanvas variables my minimizing or maximizing its fitness function.</P>
+
+<P ALIGN="CENTER"><IMG SRC="rslv01.png" WIDTH=399 HEIGHT=129></P>
+
+<P>The expression to be optimized is entered into the edit field. The equation can span multiple lines.</P>
+
+<P>Clicking the Solve button commences the search.</P>
+
+<P>Clicking the Evaluate button displays a window indicating the current value that the expression evaluates to, without initiating the search.</P>
+
+<P>Clicking the Restore button returns the LaserCanvas variable values to those before the Solver was opened.</P>
+
+
+
+<H3>Fitness Function</H3>
+
+<P>The fitness function is expressed as an equation that evaluates to a single value. The solver attempts to either minimize or maximize its value.</P>
+
+<P>If you wish to optimize to a value other than zero, we recommend minimizing terms such as</P>
+<P ALIGN="CENTER"><TT>(x – 500)^2</TT></P>
+<P>that diverge as <I>x</I> deviates either above or below 500.</P>
+
+<P>For solving, it may also be useful to use comparative operators such as</P>
+<P ALIGN="CENTER"><TT>(x &lt;= 20)</TT></P>
+<P>which evaluate to 1 if the condition is true, and 0 otherwise.</P>
+
+
+
+<H4>Optic Parameters</H4>
+
+<P>The parameters of the optics in the system can be accessed using the notation</P>
+<P ALIGN="CENTER"><TT>M1.w_sag</TT></P>
+<P>where <TT>M1</TT> is the optic’s tag and <TTI>w_sag</TT> is one of the parameters in the following table.</P>
+
+<TABLE BORDER=0>
+<TR><TD COLSPAN=3><HR></TD></TR>
+<TR><TD COLSPAN=2><B>Property</B></TD><TD><B>Description</B></TD></TR>
+<TR><TD COLSPAN=3><HR></TD></TR>
+<TR VALIGN="TOP"><TD>
+<TT>w_sag</TT>
+</TD><TD>
+<TT>w_tan</TT>
+</TD><TD>
+Sagittal or tangential mode size at the optic.
+</TD></TR><TR vALIGN="TOP"><TD>
+<TT>R_sag</TT>
+</TD><TD>
+<TT>R_tan</TT>
+</TD><TD>
+Sagittal or tangential wave front radius of curvature at the optic.
+</TD></TR><TR vALIGN="TOP"><TD>
+<TT>w0_sag</TT>
+</TD><TD>
+<TT>w0_tan</TT>
+</TD><TD>
+Sagittal or tangential mode nearest the optic. See the notes on Optic Graph.s
+</TD></TR><TR vALIGN="TOP"><TD>
+<TT>z0_sag</TT>
+</TD><TD>
+<TT>z0_tan</TT>
+</TD><TD>
+Distance from the optic to the nearest sagittal or tangential waist. See notes on <A HREF="intfce_vxgraph.html">Optic Graphs</A>.
+</TD></TR><TR vALIGN="TOP"><TD>
+<TT>zR_sag</TT>
+</TD><TD>
+<TT>zR_tan</TT>
+</TD><TD>
+The mode Rayleigh length in the sagittal or tangential plane.
+</TD></TR><TR vALIGN="TOP">
+<TD COLSPAN=2>
+<TT>dz0</TT>
+</TD><TD>
+The beam astigmatism at the optic.
+</TD></TR>
+<TR><TD COLSPAN=3><HR></TD></TR>
+</TABLE>
+
+
+
+<H4>System Parameters</H4>
+<P>Properties of the system can be accessed directly by typing in one of the following.</P>
+
+<TABLE BORDER=0>
+<TR><TD COLSPAN=3><HR></TD></TR>
+<TR><TD COLSPAN=2><B>Property</B></TD><TD><B>Description</B></TD></TR>
+<TR><TD COLSPAN=3><HR></TD></TR>
+<TR VALIGN="TOP"><TD>
+<TT>G_sag</TT>
+</TD><TD>
+<TT>G_tan</TT>
+</TD><TD>
+Cavity stability in the sagittal or tangential plane.
+</TD></TR><TR VALIGN="TOP">
+<TD COLSPAN=2>
+<TT>Lopt</TT>
+</TD><TD>
+Optical cavity length, in mm.
+</TD></TR><TR VALIGN="TOP">
+<TD COLSPAN=2>
+<TT>frep</TT>
+</TD><TD>Cavity mode spacing, in MHz.</TD></TR>
+<TR><TD COLSPAN=3><HR></TD></TR>
+</TABLE>
+
+
+
+<H4>Variable Values</H4>
+<P>Finally, the LaserCanvas variables can be included in the fitness function, by typing <TT>x</TT>, <TT>y</TT>, or <TT>z</TT>.</P>
+
+
+
+
+<H3>Algorithm</H3>
+<P>The Solver performs a <I>very simple</I> Nelder-Mead type simplex minimize search. For optimal results, it may be necessary to try different variable starting values and different weightings to the desired parameters in the optimization equation. Cases where the Solver cannot find a satisfactory solution do not necessarily imply that a solution cannot be found, although there are many instances when solutions do not exist.</P>
+
+
+
+
+<H3>Solver Properties</H3>
+<TABLE BORDER=0>
+<TR><TD COLSPAN=2><HR></TD></TR>
+<TR><TD><B>Property</B></TD><TD><B>Description</B></TD></TR>
+<TR><TD COLSPAN=2><HR></TD></TR>
+<TR VALIGN="TOP"><TD>
+Max. Iterations
+</TD><TD>The maximum number of solver steps to perform. Setting a high value may cause the program to become unresponsive.
+</TD></TR><TR VALIGN="TOP"><TD>
+Function Tolerance
+</TD><TD>
+The tolerance on the fitness function to terminate the search.
+</TD></TR><TR VALIGN="TOP"><TD>
+Solve For
+</TD><TD>
+Specifies whether the fitness function should be minimized or maximized. Finding the maximum is equivalent to finding the minimum of the negative fitness function.
+</TD></TR>
+<TR><TD COLSPAN=2><HR></TD></TR>
+</TABLE>
+
+
+</BODY>
+</HTML>

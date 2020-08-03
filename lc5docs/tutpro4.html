@@ -1,0 +1,38 @@
+<HTML>
+<HEAD>
+<TITLE>Optimize with the Solver</TITLE>
+<LINK REL=StyleSheet HREF="style.css" TYPE="text/css">
+</HEAD>
+<BODY>
+<P><A HREF="lc5_cont.html">LaserCanvas 5</A> &gt; <A HREF="tut_intro.html">Tutorials</A> &gt; <A HREF="tutpro_intro.html">Collimating Telescope</A> &gt; </P>
+<H2>Part 4. Optimize with the Solver</H2>
+<P><A HREF="tutpro3.html">&lt;&nbsp;Prev</A> | <A HREF="tutpro5.html">Next&nbsp;&gt;</A></P>
+<HR>
+
+<P>We wish to find an optic spacing that creates a beam size of 2 mm at the collimating <A HREF="opt_lens.html">lens</A>. As an approximately collimated condition, we specify that we wish the waist position to be 100 m after the lens. In addition, we add Solver penalties for variables <I>x</I> and <I>y</I> should they become negative or larger than 500 mm. See also the <A HREF="intfce_solv.html">Solver</A> section.
+
+<UL>
+<LI>
+Create a system Solver by selecting menu <U>T</U>ools | Sol<U>v</U>er or clicking the
+<NOBR><IMG SRC="but_solv.png" WIDTH=20 HEIGHT=20>&nbsp;Solver</NOBR> button on the toolbar.</LI>
+
+<LI>
+In the edit field, enter the expression below to be minimized. The text can wrap over several lines, but must form a valid expression.</LI>
+</UL>
+
+<TABLE ALIGN="CENTER" BORDER=0><TR><TD><TT>
+(L4.w_sag-2000)^2 + 1e-6*(L4.z0_sag-100000)^2<BR>
++ (y&lt;0)*y^2 + (y&gt;500)*(y-500)^2<BR>
++ (x&lt;0)*x^2 + (x&gt;500)*(x-500)^2
+</TT></TD></TR></TABLE>
+
+<UL>
+<LI>Click the Solve button. For best results, you may wish to click the Solve button several times.</LI>
+</UL>
+
+<P ALIGN="CENTER"><IMG SRC="tutpro19.png" WIDTH=332 HEIGHT=40></P>
+<HR>
+<P><A HREF="tutpro3.html">&lt;&nbsp;Prev</A> | <A HREF="tutpro5.html">Next&nbsp;&gt;</A></P>
+
+</BODY>
+</HTML>

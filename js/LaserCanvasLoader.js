@@ -90,23 +90,26 @@ window.LaserCanvas = {
 			'js/LaserCanvasTheme.js',
 			'js/Localize.js',
 			'js/Math.js',
-			'js/Element.js',
-			'js/ElementDielectric.js',
-			'js/ElementDispersion.js',
-			'js/ElementLens.js',
-			'js/ElementMirror.js',
-			'js/ElementScreen.js',
-			'js/GraphPanel.js',
-			'js/PropertiesPanel.js',
-			'js/InfoPanel.js',
+			'js/element/Element.js',
+			'js/element/ElementDielectric.js',
+			'js/element/ElementDispersion.js',
+			'js/element/ElementLens.js',
+			'js/element/ElementMirror.js',
+			'js/element/ElementScreen.js',
+			'js/panel/GraphPanel.js',
+			'js/panel/PropertiesPanel.js',
+			'js/panel/InfoPanel.js',
 			'js/Render.js',
 			'js/Sellmeier.js',
-			'js/System.js',
-			'js/SystemAbcd.js',
-			'js/SystemAdjustLite.js',
+			'js/system/System.js',
+			'js/system/SystemAbcd.js',
+			'js/system/SystemAdjustLite.js',
+			'js/system/SystemNew.js',
+			'js/system/SystemLoad.js',
+			'js/system/SystemJson.js',
 			'js/Utilities.js',
 
-			'js/HelpPanel.js',
+			'js/panel/HelpPanel.js',
 			'css/HelpPanel.css',
 			// Also:
 			// refractiveIndex.js - Used by Sellmeier.
@@ -145,7 +148,6 @@ window.LaserCanvas = {
 					cnv.className = 'render2d';
 					LaserCanvas.app = new LaserCanvas.Application(cnv, info);
 					LaserCanvas.app.init();
-					LaserCanvas.app.launch(LaserCanvas.System.configuration.startup);
 				});
 		},
 		

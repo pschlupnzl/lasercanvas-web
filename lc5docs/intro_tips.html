@@ -1,0 +1,97 @@
+<HTML>
+<HEAD>
+<TITLE>Top-10 Tips</TITLE>
+<LINK REL=StyleSheet HREF="style.css" TYPE="text/css">
+</HEAD>
+<BODY>
+<P><A HREF="lc5_cont.html">LaserCanvas 5</A> &gt; <A HREF="intro_intro.html">Introduction</A> &gt; </P>
+<H2>Top-10 Tips</H2>
+<HR>
+
+
+
+<H3>1. Grab optics at the centreline.</H3>
+<P>Optics can only be selected and moved by their "vertex" at the centreline of the system. When the mouse is over an optic vertex, the mouse cursor changes to indicate that the optic can be selected and moved. The icons themselves cannot be selected.</P>
+<TABLE BORDER=0 ALIGN=CENTER><TR>
+<TD ALIGN="CENTER"><IMG SRC="tip1a.png" WIDTH=60 HEIGHT=60></TD>
+<TD ALIGN="CENTER"><IMG SRC="tip1b.png" WIDTH=60 HEIGHT=60></TD>
+</TR><TR>
+<TD ALIGN="CENTER">Incorrect</TD>
+<TD ALIGN="CENTER">Correct</TD>
+</TR></TABLE> 
+
+
+
+<H3>2. There are no space elements.</H3>
+<P>You do not need to insert space elements between optics. The positioning of the remaining optics (mirrors, lenses, etc.) automatically defines the spaces between them.</P>
+ 
+<IMG SRC="tip2b.png" WIDTH=257 HEIGHT=21><BR>
+<P>To precisely define the separation between two optics, select the optic before the space you wish to define and enter the desired spacing in the Distance to Next item in the Property Manager.</P>
+ 
+<IMG SRC="tip2c.png" WIDTH=258 HEIGHT=20><BR>
+<P>To precisely determine the thickness of a refractive element, select the input face and enter the desired thickness in the Thickness item in the Property Manager.</P>
+<TABLE BORDER=0 ALIGN="CENTER"><TR VALIGN="CENTER">
+<TD><IMG SRC="tip2a.png" WIDTH=116 HEIGHT=55></TD><TD>Displayed Separation</TD>
+</TR></TABLE>
+
+
+
+<H3>3. Set the system wavelength.</H3>
+<P>If you are looking for accurate mode sizes, the wavelength of the system (and the <I>M</I><SUP>2</SUP> beam propagation factor) must be set correctly. By default, LaserCanvas assumes a wavelength of 1064 nm. The mode typically scales in proportion to the wavelength, so an incorrect wavelength leads to inaccurate mode sizes.</P>
+
+
+
+<H3>4. Flat mirrors have curvature = 0.</H3>
+<P>Mathematically, the radius of curvature of a flat mirror, or a flat wave front, is infinite. LaserCanvas uses ROC = 0 to denote flat mirrors and wave fronts. </P>
+
+<IMG SRC="tip3a.png" WIDTH=257 HEIGHT=21><BR>
+<P>Due to floating-point round-off, flat or nearly-flat wave fronts may sometimes be displayed as large curvatures, such as 1 x 10<SUP>18</SUP> mm.</P>
+
+
+
+<H3>5. Focusing mirrors have positive curvature.</H3>
+<P>Similarly, focusing lenses have positive focal lengths.</P>
+<TABLE BORDER=0 ALIGN=CENTER>
+<TR VALIGN="MIDDLE"><TD ALIGN="RIGHT"><IMG SRC="tip4aa.png" WIDTH=56 HEIGHT=56></TD><TD><IMG SRC="tip4ab.png" WIDTH=257 HEIGHT=21></TD></TR>
+<TR VALIGN="MIDDLE"><TD ALIGN="RIGHT"><IMG SRC="tip4ba.png" WIDTH=56 HEIGHT=56></TD><TD><IMG SRC="tip4bb.png" WIDTH=254 HEIGHT=21></TD></TR>
+<TR VALIGN="MIDDLE"><TD ALIGN="RIGHT"><IMG SRC="tip5aa.png" WIDTH=46 HEIGHT=56></TD><TD><IMG SRC="tip5ab.png" WIDTH=256 HEIGHT=21></TD></TR>
+<TR VALIGN="MIDDLE"><TD ALIGN="RIGHT"><IMG SRC="tip5ba.png" WIDTH=46 HEIGHT=56></TD><TD><IMG SRC="tip5bb.png" WIDTH=254 HEIGHT=21></TD></TR>
+</TABLE>
+
+
+
+<H3>6. Dielectric interface sign convention.</H3>
+<P>A concave dielectric interface, as seen from the refractive material, always has a positive radius of curvature, for both entrance and exit faces. Convex interfaces have negative ROC.</P>
+<TABLE BORDER=0 ALIGN="CENTER">
+<TR VALIGN="MIDDLE"><TD ALIGN="RIGHT"><IMG SRC="tip6aa.png" WIDTH=166 HEIGHT=56></TD><TD><IMG SRC="tip6ab.png" WIDTH=257 HEIGHT=21></TD></TR>
+<TR VALIGN="MIDDLE"><TD ALIGN="RIGHT"><IMG SRC="tip6ba.png" WIDTH=166 HEIGHT=56></TD><TD><IMG SRC="tip6bb.png" WIDTH=257 HEIGHT=21></TD></TR>
+</TABLE>
+
+ 
+
+<H3>7. Units are metric, but not SI.</H3>
+<P>The <I>ABCD</I> formulae are not tied to any system of units and include no conversion factors. LaserCanvas uses a selection of metric convenience units to eliminate large pre-factors. All quantities are listed with their units. Lengths are in mm (<NOBR>10<SUP>–3</SUP></NOBR> m), except wavelength (nm = <NOBR>10<SUP>–9</SUP></NOBR> m) and laser mode and waist sizes (µm = <NOBR>10<SUP>–6</SUP></NOBR> m, displayed as "um").</P>
+<P>If you wish, you can use any other length units (meters, inches, etc.) provided all lengths are expressed in the same units.</P>
+
+
+
+<H3>8. The mode is a guide only.</H3>
+<P>The displayed laser mode appears discontinuous at system corners and is not flush with curved interfaces.</P>
+
+<P ALIGN="CENTER"><IMG SRC="tip8.png" WIDTH=166 HEIGHT=79></P>
+
+<P>Remember that the mode is displayed on a larger scale than the optical system (typically 20x larger). The small offset of curved optics and the actual intersection points with angled optics are not intended to be displayed accurately.</P>
+
+
+
+<H3>9. Sagittal and Tangential.</H3>
+<P>The tangential plane is the plane formed by the incidence ray and the normal to the optic. Since LaserCanvas only models two-dimensional systems, this is equivalent to the plane of the drawing. Thus, the <I>tangential</I> plane is parallel to the table. The <I>sagittal</I> plane <I>sticks out</I>.</P>
+
+
+
+<H3>10. Ring resonators are not supported.</H3>
+<P>This limitation is currently imposed by the interface engine of LaserCanvas, not the <I>ABCD</I> calculations. The calculations for ring resonators are no more complex than for standing-wave resonators.</P>
+
+
+</BODY>
+</HTML>

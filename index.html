@@ -153,6 +153,10 @@
 		<button data-create-system="ultrafast"  ><span data-localize="Ultrafast resonator"></span></button>
 		<button data-create-system="ring"       ><span data-localize="Ring resonator"></span></button>
 		<button data-create-system="propagation"><span data-localize="Propagation system"></span></button>
+		<button data-action="openFile">
+			<input type="file" />
+			<span data-localize="Open file..."></span>
+		</button>
 	</div>
 	
 	<!-- Info panel -->
@@ -201,7 +205,22 @@
 	<button id="LaserCanvasToggleInfo" data-action="toggleInfo"><span></span></button>
 
 	<!-- Help button -->
-	<div class="helpButton" onclick="LaserCanvas.HelpPanel.show()">?</div>
+	<div class="helpButton help" onclick="LaserCanvas.HelpPanel.show()">?</div>
+	<div class="helpButton feedback">
+		<a href="mailto:lasercanvas@outlook.com" title="Send feedback">
+			<svg xmlns="http://www.w3.org/2000/svg" viewBox="-10 -10 20 20">
+				<ellipse cx="0" cy="0" rx="8" ry="5" />
+				<path d="M-7,8 L-4,0 L2,4 Z" />
+			</svg>
+		</a>
+	</div>
+	<div class="helpButton docs">
+		<a href="lc5docs/" title="LaserCanvas 5 documentation">
+			<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 10 10">
+				<path d="M2,1 L6,1 L8,3 L8,9 L2,9 L2,1  M3,3 L7,3  M3,5 L7,5  M3,7 L7,7" stroke="black" fill="none"/>
+			</svg>
+		</a>
+	</div>
 	
 	<!-- Loading bar -->
 	<div class="progressBarLoading"><div></div></div>

@@ -289,6 +289,45 @@ window.LaserCanvas.Math = {};
 					return str;
 				};
 			return '[[' + fmt(0, 0) + '  ' + fmt(0, 1) + '] [' + fmt(1, 0) + '  ' + fmt(1, 1) + ']]';
+		},
+
+		/**
+		 * Returns a value indicating whether the two matrices have elements
+		 * with the same numerical values.
+		 * @param {Matrix2x2} mx Matrix to compare to.
+		 * @param {number=} tol Optional tolerance, defaults to 1e-15. If the value is positive, means significant figures instead.
+		 */
+		isEqual: function (mx, tol) {
+			if (tol === undefined) {
+				tol = 1e-15;
+			}
+			if (this.length !== mx.length) {
+				// Mismatch number of rows.
+				return false;
+			}
+			for (var r = 0; r < this.length; r += 1) {
+				if (this[r].length !== mx[r].length) {
+					// Mismatch number of columns.
+					return false;
+				}
+				for (var c = 0; c < this[r].length; c += 1) {
+					if (isNaN(this[r][c]) || isNaN(mx[r][c])) {
+						return false;
+					}
+					if (tol < 1) {
+						// Tolerance by decimal places.
+						if (tol < 1 && Math.abs(this[r][c] - mx[r][c]) > tol) {
+							return false;
+						}
+					} else {
+						// Or, tolerance by significant figures.
+						if (tol >= 1 && this[r][c].toPrecision(tol) !== mx[r][c].toPrecision(tol)) {
+							return false;
+						}
+					}
+				}
+			}
+			return true;
 		}
 	};
 	

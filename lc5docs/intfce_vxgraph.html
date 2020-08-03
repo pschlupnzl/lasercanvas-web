@@ -1,0 +1,90 @@
+<HTML>
+<HEAD>
+<TITLE>Optic Graph</TITLE>
+<LINK REL=StyleSheet HREF="style.css" TYPE="text/css">
+</HEAD>
+<BODY>
+<P><A HREF="lc5_cont.html">LaserCanvas 5</A> &gt; <A HREF="intfce_intro.html">Interface</A> &gt;
+<H2><IMG SRC="but_rvxg.png" WIDTH=40 HEIGHT=40> Optic Graph</H2>
+<HR>
+
+<P>An Optic Graph displays the evolution of a parameter from the selected optic as a function of a variable. For the graph to be useful, one or more system or optic property should be defined as an equation including the selected ordinate variable.</P>
+
+<P>To create an optic graph, the optic whose property is to be graphed must be selected in the Canvas window. If you wish to examine the properties at a specific location within the cavity, you can insert a Screen at that location, and create an Optic Plot of its properties.</P>
+
+<P ALIGN="CENTER"><IMG SRC="rvg01.png" WIDTH=398 HEIGHT=230></P>
+
+<P>To change the optic property being graphed, click on the graph title and select the desired property from the popup menu. Or, select it from the Optic Property list in the <A HREF="intfce_propmgr.html">Property Manager</A>.</P>
+
+<P>To change the variable against which the property should be plotted, click on the X-axis label and select the desired variable from the popup menu. Or, select it from the Ordinate Variable list in the <A HREF="intfce_propmgr.html">Property Manager</A>.</P>
+
+<P>The X-axis range does not automatically change when the variable range is changed in the <A HREF="intfce_propmgr.html">Property Manager</A>. To update the graph to show the entire span of the variable range, click on the ordinate variable radio button.</P>
+
+
+
+<H3>Optic Graph Properties</H3>
+<TABLE ALIGN="CENTER">
+<TR><TD COLSPAN=2><HR></TD></TR>
+<TR VALIGN="TOP"><TD><B>Property</B></TD><TD><B>Description</B></TD></TR>
+<TR><TD COLSPAN=2><HR></TD></TR>
+<TR VALIGN="TOP"><TD>
+Optic Property
+</TD><TD>
+Specifies which system property value should be plotted on the Y-axis. See table below.
+</TD></TR><TR VALIGN="TOP"><TD>
+Ordinate Variable
+</TD><TD>
+Specifies the variable against which the optic property should be plotted. Any of the LaserCanvas variables can be used.
+</TD></TR><TR VALIGN="TOP"><TD>
+X-Axis Range
+</TD><TD>
+Specifies the minimum and maximum of the horizontal (ordinate variable) axis.
+</TD></TR><TR VALIGN="TOP"><TD>
+Y-Axis Range
+</TD><TD>
+Specifies the minimum and maximum of the vertical (optic property) axis.
+</TD></TR><TR VALIGN="TOP"><TD>
+Points
+</TD><TD>
+Gives the number of points that should be plotted. The number of points is the same for all graphs that plot the same LaserCanvas variable. Note that specifying a large point number can lead to increased calculation times and an unresponsive interface.
+<TR><TD COLSPAN=2><HR></TD></TR>
+</TABLE>
+
+<P>The Optic Property can be one of the following. The mode properties refer to the mode just after the optic.</P>
+
+<TABLE ALIGN="CENTER">
+<TR><TD COLSPAN=2><HR></TD></TR>
+<TR VALIGN="TOP"><TD><B>Optic Property</B></TD><TD><B>Description</B></TD></TR>
+<TR><TD COLSPAN=2><HR></TD></TR>
+<TR VALIGN="TOP"><TD>
+Mode w (um)
+</TD><TD>
+The size of the laser mode at the selected optic, in µm.
+</TD></TR><TR VALIGN="TOP"><TD>
+Curvature R (mm)
+</TD><TD>
+The radius of curvature of the wave front at the optic, in mm.
+</TD></TR><TR VALIGN="TOP"><TD>
+Waist w0 (um)
+</TD><TD>
+The size of the waist nearest the optic, in µm. Note that the waist is not necessarily be physically present, because it could be “behind” the optic, or the mode could be modified by another optic before the waist is reached.
+</TD></TR><TR VALIGN="TOP"><TD>
+Distance z0 (mm)
+</TD><TD>
+The distance from the optic to the nearest waist, in mm. See notes to the Waist property, above.
+</TD></TR><TR VALIGN="TOP"><TD>
+Rayleigh zR (mm)
+</TD><TD>
+The Rayleigh length of the mode, in mm.
+</TD></TR><TR VALIGN="TOP"><TD>
+Astigmatism (mm)
+</TD><TD>
+The distance between the waists in the sagittal and tangential planes. See notes to the Waist property, above.
+<TR><TD COLSPAN=2><HR></TD></TR>
+</TABLE>
+
+<P>For the Astigmatism property, the Optic Graph displays a single line. For the remaining properties, two lines are shown for the sagittal (red) and tangential (blue) planes.</P>
+
+
+</BODY>
+</HTML>

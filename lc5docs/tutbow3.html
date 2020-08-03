@@ -1,0 +1,55 @@
+<HTML>
+<HEAD>
+<TITLE>Examine Astigmatism</TITLE>
+<LINK REL=StyleSheet HREF="style.css" TYPE="text/css">
+</HEAD>
+<BODY>
+<P><A HREF="lc5_cont.html">LaserCanvas 5</A> &gt; <A HREF="tut_intro.html">Tutorials</A> &gt; <A HREF="tutbow_intro.html">Bow-Tie Resonator</A> &gt; </P>
+<H2>Part 3. Examine Astigmatism</H2>
+<A HREF="tutbow2.html">&lt; Prev</A> | <A HREF="tutbow4.html">Next &gt;</A>
+<HR>
+
+<P>In the previous step, you may have noticed that the mode symmetry changes as the angle on the focusing mirror is changed. For some angles, a circular beam can be attained at the end mirrors, when the astigmatism introduced by the Brewster-angled <A HREF="opt_plat.html">crystal</A> is compensated by the off-axis curved <A HREF="opt_mirr.html">mirrors</A>.</P>
+
+<P>Now, we introduce the variable <I>x</I> for the incidence angle on the curved optics and examine the mode symmetry as this variable is varied.</P>
+
+<UL>
+<LI>
+Drag the system into a configuration similar to that shown below. Be sure that the separation between the curved optics is such that the cavity mode is stable. </LI>
+
+<LI>
+Select both of the focusing <A HREF="opt_mirr.html">mirrors</A> by clicking near the centreline while holding the Shift key.</LI>
+</UL>
+
+<P ALIGN="CENTER"><IMG SRC="tutbow10.png" WIDTH=378 HEIGHT=167></P>
+
+<UL>
+<LI><IMG SRC="tutbow11.png" WIDTH=258 HEIGHT=21><BR>
+In the Face Angle field of the <A HREF="intfce_propmgr.html">Property Manager</A>, enter "<TT>x</TT>". (Don't type the quotes.) The cavity layout will change drastically, don't worry about that for now.</LI>
+
+<LI><IMG SRC="tutbow12.png" WIDTH=258 HEIGHT=22><BR>
+In the Rotation field (in the System group) of the Property Manager, enter the formula "<TT>180 + 2*x</TT>". (Spacing is not important.) The cavity layout will change again.</LI>
+
+<LI><IMG SRC="tutbow13.png" WIDTH=256 HEIGHT=18><BR>
+If necessary, expand the Variables group of the Property Manager by clicking on the + Variables heading.</LI>
+
+<LI><IMG SRC="tutbow14.png" WIDTH=258 HEIGHT=84><BR>
+Select variable <I>x</I> from the Variable popup menu.</LI>
+
+<LI><IMG SRC="tutbow15.png" WIDTH=256 HEIGHT=19><BR>
+In the Range field, enter "-20, 20" including the comma. In our case, the variable <I>x</I> represents the range of angles (in degrees) over which we wish to examine the cavity mode.</LI>
+
+<LI><IMG SRC="tutbow16.png" WIDTH=256 HEIGHT=19><BR>
+Now, drag the Slider back and forth. As the Slider is moved, the incidence angles on the mirrors change accordingly.</LI>
+</UL>
+
+<P>The formula "180 + 2*x" entered for the system rotation does not affect the cavity mode, only how the system is displayed in the <A HREF="intfce_2d.html">Canvas</A> window. We add it here so that the bow tie maintains its canonical layout.</P>
+
+<P>Dragging the focusing mirrors once these equations have been defined will erase the definitions. If you need to adjust the spacing between the optics, you’ll have to re-enter the Face Angle formulas. Or, you could define another variable to specify the spacing.</P>
+
+
+<HR>
+<A HREF="tutbow2.html">&lt; Prev</A> | <A HREF="tutbow4.html">Next &gt;</A>
+
+</BODY>
+</HTML>

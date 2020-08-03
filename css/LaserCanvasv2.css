@@ -34,17 +34,36 @@ body {
 .helpButton {
 	position: fixed;
 	right: 0;
-	top: 0;
 	width: 2em;
 	height: 1.5em;
 	background: #f1f52e;
 	font-size: 20px;
 	font-weight: bold;
 	text-align: center;
+	border-top-left-radius: 1em;
 	border-bottom-left-radius: 1em;
 	border: none;
 	cursor: pointer;
 }
+
+	.helpButton.help {
+		top: 0.5em;
+
+	}
+
+	.helpButton.feedback {
+		top: 2.5em;
+	}
+
+	.helpButton.docs {
+		top: 4.5em;
+	}
+
+		.helpButton.feedback svg,
+		.helpButton.docs svg {
+			width: 1.2em;
+			height: 1.3em;
+		}
 
 /**
 * New system panel.
@@ -72,6 +91,18 @@ body {
 		background-color: #aaa;
 	}
 	
+	.laserCanvasNewPanel button[data-action="openFile"] {
+		position: relative;
+		overflow: hidden;
+	}
+
+		.laserCanvasNewPanel button[data-action="openFile"] > input[type="file"] {
+			position: absolute;
+			right: 0;
+			top: 0;
+			font-size: 100px;
+			opacity: 0;
+		}
 /*
 * Toolbar.
 */

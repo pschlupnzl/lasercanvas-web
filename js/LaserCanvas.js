@@ -1,6 +1,12 @@
 /**
 * Laser Canvas - main application controller.
 */
+
+/** When included without UI, e.g. tests. */
+window.LaserCanvas = window.LaserCanvas || {
+	Element: {},    // {Namespace} Elements.
+};
+
 // @param {HTMLCanvasElement} canvas Canvas element where system is drawn.
 // @param {HTMLDivElement} info Panel where to write information.
 window.LaserCanvas.Application = function (canvas, info) {
@@ -231,6 +237,11 @@ window.LaserCanvas.Application = function (canvas, info) {
 				attachClickHandler('.toggleHelp', window.LaserCanvas.showHelp);
 				attachClickHandler('[data-action="toggleRender"]', toggleRenderProperty);
 				attachClickHandler('[data-action="toggleInfopanel"]', toggleInfoAttribute);
+
+				// Listener for file Open button.
+				window.LaserCanvas.SystemUtil.attachLoadListener(
+					document.querySelector("[data-action='openFile'] > input"),
+					msystem, mrender);
 				document.querySelector('button[data-action="download-svg"]').onclick = function () {
 					LaserCanvas.getScript('RenderSvg.js', function () {
 						window.globalRenderSvg = new window.LaserCanvas.RenderSvg(msystem)
@@ -238,6 +249,14 @@ window.LaserCanvas.Application = function (canvas, info) {
 							.download();
 					}, this);
 				};
+
+				// On every change, store to local storage.
+				msystem.addEventListener("update", function () {
+					msystem.toJsonDestination(LaserCanvas.SystemUtil.toLocalStorage);
+				});
+
+				// Initialize from local storage, if possible.
+				msystem.fromJsonSource(LaserCanvas.SystemUtil.fromLocalStorage);
 			}());
 
 			(function () {
@@ -387,7 +406,6 @@ window.LaserCanvas.Application = function (canvas, info) {
 	this.addEventListener = addEventListener; // Add a listener for the given event 'interactionChange'|'insertElement'|etc.
 	this.fireEventListeners = fireEventListeners; // Fire listeners for an event 'interactionChange'|'insertElement'|etc.
 	this.init = init;           // Initialize the application.
-	this.launch = launch;       // Launch the application with a new cavity.
 };
 
 /**
