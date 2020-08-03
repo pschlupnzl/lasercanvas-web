@@ -377,6 +377,17 @@
 		 */
 		attachLoadListener = function (input, system, render) {
 			var
+				/** Create a new input field with a new listener. */
+				refreshInput = function (oldInput) {
+					var newInput = document.createElement("input"),
+						parent = oldInput.parentElement;
+					newInput.type = oldInput.type;
+					newInput.className = oldInput.className;
+					newInput.addEventListener("change", change);
+					parent.insertBefore(newInput, oldInput);
+					parent.removeChild(oldInput);
+				},
+
 				/** Load the text into the system. */
 				loadText = function (src) {
 					render.resetTransform();
@@ -397,6 +408,7 @@
 						reader.onload = onload;
 						text = reader.readAsText(file);
 					}
+					refreshInput(this);
 				};
 			input.addEventListener("change", change);
 		};
