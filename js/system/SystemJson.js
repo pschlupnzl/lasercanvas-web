@@ -1,7 +1,6 @@
 /**
  * System storing and loading.
  */
-
  (function (LaserCanvas) {
 	var localStorageKey = "laserCanvasSystem",
 
@@ -74,8 +73,8 @@
 		};
 
 	LaserCanvas.SystemUtil = LaserCanvas.SystemUtil || {};
-	window.LaserCanvas.SystemUtil.toLocalStorage = toLocalStorage;
-	window.LaserCanvas.SystemUtil.fromLocalStorage = fromLocalStorage;
-	window.LaserCanvas.SystemUtil.toJson = toJson;
-	window.LaserCanvas.SystemUtil.fromJson = fromJson;
+	LaserCanvas.SystemUtil.toLocalStorage = toLocalStorage;
+	LaserCanvas.SystemUtil.fromLocalStorage = fromLocalStorage;
+	LaserCanvas.SystemUtil.toJson = toJson;
+	LaserCanvas.SystemUtil.fromJson = fromJson;
  }(window.LaserCanvas));

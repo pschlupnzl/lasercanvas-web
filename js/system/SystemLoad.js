@@ -74,6 +74,20 @@
 			}
 		},
 
+		toDielectricType = function (type) {
+			switch (type) {
+				case "CrystalInput":
+				case "CrystalOutput":
+					return LaserCanvas.Element.Dielectric.eType.Crystal;
+				case "BrewsterInput":
+				case "BrewsterOutput":
+					return LaserCanvas.Element.Dielectric.eType.Brewster;
+				case "PlateInput":
+				case "PlateOutput":
+					return LaserCanvas.Element.Dielectric.eType.Plate;
+			}
+		},
+
 		/**
 		 * Search the array of source elements for an element of the 
 		 * given name, returning the found element.
@@ -85,39 +99,40 @@
 		},
 
 		/**
-		 * Create the system elements into the given array.
-		 * @param {Array<Element>} melements Array of elements to be filled.
+		 * Returns a JSON structure to create the system of elements.
 		 * @param {Array<object>} elements Source element data.
 		 * @param {object} variables Variables used to evaluate expression to numeric values.
 		 */
-		createElements = function (melements, elements, variables) {
-			if (elements[0].type !== "Mirror"
-				|| elements[elements.length - 1].type !== "Mirror") {
-				throw "First and last elements must be mirrors.";
+		elementsToJson = function (elements, variables) {
+			if (elements[0].type !== "Mirror") {
+				throw "First element must be a mirror.";
 			}
 
-			// Prepare system.
-			LaserCanvas.SystemUtil.resetElements(melements);
-
 			// Add new elements.
+			var jsonElements = [];
 			for (var index = 0; index < elements.length; index += 1) {
 				var src = elements[index];
-				var name = src.name;
-				var props, element, linkedElement;
-
+				var linkedElement;
+				var elementJson = {
+					name: src.name,
+					loc: {
+						l: src.DistanceToNext !== undefined
+							? toNumber(src.DistanceToNext, variables)
+							: 0
+					}
+				};
 				switch (src.type) {
 					case "Mirror":
-						element = new LaserCanvas.Element.Mirror();
-						props = {
+						elementJson.type = LaserCanvas.Element.Mirror.Type;
+						elementJson.prop = {
 							radiusOfCurvature: toNumber(src.ROC, variables),
 							angleOfIncidence: FLIP * toNumber(src.FaceAngle, variables) * Math.PI / 180.00
 						};
 						break;
 
 					case "ThinLens":
-						// TODO: Check lens format in data file.
-						element = new LaserCanvas.Element.Lens();
-						props = {
+						elementJson.type = LaserCanvas.Element.Lens.Type;
+						elementJson.prop = {
 							focalLength: toNumber(src.FL, variables)
 						};
 						break;
@@ -125,21 +140,21 @@
 					case "Screen":
 						if (src.LinkedTo) {
 							console.warn("Screen inside block not supported.");
-							// melements[melements.length - 1].loc.l += toNumber(src.DistanceToNext, variables);
 							continue;
 						}
-						element = new LaserCanvas.Element.Screen();
+						elementJson.type = LaserCanvas.Element.Screen.Type;
 						break;
 
 					case "BrewsterInput":
 					case "CrystalInput":
 					case "PlateInput":
-						element = new LaserCanvas.Element.Dielectric(toBlockType(src.type));
 						linkedElement = findElement(elements, src.LinkedTo);
 						if (!linkedElement) {
 							throw "Unable to find linked output element " + src.LinkedTo + ".";
 						}
-						props = {
+						elementJson.type = LaserCanvas.Element.Dielectric.Type;
+						elementJson.prop = {
+							type: toDielectricType(src.type),
 							refractiveIndex: toNumber(src.RefractiveIndex, variables),
 							flip: src.Flipped || false,
 							curvatureFace1: toNumber(src.ROC, variables),
@@ -147,88 +162,65 @@
 						};
 
 						if (src.type === "CrystalInput") {
-							props.faceAngle = toNumber(src.FaceAngle, variables) * Math.PI / 180;
+							elementJson.prop.faceAngle = toNumber(src.FaceAngle, variables) * Math.PI / 180;
 						} else if (src.type === "PlateInput") {
-							props.angleOfIncidence = toNumber(src.FaceAngle, variables) * Math.PI / 180;
+							elementJson.prop.angleOfIncidence = toNumber(src.FaceAngle, variables) * Math.PI / 180;
 						}
 
 						if (elements[index + 1].type === "ThermalLens") {
-							props.thermalLens = toNumber(elements[index + 1].FL, variables);
+							elementJson.prop.thermalLens = toNumber(elements[index + 1].FL, variables);
 						}
 						
 						// groupVelocityDispersion: 0,// {number} (um^-2) Group velocity dispersion for ultrafast calculations.
-						element.loc.l = toNumber(src.Thickness, variables);
+						elementJson.loc.l = toNumber(src.Thickness, variables);
 						break;
 
-						case "ThermalLens":
-							// Thermal lens handled at input face.
-							continue;
+					case "ThermalLens":
+						// Thermal lens handled at input face.
+						continue;
 	
 					case "BrewsterOutput":
 					case "CrystalOutput":
 					case "PlateOutput":
 						// Add thermal lens placeholder. The focal length is handled at input face.
-						melements.push(new LaserCanvas.Element.Lens());
-						element = new LaserCanvas.Element.Dielectric(toBlockType(src.type));
+						jsonElements.push({
+							type: LaserCanvas.Element.Lens.Type,
+						});
 						linkedElement = findElement(elements, src.LinkedTo);
 						if (!linkedElement) {
 							throw "Unable to find linked input element " + src.LinkedTo + ".";
 						}
-						props = {};
+						elementJson.type = LaserCanvas.Element.Dielectric.Type;
+						elementJson.prop = {
+							type: toDielectricType(src.type),
+						};
 						if (src.type === "CrystalOutput") {
-							props.faceAngle = toNumber(linkedElement.FaceAngle, variables), Math.PI / 180;
+							elementJson.prop.faceAngle = toNumber(linkedElement.FaceAngle, variables) * Math.PI / 180;
 						} else if (src.type === "PlateOutput") {
-							props.angleOfIncidence = toNumber(linkedElement.FaceAngle, variables) * Math.PI / 180;
+							elementJson.prop.angleOfIncidence = toNumber(linkedElement.FaceAngle, variables) * Math.PI / 180;
 						}
 						break;
 
 					default:
 						// Accumulate skipped element spacing.
 						if (src.DistanceToNext) {
-							melements[melements.length - 1].loc.l += toNumber(src.DistanceToNext, variables);
+							jsonElements[jsonElements.length - 1].loc.l += toNumber(src.DistanceToNext, variables);
 						}
-console.log("Skipping element type " + src.type);
 						continue;
 				}
 
-				// Properties.
-				element.name = name;
-				if (props) {
-					for (var key in props) {
-						if (props.hasOwnProperty(key)) {
-							element.prop[key] = props[key];
-						}
-					}
-				}
-
-				// Distance to next.
-				if (src.DistanceToNext !== undefined && index < elements.length - 1) {
-					element.loc.l = toNumber(src.DistanceToNext, variables);
-				}
-
-				// Initialize (e.g. screen).
-				if (element.init) {
-					element.init()
-				}
-
 				// Append to list.
-				melements.push(element);
+				jsonElements.push(elementJson);
 			}
 
 			// Finishing.
-			if (melements.length < 2) {
+			if (jsonElements.length < 2) {
 				throw "Need at least two elements in the cavity.";
 			}
-			melements[0].startOptic = true;
-			melements[melements.length - 1].endOptic = true;
+			jsonElements[0].prop.startOptic = true;
+			jsonElements[jsonElements.length - 1].prop.endOptic = true;
 
-			// Collect dielectrics into groups and force angle calculations.
-			LaserCanvas.Element.Dielectric.collectGroups(melements);
-			for (var element of elements) {
-				if (element.updateAngles) {
-					element.updateAngles();
-				}
-			}
+			return jsonElements;
 		},
 
 		// ----------
@@ -264,7 +256,7 @@ console.log("Skipping element type " + src.type);
 			var match,
 				/** Text file split into lines. */
 				lines = text.replace(/\n\r/g, "\n").replace(/\r\n/g, "\n").split("\n"),
-				/** First line, used as a check. */
+				/** First lines (system name and type), used as a check. */
 				firstLines = lines.splice(0, 2),
 				/** Root object being assembled. */
 				root = {
@@ -346,29 +338,26 @@ console.log("Skipping element type " + src.type);
 		},
 		
 		/**
-		 * Parse the text file, assumed to be in LaserCanvas 5
-		 * data format, to create a system.
+		 * Parse the text file, assumed to be in LaserCanvas 5 data format,
+		 * returning a JSON structure for the equivalent system.
 		 * @param {string} text Source of text file.
-		 * @param {object} mprop System properties to set.
-		 * @param {Array<Element>} melements System elements to update.
 		 */
-		fromTextFile =function (text, mprop, melements) {
+		textFileToJson = function (text) {
 			var root = parseTextFile(text),
-				variables = getVariables(root);
-
-			// System properties.
-			mprop.name = root.name;
-			mprop.wavelength = toNumber(root.Wavelength, variables);
-
-			// Elements.
-			createElements(melements, root.elements, variables);
+				variables = getVariables(root),
+				json = {
+					name: root.name,
+					wavelength: toNumber(root.Wavelength, variables),
+					elements: elementsToJson(root.elements, variables)
+				};
 
 			// Initial location.
-			LaserCanvas.Utilities.extend(melements[0].loc, {
+			LaserCanvas.Utilities.extend(json.elements[0].loc, {
 				x: toNumber(root.StartX, variables),
 				y: FLIP * toNumber(root.StartY, variables),
 				q: FLIP * toNumber(root.Rotation, variables) * Math.PI / 180,
 			});
+			return json;
 		},
 
 		// --------------
@@ -409,6 +398,6 @@ console.log("Skipping element type " + src.type);
 		};
 
 	LaserCanvas.SystemUtil = LaserCanvas.SystemUtil || {};
-	LaserCanvas.SystemUtil.fromTextFile = fromTextFile;
+	LaserCanvas.SystemUtil.textFileToJson = textFileToJson;
 	LaserCanvas.SystemUtil.attachLoadListener = attachLoadListener;
 }(window.LaserCanvas));

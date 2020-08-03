@@ -1,8 +1,9 @@
 /**
 * Laser canvas system.
 */
-window.LaserCanvas.System = function () {
-	"use strict";
+(function (LaserCanvas) {
+"use strict";
+LaserCanvas.System = function () {
 	var
 		melements = [],
 		meventListeners = {
@@ -12,7 +13,7 @@ window.LaserCanvas.System = function () {
 		mabcd = {},                 // {object} System solved ABCD calculation.
 		mprop = {                   // {object} System properties read/write by SystemAbcd.
 			name: 'System',          // {string} Name of system.
-			configuration: window.LaserCanvas.System.configuration.linear,
+			configuration: LaserCanvas.System.configuration.linear,
 			wavelength: 1000,        // {number} (nm) System wavelength
 			physicalLength: 0,       // {number} (mm) Physical length.
 			opticalLength: 0,        // {number} (mm) Optical length.
@@ -38,7 +39,7 @@ window.LaserCanvas.System = function () {
 		* @returns {Array<string>} Property names to show.
 		*/
 		userProperties = function () {
-			var configuration = window.LaserCanvas.System.configuration,
+			var configuration = LaserCanvas.System.configuration,
 				props = [{
 					propertyName: 'wavelength',
 					//standard: [266, 532, 632, 800, 810, 1040, 1064],
@@ -137,7 +138,7 @@ window.LaserCanvas.System = function () {
 			switch (propertyName) {
 				case 'groupVelocityDispersion':
 				case 'groupDelayDispersion':
-					return mprop.configuration === window.LaserCanvas.System.configuration.ultrafast;
+					return mprop.configuration === LaserCanvas.System.configuration.ultrafast;
 			}
 			
 			return true;
@@ -187,7 +188,7 @@ window.LaserCanvas.System = function () {
 			var k, element;
 			for (k = 0; k < melements.length; k += 1) {
 				element = melements[k];
-				if ((element.atLocation || window.LaserCanvas.Element.atLocation).call(element, pt, tol)) {
+				if ((element.atLocation || LaserCanvas.Element.atLocation).call(element, pt, tol)) {
 					return element;
 				}
 			}
@@ -204,7 +205,6 @@ window.LaserCanvas.System = function () {
 		segmentNearLocation = function (pt, filterBy) {
 			var k, loc, V, W, z, x, y, r2, 
 				seg = null,                       // {object?} Returned best segment.
-				LaserCanvas = window.LaserCanvas, // {object} Namespace.
 				Vector = LaserCanvas.Math.Vector, // {function} Construction function for vector.
 				kmax = mprop.configuration === LaserCanvas.System.configuration.ring
 					? melements.length : melements.length - 1;   // How many segments to check.
@@ -258,7 +258,7 @@ window.LaserCanvas.System = function () {
 		*/
 		inspectSegment = function (seg, plane) {
 			var element = melements[seg.indx];
-			return window.LaserCanvas.systemAbcd.propagateParameters(
+			return LaserCanvas.systemAbcd.propagateParameters(
 				element.abcdQ[plane], 
 				element.property('refractiveIndex') || 1,
 				seg.z);
@@ -329,12 +329,12 @@ window.LaserCanvas.System = function () {
 		* anti-parallel.
 		*/
 		alignEndElements = function () {
-			var Vector = window.LaserCanvas.Math.Vector, // {function} Vector construction function.
+			var Vector = LaserCanvas.Math.Vector, // {function} Vector construction function.
 				U, V, Z, l,         // Vectors for ring cavity.
 				el = melements[0],  // {Element} Starting element.
 				le = melements[melements.length - 1]; // {Element} Final element.
 			
-			if (mprop.configuration === window.LaserCanvas.System.configuration.ring) { 
+			if (mprop.configuration === LaserCanvas.System.configuration.ring) { 
 				// Ring cavity construction vectors.
 				// TODO: This simple ring doesn't allow optics between
 				// the last and first mirror. A complete ring layout
@@ -410,7 +410,7 @@ window.LaserCanvas.System = function () {
 		* Calculate the system ABCD coordinates.
 		*/
 		calculateAbcd = function () {
-			mabcd = window.LaserCanvas.systemAbcd(melements, mprop);
+			mabcd = LaserCanvas.systemAbcd(melements, mprop);
 		},
 		
 		/**
@@ -419,7 +419,7 @@ window.LaserCanvas.System = function () {
 		* @param {Element} elDrag Element being dragged.
 		* @returns {object|boolean} dragData Data to be passed to dragElement() method, or FALSE if elements can't be found.
 		*/
-		adjust = window.LaserCanvas.systemAdjust(melements, calculateCartesianCoordinates),
+		adjust = LaserCanvas.systemAdjust(melements, calculateCartesianCoordinates),
 		
 		/**
 		* Start dragging an element.
@@ -483,7 +483,6 @@ window.LaserCanvas.System = function () {
 		*/
 		updateElementNames = function () {
 			var name,
-				LaserCanvas = window.LaserCanvas,
 				localize = LaserCanvas.localize,  // {function} Localize for symbols.
 				typeCount = {}; // {object} Count of elements of each kind.
 			LaserCanvas.Utilities.foreach(melements, function (k_notused, element) {
@@ -509,7 +508,7 @@ window.LaserCanvas.System = function () {
 			var element,
 				seg = segmentNearLocation(pt, 'insertElement'),    // {object} Segment where being inserted.
 				prevElement = melements[seg.indx],                 // {Element} Element after which to insert.
-				Element = window.LaserCanvas.Element[elementName]; // {function} Element constructor function.
+				Element = LaserCanvas.Element[elementName]; // {function} Element constructor function.
 			
 			if (Element.createGroup) {
 				// Element.createGroup returns {Array<object>}, so
@@ -574,7 +573,7 @@ window.LaserCanvas.System = function () {
 			try {
 				jsonSource(mprop, melements);
 			} catch (e) {
-				createNew(window.LaserCanvas.System.configuration.linear);
+				createNew(LaserCanvas.System.configuration.linear);
 			}
 			calculateCartesianCoordinates();
 			fireEventListeners("change");
@@ -597,8 +596,7 @@ window.LaserCanvas.System = function () {
 		* @param {object=} loc Initial location values.
 		*/
 		createNew = function (configuration, elementsInfo, loc) {
-			var LaserCanvas = window.LaserCanvas,            // {object} Namespace.
-				SystemUtil = LaserCanvas.SystemUtil;         // {object} System namespace.
+			var SystemUtil = LaserCanvas.SystemUtil;         // {object} System namespace.
 			SystemUtil.createNew(configuration, elementsInfo, loc, mprop, melements);
 
 			// Calculate Cartesian coordinates.
@@ -613,7 +611,9 @@ window.LaserCanvas.System = function () {
 		 * @param {string} src Source text file.
 		 */
 		fromTextFile = function (src) {
-			LaserCanvas.SystemUtil.fromTextFile(src, mprop, melements);
+			var json = LaserCanvas.SystemUtil.textFileToJson(src);
+			LaserCanvas.SystemUtil.fromJson(json, mprop, melements);
+
 			// Calculate Cartesian coordinates.
 			updateElementNames();
 			calculateCartesianCoordinates();
@@ -653,16 +653,11 @@ window.LaserCanvas.System = function () {
 };
 
 // Different configurations.
-window.LaserCanvas.System.configuration = {
+LaserCanvas.System.configuration = {
 	ultrafast: 'ultrafast',     // Dispersion compensated resonator.
 	endcap: 'endcap',           // End coated dielectric.
 	linear: 'linear',           // Simple linear resonator.
 	propagation: 'propagation', // Propagation system.
 	ring: 'ring'                // Simple ring resonator.
 };
-
-// Startup configuration.
-window.LaserCanvas.System.configuration.startup = 
-	window.LaserCanvas.System.configuration.linear;
-	//window.LaserCanvas.System.configuration.endcap;
-	//window.LaserCanvas.System.configuration.ultrafast;
+}(window.LaserCanvas));

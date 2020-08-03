@@ -1873,6 +1873,8 @@ Renderer 2d {
 
 // Filter can be null, string, or RegExp. 
 let filter = null;
+// filter = "test_linear_simple";
+// filter = "test_linear_crystal";
 // filter = "test_plate";
 // filter = "test_plate_input_curved";
 // filter = "test_plate_face_angle_input_curved";

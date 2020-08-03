@@ -3,8 +3,8 @@
 * Also used as thermal lens within a block.
 */
 (function (LaserCanvas) {
+"use strict";
 LaserCanvas.Element.Lens = function () {
-	"use strict";
 	this.type = 'Lens'; // {string} Primitive element type.
 	this.name = 'L'; // {string} Name of this element (updated by System).
 	this.loc = {   // Location on canvas.
@@ -45,8 +45,8 @@ LaserCanvas.Element.Lens.prototype = {
 	/** Load a serialized representation of this object. */
 	fromJson: function (json) {
 		this.name = json.name;
-		LaserCanvas.Utilities.extend(this.loc, json.loc);
-		LaserCanvas.Utilities.extend(this.prop, json.prop);
+		LaserCanvas.Utilities.extend(this.loc, json.loc || {});
+		LaserCanvas.Utilities.extend(this.prop, json.prop || {});
 	},
 
 	/**
@@ -57,7 +57,6 @@ LaserCanvas.Element.Lens.prototype = {
 	* @returns {Element:Lens} This element for chaining.
 	*/
 	setThermalLens: function (focalLength, refractiveIndex, distanceToNext) {
-		"use strict";
 		this.prop.focalLength = focalLength;
 		this.priv.refractiveIndex = refractiveIndex;
 		this.loc.l = distanceToNext;
@@ -69,7 +68,6 @@ LaserCanvas.Element.Lens.prototype = {
 	* @returns {boolean} Value indicating whether this element is a thermal lens.
 	*/
 	isThermalLens: function () {
-		"use strict";
 		return this.priv.refractiveIndex !== 0;
 	},
 	
@@ -83,7 +81,6 @@ LaserCanvas.Element.Lens.prototype = {
 	* @returns {object} The element location object.
 	*/
 	location: function (ax) {
-		"use strict";
 		if (ax) {
 			this.loc.x = ax.x;
 			this.loc.y = ax.y;
@@ -97,7 +94,6 @@ LaserCanvas.Element.Lens.prototype = {
 	* @returns {Array<object>} Array of property keys.
 	*/
 	userProperties: function () {
-		"use strict";
 		return [
 			{
 				propertyName: 'focalLength',
@@ -112,7 +108,6 @@ LaserCanvas.Element.Lens.prototype = {
 	* @param {string} propertyName Name of property being probed 'distanceToNext'|'deflectionAngle'.
 	*/
 	canSetProperty: function (propertyName) {
-		"use strict";
 		var isThermalLens = this.isThermalLens(); // {boolean} Value indicating whether this is a thermal lens in a block.
 		return {
 			distanceToNext: !isThermalLens,
@@ -128,7 +123,6 @@ LaserCanvas.Element.Lens.prototype = {
 	* @returns {number=} The current value, if retrieving only.
 	*/
 	property: function (propertyName, newValue) {
-		"use strict";
 		// Set value, if specified.
 		if (newValue !== undefined) {
 			switch (propertyName) {
@@ -168,7 +162,6 @@ LaserCanvas.Element.Lens.prototype = {
 	* @param {number} plane The parameter is not used. Sagittal (0) or tangential (1) plane.
 	*/
 	elementAbcd: function (dir_notused, plane_notused) {
-		"use strict";
 		var f = this.prop.focalLength;  // {number} (mm) Focal length.
 		return new LaserCanvas.Math.Matrix2x2(1, 0, f === 0 ? 0 : -1 / f, 1);
 	},
@@ -183,7 +176,6 @@ LaserCanvas.Element.Lens.prototype = {
 	* @param {LaserCanvas.renderLayer} layer Rendering layer.
 	*/
 	draw: function (render, layer) {
-		"use strict";
 		var image, 
 			f = this.prop.focalLength,
 			qc = -this.loc.p, // {number} (rad) Display angle on canvas.
@@ -214,7 +206,6 @@ LaserCanvas.Element.Lens.prototype = {
 	* @param {LaserCanvas.renderLayer} layer Rendering layer.
 	*/
 	wireframe: function (render, layer) {
-		"use strict";
 		var k, dx,
 			renderLayer = LaserCanvas.Enum.renderLayer,    // {Enum} Layer to draw.
 			d = [], // {Array<string>} Path drawing instructions.

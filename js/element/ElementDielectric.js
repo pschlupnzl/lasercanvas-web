@@ -3,8 +3,8 @@
 * @param {string:Dielectric.eType} blockType Type of block. If not set, assume output face.
 */
 (function (LaserCanvas) {
+"use strict";
 LaserCanvas.Element.Dielectric = function (blockType) {
-	"use strict";
 	this.type = 'Dielectric'; // {string} Primitive element type.
 	this.name = 'D'; // {string} Name of this element (updated by System).
 	this.loc = {   // Location on canvas.
@@ -48,7 +48,6 @@ LaserCanvas.Element.Dielectric.propertyDefault = {
 // @param {number} segZ (mm) Distance along the segment where to insert.
 // @returns {Array<Element>} Elements to insert.
 LaserCanvas.Element.Dielectric.createGroup = function (prevElement, segZ) {
-	"use strict";
 	var Dielectric = LaserCanvas.Element.Dielectric, // {object} Namespace.
 		segLen = prevElement.property('distanceToNext'), // {number} (mm) Distance on segment being inserted.
 		propertyDefault = Dielectric.propertyDefault,    // {object} Default values for properties.
@@ -79,7 +78,6 @@ LaserCanvas.Element.Dielectric.createGroup = function (prevElement, segZ) {
  * @param {Array<object:Elements>} elements Elements of the system to combine.
  */
 LaserCanvas.Element.Dielectric.collectGroups = function (elements) {
-	"use strict";
 	var k, m,        // {number} Element loop counters.
 		element,      // {object:Element} Iterated element.
 		group = null; // {Array<object:Element>} Grouped elements.
@@ -109,11 +107,7 @@ LaserCanvas.Element.Dielectric.collectGroups = function (elements) {
 							group[m].group = group;
 						}
 					}
-					if (group[0].type === 'Dielectric') {
-						group[0].updateAngles();
-					} else {
-						group[0].updateAngles();
-					}
+					group[0].updateAngles();
 					group = null;
 					break;
 			}
@@ -136,6 +130,7 @@ LaserCanvas.Element.Dielectric.prototype = {
 	/** Load a serialized representation of this object. */
 	fromJson: function (json) {
 		this.name = json.name;
+		this.setDefaults(json.prop.type);
 		LaserCanvas.Utilities.extend(this.loc, json.loc);
 		LaserCanvas.Utilities.extend(this.prop, json.prop);
 		LaserCanvas.Utilities.extend(this.priv, json.priv);
@@ -147,9 +142,6 @@ LaserCanvas.Element.Dielectric.prototype = {
 	* @param {string:Dielectric.eType} blockType Type of block. If not set, assume output face.
 	*/
 	setDefaults: function (blockType) {
-		"use strict";
-		var Dielectric = LaserCanvas.Element.Dielectric; // {object} Namespace.
-
 		if (blockType) {
 			this.prop = {
 				type: blockType,           // {string:Enum} Type of dielectric element (see Dielectric.type enum) 'Plate'|'Brewster'|'Crystal'.
@@ -180,8 +172,6 @@ LaserCanvas.Element.Dielectric.prototype = {
 	* @param {number} refractiveIndex Refractive index to set.
 	*/
 	updateAngles: function () {
-		"use strict";
-
 		var eType = LaserCanvas.Element.Dielectric.eType,
 			maxA = 80 * Math.PI / 180,     // {number} Maximum angle of incidence.
 			A, B, C, nsinB,                // Temporary variables.
@@ -250,14 +240,12 @@ LaserCanvas.Element.Dielectric.prototype = {
 	* These are distances, not angles.
 	*/
 	updateThermalLens: function () {
-		"use strict";
 		var len = 
 				this.prop.type === LaserCanvas.Element.Dielectric.eType.Endcap
 				? this.priv.thickness 
 				: this.priv.thickness / Math.cos(this.prop.faceAngle),
 			l1 = this.prop.thermalLens === 0 ? len : len / 2, // {number} (mm) Propagation before lens.
 			l2 = len - l1;  // {number} (mm) Propagation after lens.
-		
 		this.group[0].loc.l = l1;
 		this.group[1].setThermalLens(
 			this.prop.thermalLens, 
@@ -275,7 +263,6 @@ LaserCanvas.Element.Dielectric.prototype = {
 	* @returns {number} Count of elements in this group.
 	*/
 	removeGroup: function (prevElement) {
-		"use strict";
 		prevElement.property('distanceToNext', 
 			prevElement.property('distanceToNext') 
 			+ this.group[0].property('thickness')
@@ -289,7 +276,6 @@ LaserCanvas.Element.Dielectric.prototype = {
 	* @returns {object} The element location object.
 	*/
 	location: function (ax) {
-		"use strict";
 		var outDefl = this.group[0].prop.type === LaserCanvas.Element.Dielectric.eType.Prism ? +1 : -1;
 
 		if (ax) {
@@ -316,7 +302,6 @@ LaserCanvas.Element.Dielectric.prototype = {
 	* @returns {Array<object>} Array of property keys.
 	*/
 	userProperties: function () {
-		"use strict";
 		var k,
 			eType = LaserCanvas.Element.Dielectric.eType,
 			props = [],
@@ -394,7 +379,6 @@ LaserCanvas.Element.Dielectric.prototype = {
 	* @param {string} propertyName Name of property being probed 'distanceToNext'|'deflectionAngle'.
 	*/
 	canSetProperty: function (propertyName) {
-		"use strict";
 		var eType = LaserCanvas.Element.Dielectric.eType,     // {string:Enum} Type of dielectric block.
 			firstElement = this === this.group[0],                    // {boolean} Value indicating whether this is the first item in the group.
 			lastElement = this === this.group[this.group.length - 1], // {boolean} Value indicating whether this is the last element.
@@ -427,7 +411,6 @@ LaserCanvas.Element.Dielectric.prototype = {
 	* @returns {number=} The current value, if retrieving only.
 	*/
 	property: function (propertyName, newValue, arg) {
-		"use strict";
 		var eType = LaserCanvas.Element.Dielectric.eType;
 		// Set value, if specified.
 		if (newValue !== undefined) {
@@ -542,7 +525,6 @@ LaserCanvas.Element.Dielectric.prototype = {
 	* @returns {Matrix2x} Transfer matrix.
 	*/
 	elementAbcd: function (dir, plane) {
-		"use strict";
 		var Matrix2x2 = LaserCanvas.Math.Matrix2x2,
 			abcd,                               // {object:Matrix2x2} Returned matrix.
 			n1, n2, q1, q2, cosq1, cosq2, dn,   // Temporary variables.
@@ -663,7 +645,6 @@ LaserCanvas.Element.Dielectric.prototype = {
 	* @returns {boolean} Value indicating whether this element is at given location.
 	*/
 	atLocation: function (pt, tol) {
-		"use strict";
 		var U,
 			Vector = LaserCanvas.Math.Vector; // {function} Constructor function for Vector.
 		if (this === this.group[0]) {
@@ -682,7 +663,6 @@ LaserCanvas.Element.Dielectric.prototype = {
 	* @param {LaserCanvas.renderLayer} layer Rendering layer.
 	*/
 	draw: function (render, layer) {
-		"use strict";
 		var 
 			eType = LaserCanvas.Element.Dielectric.eType,
 			renderLayer = LaserCanvas.Enum.renderLayer, // {Enum} Layer to draw.
@@ -802,7 +782,6 @@ LaserCanvas.Element.Dielectric.prototype = {
 	* @param {LaserCanvas.renderLayer} layer Rendering layer.
 	*/
 	wireframe: function (render, layer) {
-		"use strict";
 		return this.draw(render, layer);
 	}
 };
