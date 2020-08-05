@@ -1,0 +1,32 @@
+/**
+* Inspect tooltip
+*/
+.laserCanvasInspect {
+	position: absolute;
+	margin-left: -24px;
+	margin-top: 8px;
+	padding: 4px 0.6em;
+	border-radius: 1em;
+	background-color: rgba(255, 255, 255, 0.8);
+	pointer-events: none;
+}
+
+	.laserCanvasInspect:before {
+		content: " ";
+		position: absolute;
+		left: 16px;
+		top: -16px;
+		width: 0;
+		height: 0;
+		border: 8px solid transparent;
+		border-bottom-color: #fff;
+	}
+	
+	.laserCanvasInspect .ellipse {
+		display: inline-block;
+		vertical-align: middle;
+		border: 1px solid;
+		background: #b7b9c0;
+		border-radius: 50%;
+	}
+	

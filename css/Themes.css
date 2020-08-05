@@ -1,0 +1,63 @@
+/**
+* Themes.
+*/
+[data-theme="line"] .laserCanvasInspect,
+[data-theme="light"] .laserCanvasInfo,
+[data-theme="light"] .laserCanvasToolbar,
+[data-theme="light"] .laserCanvasInspect {
+	background-color: #f7f7f7;
+}
+
+[data-theme="light"] .propertiesPanel {
+	background-color: #f1f1f1;
+}
+
+[data-theme="dark"] .laserCanvasToolbar {
+	color: #f7f7f7;
+	background-color: #404040;
+}
+
+[data-theme="light"] .laserCanvasToolbar {
+	border-top-color: #676767;
+}
+
+[data-theme="line"] .laserCanvasInspect,
+[data-theme="light"] .laserCanvasInspect {
+	border: 1px solid #676767;
+}
+
+[data-theme="line"] .laserCanvasInspect:before,
+[data-theme="light"] .laserCanvasInspect:before {
+	border-bottom-color: #676767;
+}
+
+[data-theme="line"] .laserCanvasInfo,
+[data-theme="light"] .laserCanvasInfo {
+	border-right: 1px solid #676767;
+}
+
+/* Standard sagittal / tangential planes */
+
+[color-theme-plane="sag"] {
+	color: #933;
+}
+
+[color-theme-plane="tan"] {
+	color: #339;
+}
+
+[color-theme-plane="sag"]::after,
+[color-theme-plane="tan"]::after {
+	position: relative;
+	bottom: -0.2em;
+	font-size: 0.6em;
+	font-style: italic;
+}
+
+[color-theme-plane="sag"]::after {
+	content: "S";
+}
+
+[color-theme-plane="tan"]::after {
+	content: "T";
+}

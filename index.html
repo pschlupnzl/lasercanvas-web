@@ -104,7 +104,7 @@
 			<div class="highlight"></div>
 		</div>
 		<canvas id="LaserCanvas" class="hidden"></canvas>
-		<div class="laserCanvasInspect"><span data-dimension="sag"></span> <span class="ellipse"></span> <span data-dimension="tan"></span> &micro;m</div>
+		<div class="laserCanvasInspect"><span data-dimension="sag" color-theme-plane="sag"></span> <span class="ellipse"></span> <span data-dimension="tan" color-theme-plane="tan"></span> &micro;m</div>
 	</div>
 	
 	<!-- Toolbar -->
@@ -179,10 +179,30 @@
 							<th>Tan.</th>
 							<th>Unit</th>
 						</tr>
-						<tr class="template">
+						<tr class="template" data-type="action">
 							<td data-cell="label"></td>
-							<td data-cell="sag"></td>
-							<td data-cell="tan"></td>
+							<td data-cell="action" colspan="2"></td>
+							<td data-cell="unit"></td>
+						</tr>
+						<tr class="template" data-type="unary">
+							<td data-cell="label"></td>
+							<td data-cell="value" colspan="2"></td>
+							<td data-cell="unit"></td>
+						</tr>
+						<tr class="template" data-type="sag-tan">
+							<td data-cell="label"></td>
+							<td data-cell="sag" color-theme-plane="sag"></td>
+							<td data-cell="tan" color-theme-plane="tan"></td>
+							<td data-cell="unit"></td>
+						</tr>
+						<tr class="template" data-type="mx">
+							<td data-cell="label"></td>
+							<td data-cell="mx-col-1">
+								<span data-cell="mx-1-1"></span><br><span data-cell="mx-2-1"></span>
+							</td>
+							<td data-cell="mx-col-2">
+								<span data-cell="mx-1-2"></span><br><span data-cell="mx-2-2"></span>
+							</td>
 							<td data-cell="unit"></td>
 						</tr>
 					</thead>
