@@ -35,18 +35,20 @@ window.LaserCanvas.InfoPanel.createPanel = function (system, info) {
 			});
 		},
 		
-		// Add a new row with the given data.
-		// @param {HTMLDivElement} pnl Panel where to add.
-		// @param {string} propertyName Name of property to set.
-		// @param {string=} label Label to use, or pretty name.
-		// @param {string=} dataType Data type set into row attribute for styling, default 'sag-tan'.
-		// @param {string=} className CSS class to assign, if any.
-		// @returns {HTMLTRElement} Newly created row.
+		/**
+		 * Add a new row with the given data.
+		 * @param {HTMLDivElement} pnl Panel where to add.
+		 * @param {string} propertyName Name of property to set.
+		 * @param {string=} label Label to use, or pretty name.
+		 * @param {string=} dataType Data type set into row attribute for styling, default 'sag-tan'.
+		 * @param {string=} className CSS class to assign, if any.
+		 * @returns {HTMLTRElement} Newly created row.
+		 */
 		addRow = function (pnl, propertyName, label, dataType, className) {
-			var 
+			var dataType = dataType || "sag-tan",             // Default data view.
 				tbl = pnl.querySelector('table'),             // {HTMLTableElement} Table to fill.
 				tbody = tbl.querySelector('tbody'),           // {HTMLTBodyElement} Table body where to append rows.
-				trt = tbl.querySelector('tr.template'),       // {HTMLTRElement} Template row.
+				trt = tbl.querySelector('tr.template[data-type="' + dataType + '"]'), // {HTMLTRElement} Template row.
 				tr = trt.cloneNode(true),                     // {HTMLTRElement} Cloned row ready for panel.
 				unit = window.LaserCanvas.unit[propertyName], // {string=} Unit associated with property if any.
 				label = localize(label || prettify(propertyName)); // {string} Text to write (without units).
@@ -54,14 +56,7 @@ window.LaserCanvas.InfoPanel.createPanel = function (system, info) {
 			// Prepare clone.
 			tr.className = className || '';
 			tr.setAttribute('data-property-name', propertyName);
-			
-			// Data type.
-			tr.setAttribute('data-type', dataType || 'sag-tan');
-			if (dataType === 'unary') {
-				tr.querySelector('[data-cell="sag"]').colSpan = 2;
-				tr.removeChild(tr.querySelector('[data-cell="tan"]'));
-			}
-			
+
 			// Content.
 			tr.querySelector('[data-cell="label"]').innerHTML = label;
 			tr.querySelector('[data-cell="unit"]').innerHTML = unit || '';
@@ -69,16 +64,18 @@ window.LaserCanvas.InfoPanel.createPanel = function (system, info) {
 			return tr;
 		},
 		
-		// Add an action (edit field, toggle etc.) row.
-		// @param {HTMLDivElement} pnl Panel where to add.
-		// @param {object} prop Property attributes to set.
-		// @param {object} currentValue Current value, which determines type of input to build.
-		// @param {string=} className CSS class to assign, if any.
+		/**
+		 * Add an action (edit field, toggle etc.) row.
+		 * @param {HTMLDivElement} pnl Panel where to add.
+		 * @param {object} prop Property attributes to set.
+		 * @param {object} currentValue Current value, which determines type of input to build.
+		 * @param {string=} className CSS class to assign, if any.
+		 */
 		addActionRow = function (pnl, prop, currentValue, className) {
 			var propertyName = prop.propertyName,
 				input = document.createElement('input'),
-				tr = addRow(pnl, propertyName, prettify(propertyName), 'unary'),
-				sag = tr.querySelector('[data-cell="sag"]'), // {HTMLTDElement} Sagittal value cell (spanned and filled).
+				tr = addRow(pnl, propertyName, prettify(propertyName), 'action'),
+				action = tr.querySelector('[data-cell="action"]'), // {HTMLTDElement} Cell to be filled with action buttons.
 				
 				// Add an attribute, if used.
 				// @param {string} attributeName Name of attribute to add.
@@ -107,7 +104,7 @@ window.LaserCanvas.InfoPanel.createPanel = function (system, info) {
 
 			input.className = 'laserCanvasInput';
 			input.setAttribute('data-property-name', propertyName);
-			sag.appendChild(input);
+			action.appendChild(input);
 		},
 		
 		// Create the panel for the system.
@@ -140,8 +137,10 @@ window.LaserCanvas.InfoPanel.createPanel = function (system, info) {
 			LaserCanvas.Element.inputProperties(pnl, system, system);
 		},
 		
-		// Create panel for a single element.
-		// @param {Element} element Optical element to create for.
+		/**
+		 * Create panel for a single element.
+		 * @param {Element} element Optical element to create for.
+		 */
 		elementPanel = function (element) {
 			var pnl = tmpl.cloneNode(true);      // {HTMLDivElement} Element block.
 				
@@ -215,33 +214,40 @@ window.LaserCanvas.InfoPanel.updatePanel = function (system, info) {
 		elements = info.querySelector('.elements'),        // {HTMLDivElement} Container for element properties.
 		dir = +1, // {number} Propagation direction on elements, +1=forward.
 		
-		// Retrieve the row for the given property.
-		// @param {HTMLDivElement} pnl Panel where to update.
-		// @param {string} propertyName Name of property row to retrieve.
-		// @param {string|Array<string>} sag Sagittal value to fill, or array of sagittal and tangential.
-		// @param {string} tan Tangential value to fill.
-		// @returns {HTMLTRElement} Table row for property.
-		fillRow = function (pnl, propertyName, sag, tan) {
-			var cellSag, cellTan,
-				tr = pnl.querySelector('[data-property-name="' + propertyName + '"]');
+		/**
+		 * Retrieve the row for the given property.
+		 * @param {HTMLDivElement} pnl Panel where to update.
+		 * @param {string} propertyName Name of property row to retrieve.
+		 * @param {number} sag Sagittal value to fill, or array of sagittal and tangential.
+		 * @param {number} tan Tangential value to fill.
+		 * @param {number} mx12 Matrix element (1, 2), if used.
+		 * @param {number} mx22 Matrix element (2, 2), if used.
+		 * @returns {HTMLTRElement} Table row for property.
+		 */
+		fillRow = function (pnl, propertyName, sag, tan, mx12, mx22) {
+			var tr = pnl.querySelector('[data-property-name="' + propertyName + '"]');
 			if (tr) {
 				if (tr.hasAttribute('data-input')) {
-					// Action row with input element.
-					// Only the 'sagittal' value is used.
 					tr.querySelector('input').value = numberFormat(sag);
 					
+				} else if (tr.getAttribute('data-type') === 'unary') {
+					tr.querySelector('[data-cell="value"]').innerHTML = numberFormat(sag, true);
+
+				} else if (tr.getAttribute('data-type') === 'mx') {
+					tr.querySelector('[data-cell="mx-1-1"]').innerHTML = numberFormat(sag, true);
+					tr.querySelector('[data-cell="mx-2-1"]').innerHTML = numberFormat(tan, true);
+					tr.querySelector('[data-cell="mx-1-2"]').innerHTML = numberFormat(mx12, true);
+					tr.querySelector('[data-cell="mx-2-2"]').innerHTML = numberFormat(mx22, true);
+
 				} else {
-					// Readout only, unary or sag-tan.
-					cellSag = tr.querySelector('[data-cell="sag"]');
-					cellTan = tr.querySelector('[data-cell="tan"]');
+					// Expand two-element array, e.g. system property Stability.
 					if (Array.isArray(sag)) {
 						tan = sag[1];
 						sag = sag[0];
 					}
-					cellSag.innerHTML = typeof sag === 'number' ? numberFormat(sag, true) : sag;
-					if (cellTan) {
-						cellTan.innerHTML = typeof tan === 'number' ? numberFormat(tan, true) : tan || '';
-					}
+					// Used to have check e.g. cell.innerHTML = typeof sag === 'number' ? numberFormat(sag, true) : sag;
+					tr.querySelector('[data-cell="sag"]').innerHTML = numberFormat(sag, true);
+					tr.querySelector('[data-cell="tan"]').innerHTML = numberFormat(tan, true);
 				}
 			}
 			return tr;
@@ -281,10 +287,7 @@ window.LaserCanvas.InfoPanel.updatePanel = function (system, info) {
 		// @param {string} propertyName Name of property to set.
 		// @param {Matrix2x2} abcd ABCD matrix to show.
 		updateAbcd = function (pnl, propertyName, abcd) {
-			fillRow(pnl, propertyName,
-				numberFormat(abcd[0][0], true) + '<br/>' + numberFormat(abcd[1][0], true),
-				numberFormat(abcd[0][1], true) + '<br/>' + numberFormat(abcd[1][1], true)
-			);
+			fillRow(pnl, propertyName, abcd[0][0], abcd[1][0], abcd[0][1], abcd[1][1]);
 		},
 		
 		// Update the system values.

@@ -276,6 +276,7 @@ LaserCanvas.Element.Dielectric.prototype = {
 	* @returns {object} The element location object.
 	*/
 	location: function (ax) {
+		// Deflection angle: -1 returns to parallel to input; +1 deflects again (e.g. prism)
 		var outDefl = this.group[0].prop.type === LaserCanvas.Element.Dielectric.eType.Prism ? +1 : -1;
 
 		if (ax) {

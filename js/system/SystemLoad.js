@@ -104,8 +104,8 @@
 		 * @param {object} variables Variables used to evaluate expression to numeric values.
 		 */
 		elementsToJson = function (elements, variables) {
-			if (elements[0].type !== "Mirror") {
-				throw "First element must be a mirror.";
+			if (!["Mirror", "Source"].includes(elements[0].type)) {
+				throw "First element must be a mirror or source.";
 			}
 
 			// Add new elements.
@@ -119,7 +119,8 @@
 						l: src.DistanceToNext !== undefined
 							? toNumber(src.DistanceToNext, variables)
 							: 0
-					}
+					},
+					prop: {}
 				};
 				switch (src.type) {
 					case "Mirror":
@@ -142,6 +143,11 @@
 							console.warn("Screen inside block not supported.");
 							continue;
 						}
+						elementJson.type = LaserCanvas.Element.Screen.Type;
+						break;
+
+					case "Source":
+						// `Source` elements are at start of propagation system.
 						elementJson.type = LaserCanvas.Element.Screen.Type;
 						break;
 
@@ -201,6 +207,21 @@
 						}
 						break;
 
+					case "PrismA":
+						elementJson.type = LaserCanvas.Element.Dispersion.Type;
+						elementJson.prop = {
+							type: LaserCanvas.Element.Dispersion.eType.Prism,
+							refractiveIndex: toNumber(src.RefractiveIndex, variables)
+						};
+						break;
+
+					case "PrismB":
+						elementJson.type = LaserCanvas.Element.Dispersion.Type;
+						elementJson.prop = {
+							type: LaserCanvas.Element.Dispersion.eType.Prism
+						};
+						break;
+
 					case "Flat":
 						// Flat mirrors only. These are most likely between two
 						// prisms, so we'll just ignore them here.
@@ -235,7 +256,7 @@
 		reSystemName = /^\[([^\]]+)\]$/m,
 
 		/** Regular expression matching a system type: Resonator|... */
-		reSystemType = /^(Resonator)$/m,
+		reSystemType = /^(Resonator|Propagation)$/m,
 
 		/** Regular expression matching lines to ignore. */
 		reIgnore = /^\s*(?:Selected|Astigmatic|)\s*$/m,
@@ -247,10 +268,10 @@
 		reBooleanProperty = /^(Flipped)$/m,
 
 		/** Regular expression matching an element declaration: Element @ Name = { */
-		reElementDeclaration = /^(Mirror|ThinLens|Screen|BrewsterInput|BrewsterOutput|CrystalInput|CrystalOutput|PlateInput|PlateOutput|ThermalLens|PrismA|PrismB|Flat)\s*@\s*([^\s]+)\s*{$/m,
+		reElementDeclaration = /^(Mirror|ThinLens|Screen|BrewsterInput|BrewsterOutput|CrystalInput|CrystalOutput|PlateInput|PlateOutput|ThermalLens|PrismA|PrismB|Flat|Source)\s*@\s*([^\s]+)\s*{$/m,
 	
 		/** Regular expression matching a renderer declaration: Renderer 2d { */
-		reRendererDeclaration = /^Renderer\s+(SystemGraph|2d)\s*\{$/m,
+		reRendererDeclaration = /^Renderer\s+(1d|2d|3d|Inventory|Solver|SystemGraph|VertexGraph)\s*\{$/m,
 		/**
 		 * Parse the LaserCanvas text format into an object, returning
 		 * the object. Only the first system is returned.
@@ -350,8 +371,14 @@
 			var root = parseTextFile(text),
 				variables = getVariables(root),
 				json = {
-					name: root.name,
-					wavelength: toNumber(root.Wavelength, variables),
+					prop: {
+						configuration: 
+							root.type === "Resonator" ? LaserCanvas.System.configuration.linear :
+							root.type === "Propagation" ? LaserCanvas.System.configuration.propagation :
+							LaserCanvas.System.configuration.linear,
+						name: root.name,
+						wavelength: toNumber(root.Wavelength, variables),
+					},
 					elements: elementsToJson(root.elements, variables)
 				};
 
@@ -377,6 +404,17 @@
 		 */
 		attachLoadListener = function (input, system, render) {
 			var
+				/** Create a new input field with a new listener. */
+				refreshInput = function (oldInput) {
+					var newInput = document.createElement("input"),
+						parent = oldInput.parentElement;
+					newInput.type = oldInput.type;
+					newInput.className = oldInput.className;
+					newInput.addEventListener("change", change);
+					parent.insertBefore(newInput, oldInput);
+					parent.removeChild(oldInput);
+				},
+
 				/** Load the text into the system. */
 				loadText = function (src) {
 					render.resetTransform();
@@ -397,6 +435,7 @@
 						reader.onload = onload;
 						text = reader.readAsText(file);
 					}
+					refreshInput(this);
 				};
 			input.addEventListener("change", change);
 		};
