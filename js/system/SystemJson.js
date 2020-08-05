@@ -40,20 +40,18 @@
 			return json;
 		},
 
-		/** Map of element type names to constructor functions. */
-		factoryMap = (function () {
-			var map = {};
-			for (var elementClass of [
-				LaserCanvas.Element.Mirror,
-				LaserCanvas.Element.Lens,
-				LaserCanvas.Element.Screen,
-				LaserCanvas.Element.Dispersion,
-				LaserCanvas.Element.Dielectric,
-			]) {
-				map[elementClass.Type] = elementClass;
-			}
-			return map;
-		}())
+		/**
+		 * Returns a new element corresponding to the element type string.
+		 * @param {string} type Name of element.
+		 */
+		newElement = function (type) {
+			return type === LaserCanvas.Element.Mirror.Type ? new LaserCanvas.Element.Mirror() :
+				type === LaserCanvas.Element.Lens.Type ? new LaserCanvas.Element.Lens() :
+				type === LaserCanvas.Element.Screen.Type ? new LaserCanvas.Element.Screen() :
+				type === LaserCanvas.Element.Dispersion.Type ? new LaserCanvas.Element.Dispersion() :
+				type === LaserCanvas.Element.Dielectric.Type ? new LaserCanvas.Element.Dielectric() :
+				undefined;
+		},
 
 		/**
 		 * Convert the system and its elements to a storable JSON structure.
@@ -64,7 +62,7 @@
 			LaserCanvas.Utilities.extend(mprop, json.prop);
 			LaserCanvas.SystemUtil.resetElements(melements);
 			for (var elementJson of json.elements) {
-				var element = new factoryMap[elementJson.type]();
+				var element = newElement(elementJson.type);
 				element.fromJson(elementJson);
 				element.init && element.init();
 				melements.push(element);
