@@ -251,8 +251,9 @@ window.LaserCanvas.Application = function (canvas, info) {
 				};
 
 				// On every change, store to local storage.
+				var toLocalStorageDelayed = new LaserCanvas.Utilities.Debounce(2500);
 				msystem.addEventListener("update", function () {
-					msystem.toJsonDestination(LaserCanvas.SystemUtil.toLocalStorage);
+					toLocalStorageDelayed.delay(msystem.toJsonDestination, msystem, LaserCanvas.SystemUtil.toLocalStorage)
 				});
 
 				// Initialize from local storage, if possible.
