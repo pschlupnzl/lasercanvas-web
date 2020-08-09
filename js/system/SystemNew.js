@@ -12,11 +12,8 @@
 	* @param {Array<Element>} melements Reference to array of elements to update.
 	*/
 	var createNew = function (configuration, elementsInfo, loc, mprop, melements) {
-		var element,
-			LaserCanvas = window.LaserCanvas,            // {object} Namespace.
+		var LaserCanvas = window.LaserCanvas,            // {object} Namespace.
 			System = LaserCanvas.System,                 // {object} System namespace.
-			Dielectric = LaserCanvas.Element.Dielectric, // {object} Dielectric element namespace.
-			Dispersion = LaserCanvas.Element.Dispersion, // {object} Dispersion element namespace.
 
 			// Create elements from an array.
 			// @param {Array<object>} items Items to create.
@@ -66,50 +63,10 @@
 		if (elementsInfo) {
 			addElements(elementsInfo);
 		} else {
-			switch (configuration) {
-				case System.configuration.ultrafast:
-					addElements([
-						['Mirror', 300, { startOptic: true, angleOfIncidence: 0, radiusOfCurvature: 0 }],
-						['Mirror', 105, { angleOfIncidence: 0.15, radiusOfCurvature: 200 }],
-						// Brewster crystal.
-						['Dielectric', 2, { refractiveIndex: 1.76, groupVelocityDispersion: 0.064, faceAngle: 0.517, type: Dielectric.eType.Crystal }],
-						['Lens', 0, { focalLength: 500 }],
-						['Dielectric', 105, {}],
-						['Mirror', 170, { angleOfIncidence: 0.15, radiusOfCurvature: 200 }],
-						// Prism compressor.
-						['Dispersion', 217, { type: Dispersion.eType.Prism }],
-						['Dispersion', 40, {}],
-						['Mirror', 0, { endOptic: true, angleOfIncidence: 0, radiusOfCurvature:  0 } ]
-					]);
-					loc = { q: 0.3, x: -150, y: 0 };
-					break;
-					
-				case System.configuration.ring:
-					addElements([
-						['Mirror', 250, { startOptic: true }],
-						['Mirror', 250, { angleOfIncidence: -30 * Math.PI / 180 }],
-						['Mirror', 250, { endOptic: true, angleOfIncidence: -30 * Math.PI / 180, radiusOfCurvature: 500 }]
-					]);
-					loc = { x: -125, y: 80 };
-					break;
-					
-				case System.configuration.propagation:
-					addElements([
-						['Screen', 250, { startOptic: true }],
-						['Screen', 0, { endOptic: true }]
-					]);
-					loc = { x: -125 };
-					break;
-					
-				case System.configuration.endcap:
-				case System.configuration.linear:
-				default:
-					LaserCanvas.SystemUtil.fromJson(
-						systemDefaults()[configuration || System.configuration.linear],
-						mprop,
-						melements);
-					break;
-			}
+			LaserCanvas.SystemUtil.fromJson(
+				systemDefaults()[configuration || System.configuration.linear],
+				mprop,
+				melements);
 		}
 
 		// Initial location.
@@ -181,7 +138,6 @@
 						"name": "D1",
 						"loc": {
 							"x": -125,
-							"l": 50
 						},
 						"prop": {
 							"type": "Endcap",
@@ -191,7 +147,7 @@
 							"thermalLens": 0
 						},
 						"priv": {
-							"thickness": 50,
+							"thickness": 50
 						}
 					},
 					{
@@ -207,8 +163,7 @@
 						"loc": {
 							"l": 200
 						},
-						"prop": {},
-						"priv": {}
+						"prop": {}
 					},
 					{
 						"type": "Mirror",
@@ -238,6 +193,166 @@
 					type: "Screen",
 					name: "I2",
 				}]
+			};
+
+			_systemDefaults[LaserCanvas.System.configuration.ring] = {
+				"prop": {
+					"name": "Ring resonator",
+					"configuration": "ring",
+					"wavelength": 1000,
+				},
+				"elements": [
+					{
+						"type": "Mirror",
+						"name": "M1",
+						"loc": {
+							"x": -125,
+							"y": 80,
+							"q": 0,
+							"l": 250
+						},
+						"prop": {
+							"radiusOfCurvature": 0,
+						}
+					},
+					{
+						"type": "Mirror",
+						"name": "M2",
+						"loc": {
+							"l": 250
+						},
+						"prop": {
+							"radiusOfCurvature": 0,
+							"angleOfIncidence": -0.5235987755982988
+						}
+					},
+					{
+						"type": "Mirror",
+						"name": "M3",
+						"loc": {},
+						"prop": {
+							"radiusOfCurvature": 500,
+							"angleOfIncidence": -0.5235987755982989
+						}
+					}
+				]
+			};
+
+			_systemDefaults[LaserCanvas.System.configuration.ultrafast] = {
+				"prop": {
+					"name": "Ultrafast resonator",
+					"configuration": "ultrafast",
+					"wavelength": 800,
+				},
+				"elements": [
+					{
+						"type": "Mirror",
+						"name": "M1",
+						"loc": {
+							"x": -150,
+							"y": 0,
+							"p": 3.441592653589793,
+							"q": 0.3,
+							"l": 300
+						},
+						"prop": {
+							"radiusOfCurvature": 0,
+							"angleOfIncidence": 0
+						}
+					},
+					{
+						"type": "Mirror",
+						"name": "M2",
+						"loc": {
+							"l": 105
+						},
+						"prop": {
+							"radiusOfCurvature": 200,
+							"angleOfIncidence": 0.15
+						}
+					},
+					{
+						"type": "Dielectric",
+						"name": "D1",
+						"loc": {},
+						"prop": {
+							"type": "Crystal",
+							"refractiveIndex": 1.76,
+							"groupVelocityDispersion": 0.064,
+							"angleOfIncidence": 1.0550462304736345,
+							"faceAngle": 0.517,
+							"curvatureFace1": 0,
+							"curvatureFace2": 0,
+							"thermalLens": 0
+						},
+						"priv": {
+							"thickness": 2
+						}
+					},
+					{
+						"type": "Lens",
+						"name": "L1",
+						"loc": {},
+						"prop": {
+							"focalLength": 0
+						}
+					},
+					{
+						"type": "Dielectric",
+						"name": "D2",
+						"loc": {
+							"l": 105
+						},
+						"prop": {},
+						"priv": {}
+					},
+					{
+						"type": "Mirror",
+						"name": "M3",
+						"loc": {
+							"l": 170
+						},
+						"prop": {
+							"radiusOfCurvature": 200,
+							"angleOfIncidence": 0.15
+						}
+					},
+					{
+						"type": "Dispersion",
+						"name": "DC1",
+						"loc": {
+							"l": 217
+						},
+						"prop": {
+							"type": "Prism",
+							"prismInsertion": 0,
+							"refractiveIndex": 1.5,
+							"indexDispersion": 0,
+							"groupVelocityDispersion": 0
+						},
+						"priv": {
+							"apexAngle": 1.176005207095135,
+							"deflectionAngle": -0.7895822393995233,
+						}
+					},
+					{
+						"type": "Dispersion",
+						"name": "DC2",
+						"loc": {
+							"l": 40
+						},
+						"prop": {},
+						"priv": {}
+					},
+					{
+						"type": "Mirror",
+						"name": "M4",
+						"loc": {},
+						"prop": {
+							"radiusOfCurvature": 0,
+						}
+					}
+				]
 			};
 		}
 		return _systemDefaults;

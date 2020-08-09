@@ -134,6 +134,11 @@ LaserCanvas.Element.Dielectric.prototype = {
 		LaserCanvas.Utilities.extend(this.loc, json.loc);
 		LaserCanvas.Utilities.extend(this.prop, json.prop);
 		LaserCanvas.Utilities.extend(this.priv, json.priv);
+		if (this.priv.thickness) {
+			// In collectGroups, the thickness is derived from the space
+			// between the elements, so update that here.
+			this.loc.l = this.priv.thickness;
+		}
 	},
 
 	/** 
