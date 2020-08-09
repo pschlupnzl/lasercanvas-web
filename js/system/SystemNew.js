@@ -84,16 +84,6 @@
 					loc = { q: 0.3, x: -150, y: 0 };
 					break;
 					
-				case System.configuration.endcap:
-					addElements([
-						['Dielectric', 50, { refractiveIndex: 1.5, curvatureFace1: -200, type: Dielectric.eType.Endcap }],
-						['Lens', 0, { focalLength: 200 }],
-						['Dielectric', 200, {} ],
-						['Mirror', 0, { endOptic: true, angleOfIncidence: 0, radiusOfCurvature:  200 } ]
-					]);
-					loc = { x: -125 };
-					break;
-					
 				case System.configuration.ring:
 					addElements([
 						['Mirror', 250, { startOptic: true }],
@@ -111,22 +101,13 @@
 					loc = { x: -125 };
 					break;
 					
+				case System.configuration.endcap:
 				case System.configuration.linear:
 				default:
-					addElements([
-						['Mirror', 250, { startOptic: true, angleOfIncidence: 0, radiusOfCurvature: 200 }],
-
-						////['Prism', 100, { refractiveIndex: 1.7, prismInsertion: 5 }],
-						//// ['Lens', 20, { focalLength: 200 }],
-						//// ['Lens', 20, { focalLength: -200 }],
-
-						//// ['Dielectric', 50, { refractiveIndex: 1.5 }, Dielectric.eType.Plate],
-						//// ['Lens', 0, { focalLength: 200 }],
-						//// ['Dielectric', 50],
-
-						['Mirror', 0, { endOptic: true, angleOfIncidence: 0, radiusOfCurvature:  200 } ]
-					]);
-					loc = { x: -125 };
+					LaserCanvas.SystemUtil.fromJson(
+						systemDefaults()[configuration || System.configuration.linear],
+						mprop,
+						melements);
 					break;
 			}
 		}
@@ -147,6 +128,120 @@
 			}
 		}
 	};
+
+	/**
+	 * Returns a dictionary of default systems.
+	 */
+	var systemDefaults = (function () {
+		var _systemDefaults = null;
+		if (!_systemDefaults) {
+			// This can't be executed immediately on load because the
+			// `System.configuration` keys may not yet be defined.
+			_systemDefaults = {};
+			_systemDefaults[LaserCanvas.System.configuration.linear] = {
+				prop: {
+				   name: "Linear resonator",
+				   configuration: "linear",
+				   wavelength: 1000,
+				},
+				elements: [
+					{
+						type: "Mirror",
+						name: "M1",
+						loc: {
+							x: -125,
+							y: 0,
+							l: 250
+						},
+						prop: {
+							radiusOfCurvature: 200,
+							angleOfIncidence: 0
+						}
+					},
+					{
+						type: "Mirror",
+						name: "M2",
+						prop: {
+							radiusOfCurvature: 200,
+							angleOfIncidence: 0
+						}
+					}
+				]
+			};
+
+			_systemDefaults[LaserCanvas.System.configuration.endcap] = {
+				"prop": {
+					"name": "End coated resonator",
+					"configuration": "endcap",
+					"wavelength": 1000,
+				},
+				"elements": [
+					{
+						"type": "Dielectric",
+						"name": "D1",
+						"loc": {
+							"x": -125,
+							"l": 50
+						},
+						"prop": {
+							"type": "Endcap",
+							"refractiveIndex": 1.5,
+							"curvatureFace1": -200,
+							"curvatureFace2": 0,
+							"thermalLens": 0
+						},
+						"priv": {
+							"thickness": 50,
+						}
+					},
+					{
+						"type": "Lens",
+						"name": "L1",
+						"prop": {
+							"focalLength": 0
+						}
+					},
+					{
+						"type": "Dielectric",
+						"name": "D2",
+						"loc": {
+							"l": 200
+						},
+						"prop": {},
+						"priv": {}
+					},
+					{
+						"type": "Mirror",
+						"name": "M1",
+						"prop": {
+							"radiusOfCurvature": 200,
+						}
+					}
+				]
+			};
+
+			_systemDefaults[LaserCanvas.System.configuration.propagation] = {
+				prop: {
+					name: "Propagation",
+					configuration: "propagation",
+					wavelength: 1000,
+					initialWaist: 100
+				},
+				elements: [{
+					type: "Screen",
+					name: "I1",
+					loc: {
+						x: -125,
+						l: 250
+					}
+				}, {
+					type: "Screen",
+					name: "I2",
+				}]
+			};
+		}
+		return _systemDefaults;
+	})
 
 	LaserCanvas.SystemUtil = LaserCanvas.SystemUtil || {};
 	LaserCanvas.SystemUtil.createNew = createNew;
