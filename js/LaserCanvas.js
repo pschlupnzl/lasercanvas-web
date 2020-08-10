@@ -271,25 +271,26 @@ window.LaserCanvas.Application = function (canvas, info) {
 					// @param {string} name Name of element being inserted.
 					// @param {string} html Content to set.
 					createPreviewElement = function (name, html) {
-						var img;
+						var img,
+							/** Set the preview element margins to align the contained image. */
+							setOffset = function () {
+								elPreview.style.marginLeft = -0.5 * elPreview.offsetWidth + 'px';
+								elPreview.style.marginTop = -0.5 * elPreview.offsetHeight + 'px';
+							};
 						elementName = name;
 						if (!elPreview) {
 							elPreview = document.createElement('div');
 							elPreview.className = 'insertElementPreview';
-							elPreview.style.position = 'absolute';
-							elPreview.style.opacity = 0.5;
-							elPreview.style.top = 0;
-							elPreview.style.left = 0;
-							elPreview.style.pointerEvents = 'none';
 							document.body.appendChild(elPreview);
 						}
 						elPreview.innerHTML = html;
+						elPreview.classList.add("hidden");
 						img = elPreview.querySelector('img');
 						if (img) {
 							img.style.transform = 'scale(' + mrender.getTransform().s.toFixed(1); + ')';
+							img.onload = setOffset;
 						}
-						elPreview.style.marginLeft = -0.5 * elPreview.offsetWidth + 'px';
-						elPreview.style.marginTop = -0.5 * elPreview.offsetHeight + 'px';
+						setOffset();
 						mrender.setInteraction(interaction.insert);                   // Set insert interaction.
 					},
 					
@@ -321,6 +322,7 @@ window.LaserCanvas.Application = function (canvas, info) {
 						elPreview.style.left = seg.canvas.x + 'px';
 						elPreview.style.top = seg.canvas.y + 'px';
 						elPreview.style.transform = 'rotate(' + -seg.q.toFixed(2) + 'rad)';
+						elPreview.classList.remove("hidden");
 					},
 					
 					// Mouse is down on a button.
