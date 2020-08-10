@@ -1931,12 +1931,3 @@ collection.systemload = {
 	}
 };
 }(window.testCollection));
-
-/*
-n1 = 1; n2 = 2.5; q1 = 45 * Math.PI / 180; q2 = Math.asin(Math.sin(q1) / n2);
-[[1, 0], [(n2 * Math.cos(q2) - n1 * Math.cos(q1)) / R, 1]]
-
-[[Math.cos(q2) / Math.cos(q1), 0, (n2 * Math.cos(q2) - n1 * Math.cos(q1)) / (Math.cos(q1) * Math.cos(q2) * R), Math.cos(q1) / Math.cos(q2)]]
-
-
-*/
