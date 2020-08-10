@@ -11,10 +11,10 @@ LaserCanvas.Element.Lens = function () {
 		x: 0,       // {number} (mm) Horizontal location of element.
 		y: 0,       // {number} (mm) Vertical location of element.
 		p: 0,       // {number} (rad) Rotation angle of incoming axis.
-		q: 0,       // {number} (rad) Rotation angle of outgoing axis.
-		l: 0        // {number} (mm) Distance to next element.
+		q: 0        // {number} (rad) Rotation angle of outgoing axis.
 	};
 	this.prop = {
+		distanceToNext: 0,  // {number} (mm) Distance to next element.
 		focalLength: 250    // {number} (mm) Focal length, 0 for infinite.
 	};
 	this.priv = {
@@ -59,7 +59,7 @@ LaserCanvas.Element.Lens.prototype = {
 	setThermalLens: function (focalLength, refractiveIndex, distanceToNext) {
 		this.prop.focalLength = focalLength;
 		this.priv.refractiveIndex = refractiveIndex;
-		this.loc.l = distanceToNext;
+		this.prop.distanceToNext = distanceToNext;
 	},
 
 	/**
@@ -127,9 +127,6 @@ LaserCanvas.Element.Lens.prototype = {
 		if (newValue !== undefined) {
 			switch (propertyName) {
 				case 'distanceToNext': // {number} (mm) New distance to next element.
-					this.loc.l = newValue;
-					break;
-					
 				case 'focalLength':
 					this.prop[propertyName] = newValue;
 					break;
@@ -137,9 +134,6 @@ LaserCanvas.Element.Lens.prototype = {
 		} else {
 			// Otherwise, return the current value.
 			switch (propertyName) {
-				case 'distanceToNext': // {number} (mm) Distance to next element.
-					return this.loc.l;
-					
 				case 'refractiveIndex': // {number} Refractive index, when used as thermal lens (used by ABCD calculation).
 					return this.priv.refractiveIndex === 0 ? 1 : this.priv.refractiveIndex;
 					

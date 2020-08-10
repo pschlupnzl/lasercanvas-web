@@ -146,7 +146,10 @@ window.LaserCanvas.Utilities = {
 				}
 				return o;
 			};
-		return recursive(obj, src);
+		window.LaserCanvas.Utilities.foreach(Array.prototype.slice.call(arguments, 1), function (index, s) {
+			recursive(obj, s);
+		});
+		return obj;
 	},	
 	
 	// ----------------------------------------------------

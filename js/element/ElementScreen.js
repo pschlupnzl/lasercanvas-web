@@ -2,20 +2,20 @@
 * LaserCanvas - Screen element for inspecting the beam.
 */
 (function (LaserCanvas) {
-LaserCanvas.Element.Screen = function () {
 	"use strict";
+LaserCanvas.Element.Screen = function () {
 	this.type = "Screen"; // {string} Primitive element type.
 	this.name = 'I';      // {string} Name of this element (updated by System).
 	this.loc = {          // Location on canvas.
 		x: 0,              // {number} (mm) Horizontal location of element.
 		y: 0,              // {number} (mm) Vertical location of element.
 		p: 0,              // {number} (rad) Rotation angle of incoming axis.
-		q: 0,              // {number} (rad) Rotation angle of outgoing axis.
-		l: 0               // {number} (mm) Distance to next element.
+		q: 0               // {number} (rad) Rotation angle of outgoing axis.
 	};
 	this.prop = {
 		startOptic: false, // {boolean} Value indicating whether this is the first element (e.g. propagation system).
-		endOptic: false    // {boolean} Value indicating whether this is the final element (e.g. propagation system).
+		endOptic: false,   // {boolean} Value indicating whether this is the final element (e.g. propagation system).
+		distanceToNext: 0  // {number} (mm) Distance to next element.
 	};
 	this.panel = null;    // {HTMLDivElement?} Information panel.
 	this.showProperties = false; // {boolean} Value indicating whether this can show properties window. FALSE to suppress.
@@ -60,7 +60,6 @@ LaserCanvas.Element.Screen.prototype = {
 	* @param {string} name New name to set.
 	*/
 	setName: function (name) {
-		"use strict";
 		this.name = this.panel.querySelector('h1').innerHTML = name;
 	},
 	
@@ -73,7 +72,6 @@ LaserCanvas.Element.Screen.prototype = {
 	* @returns {HTMLDivElement} The created panel.
 	*/
 	createPanel: function (system) {
-		"use strict";
 		var self = this,
 			el,
 			panel = document.createElement('div');
@@ -114,7 +112,6 @@ LaserCanvas.Element.Screen.prototype = {
 	* @returns {object} The element location object.
 	*/
 	location: function (ax) {
-		"use strict";
 		if (ax) {
 			this.loc.x = ax.x;
 			this.loc.y = ax.y;
@@ -128,7 +125,6 @@ LaserCanvas.Element.Screen.prototype = {
 	* @returns {Array<object>} Array of property keys.
 	*/
 	userProperties: function () {
-		"use strict";
 		return [];
 	},
 	
@@ -137,7 +133,6 @@ LaserCanvas.Element.Screen.prototype = {
 	* @param {string} propertyName Name of property being probed 'distanceToNext'|'deflectionAngle'.
 	*/
 	canSetProperty: function (propertyName) {
-		"use strict";
 		return {
 			distanceToNext: true,
 			insertElement: true,
@@ -154,12 +149,11 @@ LaserCanvas.Element.Screen.prototype = {
 	* @returns {number=} The current value, if retrieving only.
 	*/
 	property: function (propertyName, newValue, arg) {
-		"use strict";
 		// Set value, if specified.
 		if (newValue !== undefined) {
 			switch (propertyName) {
 				case 'distanceToNext': // {number} (mm) New distance to next element.
-					this.loc.l = newValue;
+					this.prop[propertyName] = newValue;
 					break;
 					
 				case 'outgoingAngle': 
@@ -174,7 +168,7 @@ LaserCanvas.Element.Screen.prototype = {
 			// Otherwise, return the current value.
 			switch (propertyName) {
 				case 'distanceToNext': // {number} (mm) Distance to next element.
-					return this.loc.l;
+					return this.prop[propertyName];
 			}
 		}
 	},
@@ -186,7 +180,6 @@ LaserCanvas.Element.Screen.prototype = {
 	* @returns {Matrix2x} Transfer matrix.
 	*/
 	elementAbcd: function (dir, plane) {
-		"use strict";
 		return new LaserCanvas.Math.Matrix2x2.eye();
 	},
 	
@@ -196,7 +189,6 @@ LaserCanvas.Element.Screen.prototype = {
 	* @param {number:ModePlane} plane Plane for which to set.
 	*/
 	updateAbcdQ: function (abcdQ, plane) {
-		"use strict";
 		var k, info, el,
 			sel = '[data-column="{0}"]'.replace('{0}', plane === LaserCanvas.Enum.modePlane.sagittal ? 'sag' : 'tan'),
 			rows = this.panel.querySelectorAll('[data-info]');
@@ -214,7 +206,6 @@ LaserCanvas.Element.Screen.prototype = {
 	* The element is being destroyed.
 	*/
 	destroy: function () {
-		"use strict";
 		if (this.panel && this.panel.parentNode) {
 			this.panel.parentNode.removeChild(this.panel);
 		}
@@ -239,7 +230,6 @@ LaserCanvas.Element.Screen.prototype = {
 	* @param {boolean} wireframe Value indicating whether called via wireframe.
 	*/
 	draw: function (render, layer, wireframe) {
-		"use strict";
 		var
 			renderLayer = LaserCanvas.Enum.renderLayer, // {Enum} Layer to draw.
 			qc = -this.loc.q; // {number} (rad) Angle on canvas.

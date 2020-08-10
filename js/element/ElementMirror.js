@@ -10,12 +10,12 @@ LaserCanvas.Element.Mirror = function () {
 		x: 0,       // {number} (mm) Horizontal location of element.
 		y: 0,       // {number} (mm) Vertical location of element.
 		p: 0,       // {number} (rad) Rotation angle of incoming axis.
-		q: 0,       // {number} (rad) Rotation angle of outgoing axis.
-		l: 0        // {number} (mm) Distance to next element.
+		q: 0        // {number} (rad) Rotation angle of outgoing axis.
 	};
 	this.prop = {
 		startOptic: false,            // {boolean} Value indicating whether this is the cavity start optic.
 		endOptic: false,              // {boolean} Value indicating whether this is the cavity end optic.
+		distanceToNext: 0,            // {number} (mm) Distance to next element.
 		radiusOfCurvature: 0,         // {number} (mm) Radius of curvature, or 0 for flat.
 		angleOfIncidence: Math.PI / 2 // {number} (rad) Angle of incidence. Default no deflection
 	};
@@ -131,10 +131,6 @@ LaserCanvas.Element.Mirror.prototype = {
 					this.prop.angleOfIncidence = newValue * Math.PI / 180;
 					break;
 					
-				case 'distanceToNext': // {number} (mm) New distance to next element.
-					this.loc.l = newValue;
-					break;
-					
 				case 'deflectionAngle': // {number} (rad) New deflection angle.
 					// SPECIAL CASE: Set angle of incidence to match a required deflection.
 					while (newValue < -Math.PI) {
@@ -156,6 +152,7 @@ LaserCanvas.Element.Mirror.prototype = {
 					}
 					break;
 					
+				case 'distanceToNext': // {number} (mm) New distance to next element.
 				case 'radiusOfCurvature':
 					this.prop[propertyName] = newValue;
 					break;
@@ -166,13 +163,11 @@ LaserCanvas.Element.Mirror.prototype = {
 				case 'angleOfIncidence':
 					return this.prop.angleOfIncidence * 180 / Math.PI;
 					
-				case 'distanceToNext': // {number} (mm) Distance to next element.
-					return this.loc.l;
-					
 				case 'deflectionAngle': // {number} (rad) New deflection angle.
 					i = this.prop.angleOfIncidence;
 					return (i < 0 ? -1 : +1) * (Math.PI - 2 * Math.abs(i));
 					
+				case "distanceToNext":
 				default:
 					return this.prop[propertyName];
 			}

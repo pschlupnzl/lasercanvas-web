@@ -115,11 +115,7 @@
 				var linkedElement;
 				var elementJson = {
 					name: src.name,
-					loc: {
-						l: src.DistanceToNext !== undefined
-							? toNumber(src.DistanceToNext, variables)
-							: 0
-					},
+					loc: {},
 					prop: {}
 				};
 				switch (src.type) {
@@ -178,7 +174,9 @@
 						}
 						
 						// groupVelocityDispersion: 0,// {number} (um^-2) Group velocity dispersion for ultrafast calculations.
-						elementJson.loc.l = toNumber(src.Thickness, variables);
+						elementJson.priv = {
+							thickness: toNumber(src.Thickness, variables)
+						};
 						break;
 
 					case "ThermalLens":
@@ -229,11 +227,16 @@
 					default:
 						// Accumulate skipped element spacing.
 						if (src.DistanceToNext) {
-							jsonElements[jsonElements.length - 1].loc.l += toNumber(src.DistanceToNext, variables);
+							jsonElements[jsonElements.length - 1].prop.distanceToNext += toNumber(src.DistanceToNext, variables);
 						}
 						continue;
 				}
 
+				// Common properties.
+				elementJson.prop.distanceToNext = src.DistanceToNext !== undefined
+					? toNumber(src.DistanceToNext, variables)
+					: 0;
+		
 				// Append to list.
 				jsonElements.push(elementJson);
 			}

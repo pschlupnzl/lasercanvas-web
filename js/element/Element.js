@@ -256,10 +256,10 @@ window.LaserCanvas.Element.atLocation = function (pt, tol) {
 * a groupVelocityDispersion property, as well as an element 
 * group. The GDD is only returned for the first element in the
 * group. If the parameter L is not supplied, the element's
-* loc.l property is used as the propagation length.
+* distanceToNext property is used as the propagation length.
 * @this {Element} Grouped element, e.g. Dispersion or Dielectric.
 	* @param {number} lam (nm) Wavelength (note units nm!).
-* @param {number=} L (mm) Optional length, if different to loc.l.
+* @param {number=} L (mm) Optional length, if different to distanceToNext.
 * @returns {number} (fs^2/rad) Group delay dispersion for first element in group, otherwise 0.
 */
 window.LaserCanvas.Element.groupDelayDispersion = function (lam, L) {
@@ -284,6 +284,6 @@ window.LaserCanvas.Element.groupDelayDispersion = function (lam, L) {
 	return this === this.group[0]
 		? 1e-6 * lam * lam * lam / (2 * Math.PI * c * c) 
 			* this.prop.groupVelocityDispersion 
-			* (L !== undefined ? L : this.loc.l)
+			* (L !== undefined ? L : this.property("distanceToNext"))
 		: false;
 };
