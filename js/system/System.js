@@ -573,7 +573,7 @@ LaserCanvas.System = function () {
 		 */
 		fromJsonSource = function (jsonSource) {
 			try {
-				jsonSource(mprop, melements);
+				jsonSource(mprop, melements, this);
 			} catch (e) {
 				createNew(LaserCanvas.System.configuration.linear);
 			}

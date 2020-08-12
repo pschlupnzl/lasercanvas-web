@@ -18,11 +18,12 @@
 		 * Load a system from local storage.
 		 * @param {object} mprop Reference to the system's internal properties.
 		 * @param {Array<object:Element>} melements Reference to elements.
+		 * @param {System} system Optical system to which the elements belong.
 		 */
-		fromLocalStorage = function (mprop, melements) {
+		fromLocalStorage = function (mprop, melements, system) {
 			var json;
 			json = JSON.parse(window.localStorage.getItem(localStorageKey));
-			fromJson(json, mprop, melements);
+			fromJson(json, mprop, melements, system);
 		},
 
 		/**
@@ -57,14 +58,15 @@
 		 * Convert the system and its elements to a storable JSON structure.
 		 * @param {object} mprop Reference to properties to save and load.
 		 * @param {Array<object:Element>} melements Reference to elements to save and load.
+		 * @param {System} system Parent system to which the elements belong, used e.g. for deleting screen.
 		 */
-		fromJson = function (json, mprop, melements) {
+		fromJson = function (json, mprop, melements, system) {
 			LaserCanvas.Utilities.extend(mprop, json.prop);
 			LaserCanvas.SystemUtil.resetElements(melements);
 			for (var elementJson of json.elements) {
 				var element = newElement(elementJson.type);
 				element.fromJson(elementJson);
-				element.init && element.init();
+				element.init && element.init(system);
 				melements.push(element);
 			}
 			LaserCanvas.Element.Dielectric.collectGroups(melements);
