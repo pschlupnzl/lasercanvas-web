@@ -19,7 +19,7 @@ window.LaserCanvas.Sellmeier = function (fnReady, thisArg) {
 /**
 * Script URL for loading refractive index data.
 */
-window.LaserCanvas.Sellmeier.refractiveIndexUrl = 'refractiveIndex.js';
+window.LaserCanvas.Sellmeier.refractiveIndexUrl = 'js/refractiveIndex.js';
 
 // Create a Sellmeier equation of the given form for the specified parameters.
 // @param {number} type Type of formula to use.
