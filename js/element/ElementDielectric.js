@@ -11,11 +11,12 @@ LaserCanvas.Element.Dielectric = function (blockType) {
 		x: 0,       // {number} (mm) Horizontal location of element.
 		y: 0,       // {number} (mm) Vertical location of element.
 		p: 0,       // {number} (rad) Rotation angle of incoming axis.
-		q: 0,       // {number} (rad) Rotation angle of outgoing axis.
-		l: 0        // {number} (mm) Distance to next element.
+		q: 0        // {number} (rad) Rotation angle of outgoing axis.
 	};
 	this.group = [];              // {Array<Element>} Related elements: Input interface, lens, output interface.
-	this.prop = {};     // {object} Public properties.
+	this.prop = {                 // {object} Public properties.
+		distanceToNext: 0         // {number} (mm) Distance to next element.
+	};
 	this.priv = {};     // {object} Private properties.
 	this.setDefaults(blockType);
 	
@@ -88,7 +89,7 @@ LaserCanvas.Element.Dielectric.collectGroups = function (elements) {
 			// Start a new group.
 			group = [element];
 			if (element.type === 'Dielectric') {
-				element.priv.thickness = element.loc.l;
+				element.priv.thickness = element.property("distanceToNext");
 			}
 			
 		} else if (group) {
@@ -134,6 +135,11 @@ LaserCanvas.Element.Dielectric.prototype = {
 		LaserCanvas.Utilities.extend(this.loc, json.loc);
 		LaserCanvas.Utilities.extend(this.prop, json.prop);
 		LaserCanvas.Utilities.extend(this.priv, json.priv);
+		if (this.priv.thickness) {
+			// In collectGroups, the thickness is derived from the space
+			// between the elements, so update that here.
+			this.prop.distanceToNext = this.priv.thickness;
+		}
 	},
 
 	/** 
@@ -144,6 +150,7 @@ LaserCanvas.Element.Dielectric.prototype = {
 	setDefaults: function (blockType) {
 		if (blockType) {
 			this.prop = {
+				distanceToNext: 0,         // {number} (mm) Distance to next element.
 				type: blockType,           // {string:Enum} Type of dielectric element (see Dielectric.type enum) 'Plate'|'Brewster'|'Crystal'.
 				refractiveIndex: 1,        // {number} Refractive index.
 				groupVelocityDispersion: 0,// {number} (um^-2) Group velocity dispersion for ultrafast calculations.
@@ -246,7 +253,7 @@ LaserCanvas.Element.Dielectric.prototype = {
 				: this.priv.thickness / Math.cos(this.prop.faceAngle),
 			l1 = this.prop.thermalLens === 0 ? len : len / 2, // {number} (mm) Propagation before lens.
 			l2 = len - l1;  // {number} (mm) Propagation after lens.
-		this.group[0].loc.l = l1;
+		this.group[0].prop.distanceToNext = l1;
 		this.group[1].setThermalLens(
 			this.prop.thermalLens, 
 			this.prop.refractiveIndex, 
@@ -313,6 +320,11 @@ LaserCanvas.Element.Dielectric.prototype = {
 					options: ['Plate', 'Brewster', 'Crystal', 'Prism'],
 					infoPanel: false
 				},
+				elementDistanceToNext: {
+					propertyName: 'elementDistanceToNext',
+					increment: 5,
+					min: 0
+				},
 				refractiveIndex: {
 					propertyName: 'refractiveIndex',
 					increment: 0.1,
@@ -359,12 +371,12 @@ LaserCanvas.Element.Dielectric.prototype = {
 				}
 			},
 			elementProps =
-				this.prop.type === eType.Plate ? ["type", "refractiveIndex", "groupVelocityDispersion", "thickness", "curvatureFace1", "curvatureFace2", "angleOfIncidence", "flip"] :
-				this.prop.type === eType.Brewster ? ["type", "refractiveIndex", "groupVelocityDispersion", "thickness", "flip"] :
-				this.prop.type === eType.Crystal ? ["type", "refractiveIndex", "groupVelocityDispersion", "thickness", "curvatureFace1", "curvatureFace2", "flip", "faceAngle", "thermalLens"] :
-				this.prop.type === eType.Prism ? ["type", "refractiveIndex", "thickness", "flip"] :
-				this.prop.type === eType.Endcap ? ["refractiveIndex", "groupVelocityDispersion", "thickness", "curvatureFace1", "curvatureFace2", "flip", "faceAngle", "thermalLens"] :
-				"";
+				this.prop.type === eType.Plate ? ["type", "elementDistanceToNext", "refractiveIndex", "groupVelocityDispersion", "thickness", "curvatureFace1", "curvatureFace2", "angleOfIncidence", "flip"] :
+				this.prop.type === eType.Brewster ? ["type", "elementDistanceToNext", "refractiveIndex", "groupVelocityDispersion", "thickness", "flip"] :
+				this.prop.type === eType.Crystal ? ["type", "elementDistanceToNext", "refractiveIndex", "groupVelocityDispersion", "thickness", "curvatureFace1", "curvatureFace2", "flip", "faceAngle", "thermalLens"] :
+				this.prop.type === eType.Prism ? ["type", "elementDistanceToNext", "refractiveIndex", "thickness", "flip"] :
+				this.prop.type === eType.Endcap ? ["elementDistanceToNext", "refractiveIndex", "groupVelocityDispersion", "thickness", "curvatureFace1", "curvatureFace2", "flip", "faceAngle", "thermalLens"] :
+				[];
 
 		// No properties except for first element.
 		if (this === this.group[0]) {
@@ -399,6 +411,7 @@ LaserCanvas.Element.Dielectric.prototype = {
 			curvatureFace1: !brewster,
 			curvatureFace2: !brewster,
 			distanceToNext: lastElement,
+			elementDistanceToNext: true,
 			outgoingAngle: endcap // Used for cavity geometry adjustment.
 		}[propertyName] || false;
 	},
@@ -465,26 +478,26 @@ LaserCanvas.Element.Dielectric.prototype = {
 					this.prop[propertyName] = newValue * Math.PI / 180.00;
 					this.updateAngles();
 					break;
-					
-				case 'groupVelocityDispersion':
-					this.prop[propertyName] = newValue;
-					break;
-				
 				case 'thermalLens':
 					this.prop[propertyName] = newValue;
 					this.updateThermalLens();
 					break;
 				
-				case 'distanceToNext': // {number} (mm) New distance to next element.
-					this.loc.l = newValue;
-					break;
-					
 				case 'outgoingAngle':
 					// newValue {number} (rad) New outgoing angle on canvas.
 					// arg {boolean} Value indicating whether this is first element in cavity.
 					if (arg) {
 						this.loc.q = newValue;
 					}
+					break;
+
+				case 'distanceToNext': // {number} (mm) New distance to next element.
+				case 'groupVelocityDispersion':
+					this.prop[propertyName] = newValue;
+					break;
+				
+				case 'elementDistanceToNext': // {number} (mm) New distance to next element *after* the group.
+					this.group[this.group.length - 1].prop.distanceToNext = newValue;
 					break;
 			}
 		} else {
@@ -494,6 +507,7 @@ LaserCanvas.Element.Dielectric.prototype = {
 				case 'faceAngle':
 					return this.prop[propertyName] * 180.00/ Math.PI;
 					
+				case 'distanceToNext': // {number} (mm) Distance to next element.
 				case 'curvatureFace1':
 				case 'curvatureFace2':
 				case 'type':            // {string} Dielectric block type.
@@ -505,9 +519,9 @@ LaserCanvas.Element.Dielectric.prototype = {
 
 				case 'thickness':       // {number} (mm) Thickness of element.
 					return this.priv[propertyName];
-					
-				case 'distanceToNext': // {number} (mm) Distance to next element.
-					return this.loc.l;
+
+				case 'elementDistanceToNext': // {number} (mm) New distance to next element *after* the group.
+					return this.group[this.group.length - 1].prop.distanceToNext;
 			}
 		}
 	},
@@ -738,7 +752,7 @@ LaserCanvas.Element.Dielectric.prototype = {
 					// Parameters.
 					endcap = this.prop.type === eType.Endcap;
 					r = 20;                          // {number} Radius ('width') of dielectric block.
-					l = this.loc.l                   // {number} Length of dielectric block.
+					l = this.property("distanceToNext") // {number} Length of dielectric block.
 						+ this.group[1].property('distanceToNext'); // Plus thermal lens.
 					qf = -this.prop.faceAngle;       // {number} (rad) Angle of face, relative to internal propagation axis.
 					tan2 = r * Math.tan(qf || 1e-3); // {number} Face angle secant, for face offset.

@@ -1004,6 +1004,7 @@ window.LaserCanvas.Render.update = function (system, render, options) {
 				renderLayer = window.LaserCanvas.Enum.renderLayer, // {Enum} Rendering layers.
 				modePlane = window.LaserCanvas.Enum.modePlane, // {Enum} Rendering planes.
 				loc = element.location(),         // {object} Element location.
+				distanceToNext = element.property("distanceToNext"), // {number} (mm) Distance to next element.
 				nextLoc = nextElement.location(); // {object} Next element location.
 			
 			switch (layer) {
@@ -1017,9 +1018,9 @@ window.LaserCanvas.Render.update = function (system, render, options) {
 					
 				case renderLayer.distance:
 					// Distance marker.
-					if (loc.l > 0 
+					if (distanceToNext > 0 
 						&& typeof render.centerText === 'function') {
-						render.centerText(Math.round(loc.l),
+						render.centerText(Math.round(distanceToNext),
 							(loc.x + nextLoc.x) / 2,
 							(loc.y + nextLoc.y) / 2,
 							0, 1);
@@ -1034,7 +1035,7 @@ window.LaserCanvas.Render.update = function (system, render, options) {
 					n = element.property('refractiveIndex') || 1;
 					if (abcdQ) {
 						renderMode(loc, {
-							dist: loc.l,
+							dist: distanceToNext,
 							z0: abcdQ.z0,       // {number} (mm) Distance to waist.
 							w0: abcdQ.w0 * 0.1, // {number} (um) Waist size.
 							zR: abcdQ.zR,       // {number} (mm) Rayleigh length.

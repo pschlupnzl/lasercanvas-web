@@ -3,19 +3,20 @@
 * @param {string:Dielectric.eType} dispersionType Type of dispersion compensation pair to create.
 */
 (function (LaserCanvas) {
-LaserCanvas.Element.Dispersion = function (dispersionType) {
 	"use strict";
+LaserCanvas.Element.Dispersion = function (dispersionType) {
 	this.type = 'Dispersion'; // {string} Primitive element type.
 	this.name = 'DC';  // {string} Name of this element (updated by System).
 	this.loc = {       // Location on canvas.
 		x: 0,           // {number} (mm) Horizontal location of element.
 		y: 0,           // {number} (mm) Vertical location of element.
 		p: 0,           // {number} (rad) Rotation angle of incoming axis.
-		q: 0,           // {number} (rad) Rotation angle of outgoing axis.
-		l: 0            // {number} (mm) Distance to next element.
+		q: 0            // {number} (rad) Rotation angle of outgoing axis.
 	};
 	this.group = [];   // {Array<Element>} Elements in this dispersion compensation pair.
-	this.prop = {};    // Public properties, for first of pair only.
+	this.prop = {      // Public properties, for first of pair only.
+		distanceToNext: 0 // {number} (mm) Distance to next element.
+	};
 	this.priv = {};    // Private properties, for first of pair only.
 	this.setDefaults(dispersionType); // Set default properties for first of pair.
 	
@@ -55,7 +56,6 @@ LaserCanvas.Element.Dispersion.propertyDefault = {
  * @returns {Array<Element>} Elements to insert.
  */
 LaserCanvas.Element.Dispersion.createGroup = function (prevElement, segZ) {
-	"use strict";
 	var Dispersion = LaserCanvas.Element.Dispersion, // {object} Namespace.
 		segLen = prevElement.property('distanceToNext'), // {number} (mm) Distance on segment being inserted.
 		elements = [
@@ -137,7 +137,6 @@ LaserCanvas.Element.Dispersion.prototype = {
 	* @param {string:Dielectric.eType} dispersionType Type of dispersion compensation pair to create.
 	*/
 	setDefaults: function (dispersionType) {
-		"use strict";
 		var Dispersion = LaserCanvas.Element.Dispersion,  // {object} Namespace.
 			eType = Dispersion.eType,                     // {object:Enum} Types of dispersion pairs.
 			propertyDefault = Dispersion.propertyDefault; // {object} Default properties to set.
@@ -145,7 +144,8 @@ LaserCanvas.Element.Dispersion.prototype = {
 		if (dispersionType) {
 			// Set for first element only.
 			this.prop = {
-				type: eType.Prism // {string:Enum} Type of dispersion pair 'Prism'|'Grating'.
+				type: eType.Prism, // {string:Enum} Type of dispersion pair 'Prism'|'Grating'.
+				distanceToNext: 0  // {number} (mm) Distance to next element.
 			};
 			LaserCanvas.Utilities.extend(this.prop, Dispersion.propertyDefault);
 			
@@ -161,7 +161,6 @@ LaserCanvas.Element.Dispersion.prototype = {
 	* Re-calculate angles based on new values and type.
 	*/
 	updateAngles: function () {
-		"use strict";
 		var eType = LaserCanvas.Element.Dispersion.eType; // {object:Enum} Types of dispersion pairs.
 		// Update for first element.
 		if (this === this.group[0]) {
@@ -186,7 +185,6 @@ LaserCanvas.Element.Dispersion.prototype = {
 	* @returns {object} The element location object.
 	*/
 	location: function (ax) {
-		"use strict";
 		if (ax) {
 			this.loc.x = ax.x;
 			this.loc.y = ax.y;
@@ -207,6 +205,10 @@ LaserCanvas.Element.Dispersion.prototype = {
 				propertyName: 'type',
 				options: ['Prism'], // , 'Grating'], // TODO: Grating.
 				infoPanel: false
+			}, {
+				propertyName: 'distanceToNext',
+				increment: 5,
+				min: 0
 			}];
 		switch (this.group[0].prop.type) {
 			case eType.Prism:
@@ -254,7 +256,6 @@ LaserCanvas.Element.Dispersion.prototype = {
 	* @param {object} adjustingElement Element being dragged - to retain intra-pair spacing.
 	*/
 	canSetProperty: function (propertyName, adjustingElement) {
-		"use strict";
 		var eType = LaserCanvas.Element.Dispersion.eType, // {object:Enum} Dispersion pair types.
 			isPrism = this.group[0].prop.type === eType.Prism; // {boolean} Value indicating whether the dispersion pair is a prism.
 		return {
@@ -277,13 +278,12 @@ LaserCanvas.Element.Dispersion.prototype = {
 	* @returns {number=} The current value, if retrieving only.
 	*/
 	property: function (propertyName, newValue, arg) {
-		"use strict";
 
 		// Set value, if specified.
 		if (newValue !== undefined) {
 			switch (propertyName) {
 				case 'distanceToNext': // {number} (mm) New distance to next element.
-					this.loc.l = newValue;
+					this.prop[propertyName] = newValue;
 					break;
 					
 				////case 'gratingDensity':
@@ -300,7 +300,7 @@ LaserCanvas.Element.Dispersion.prototype = {
 			// Otherwise, return the current value.
 			switch (propertyName) {
 				case 'distanceToNext': // {number} (mm) Distance to next element.
-					return this.loc.l;
+					return this.prop[propertyName];
 					
 				case 'deflectionAngle': // {number} (rad) Outgoing axis.
 					return this.group[0].priv.deflectionAngle *
@@ -327,7 +327,6 @@ LaserCanvas.Element.Dispersion.prototype = {
 	* @returns {number} Refractive index for space following the element.
 	*/
 	spaceRefractiveIndex: function () {
-		"use strict";
 		return 1.0;
 	},
 	
@@ -337,7 +336,6 @@ LaserCanvas.Element.Dispersion.prototype = {
 	* @returns {number|boolean} (fs^2/rad) Group delay dispersion, or FALSE for second element where method doesn't apply.
 	*/
 	groupDelayDispersion: function (lam) {
-		"use strict";
 		var gdd, A, B, c, l3pic2, dndl, d2ndl2;
 
 		// See https://arxiv.org/pdf/1411.0232.pdf.
@@ -353,7 +351,7 @@ LaserCanvas.Element.Dispersion.prototype = {
 			// Variables.
 			c = LaserCanvas.constant.c; // {number} (um/fs) Speed of light.
 			l3pic2 = lam * lam * lam / (Math.PI * c * c); // Factor lam^2 / pi c^2.
-			A = this.loc.l; // {number} (mm) Distance between prisms.
+			A = this.property("distanceToNext"); // {number} (mm) Distance between prisms.
 			B = 0;          // {number} (mm) Insertion.
 			
 			// Calculation (approximate).
@@ -361,7 +359,7 @@ LaserCanvas.Element.Dispersion.prototype = {
 				- A * 2 * l3pic2 * dndl * dndl;
 				
 			// Units: Wavelength [um] <-- lam [nm] x 1e-3.
-			//        Distance [um] <-- loc.l [mm] x 1e+3.
+			//        Distance [um] <-- distToNext [mm] x 1e+3.
 			// Wavelength cubed, distance once.
 			gdd *= 1e-6;
 
@@ -409,7 +407,6 @@ LaserCanvas.Element.Dispersion.prototype = {
 	* @param {LaserCanvas.renderLayer} layer Rendering layer.
 	*/
 	draw: function (render, layer) {
-		"use strict";
 		var qf, tan, path,
 			i = this === this.group[0] ? 0    // {number} (mm) Prism insertion.
 				: this.group[0].prop.prismInsertion, // Assign to second prism only (although stored on first).
@@ -450,7 +447,6 @@ LaserCanvas.Element.Dispersion.prototype = {
 	* @param {LaserCanvas.renderLayer} layer Rendering layer.
 	*/
 	wireframe: function (render, layer) {
-		"use strict";
 		return this.draw(render, layer);
 	}
 };

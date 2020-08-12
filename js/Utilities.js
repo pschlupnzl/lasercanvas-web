@@ -146,7 +146,10 @@ window.LaserCanvas.Utilities = {
 				}
 				return o;
 			};
-		return recursive(obj, src);
+		window.LaserCanvas.Utilities.foreach(Array.prototype.slice.call(arguments, 1), function (index, s) {
+			recursive(obj, s);
+		});
+		return obj;
 	},	
 	
 	// ----------------------------------------------------
@@ -318,7 +321,61 @@ window.LaserCanvas.Utilities = {
 			handle.addEventListener('touchstart', tstart, false);
 			handle.setAttribute('data-draggable', 'true');
 		}
-	}
+	},
+
+	// ------------
+	//  Utilities.
+	// ------------
+
+	/**
+	 * Handler to invoke delayed tasks.
+	 */
+	Debounce: (function () {
+		/**
+		 * Initialize a new instance of the Debounce class.
+		 * @param {number} defaultDelay Default delay, in ms. Defaults to 0.
+		 */
+		var Debounce = function (defaultDelay) {
+			this.timeout = null;
+			this.defaultDelay = defaultDelay || 0;
+		};
+		/**
+		 * Prepares an action to be executed after a delay.
+		 * @param {function} action Method to invoke when the delay elapses.
+		 * @param {object=} thisArg Opttional argument passed as `this` to the action.
+		 * @param {arguments=} args Additional arguments passed to the action.
+		 */
+		Debounce.prototype.delay = function (action, thisArg, args) {
+			var extraArgs = Array.prototype.slice.call(arguments, 2);
+			this.cancel();
+			this.timeout = setTimeout((function (self) {
+				return function () {
+					action.apply(thisArg, extraArgs);
+				};
+			}(this)), this.defaultDelay);
+		};
+		/**
+		 * Executes a synchronous action immediately, canceling any queued action.
+		 * @param {function} action Method to invoke when the delay elapses.
+		 * @param {object=} thisArg Opttional argument passed as `this` to the action.
+		 * @param {arguments=} args Additional arguments passed to the action.
+		 */
+		Debounce.prototype.execute = function (action, thisArg, args) {
+			var extraArgs = Array.prototype.slice.call(arguments, 2);
+			this.cancel();
+			action.apply(thisArg, extraArgs);
+		};
+		/**
+		 * Cancels a delayed action.
+		 */
+		Debounce.prototype.cancel = function () {
+			if (this.timeout) {
+				clearTimeout(this.timeout);
+			}
+			this.timeout = null;
+		};
+		return Debounce;
+	}())
 };
 
 /**

@@ -203,7 +203,7 @@ LaserCanvas.System = function () {
 		* @returns {object} Closest point on a segment, plus information about element and distance.
 		*/
 		segmentNearLocation = function (pt, filterBy) {
-			var k, loc, V, W, z, x, y, r2, 
+			var k, loc, V, W, z, x, y, r2, zMax,
 				seg = null,                       // {object?} Returned best segment.
 				Vector = LaserCanvas.Math.Vector, // {function} Construction function for vector.
 				kmax = mprop.configuration === LaserCanvas.System.configuration.ring
@@ -211,6 +211,7 @@ LaserCanvas.System = function () {
 			for (k = 0; k < kmax; k += 1) {
 				if (!filterBy || melements[k].canSetProperty(filterBy)) {
 					loc = melements[k].location(); // {Point} Current optic location.
+					zMax = melements[k].property("distanceToNext"); // {number} (mm) Distance to next element.
 					
 					// Calculate dot product.
 					V = new Vector([   // Normalized axis vector.
@@ -226,7 +227,7 @@ LaserCanvas.System = function () {
 					// Distance from point on segment to mouse.
 					// We could use magnitude of difference vector, but need the
 					// method here for points beyond the segment anyway.
-					z = z < 0 ? 0 : z > loc.l ? loc.l : z;   // Constrain to segment.
+					z = z < 0 ? 0 : z > zMax ? zMax : z;   // Constrain to segment.
 					x = loc.x + z * Math.cos(loc.q);         // {number} (mm) Horizontal location of point on axis.
 					y = loc.y + z * Math.sin(loc.q);         // {number} (mm) Vertical location of point on axis.
 					r2 = (pt.x - x) * (pt.x - x) + (pt.y - y) * (pt.y - y); // {number} (mm^2) Squared distance.
@@ -362,11 +363,11 @@ LaserCanvas.System = function () {
 				el.property('deflectionAngle', Math.atan2(Z.cross(U), Z.dot(U))); // Updates angleOfIncidence.
 				le.property('deflectionAngle', Math.atan2(V.cross(Z), V.dot(Z))); // Updates angleOfIncidence.
 				le.loc.q = Z.atan2();
-				le.loc.l = l;
+				le.property("distanceToNext", l);
 			} else {
 				// Linear cavity: Normal incidence.
 				el.loc.p = el.loc.q + Math.PI;
-				le.loc.l = 0;
+				le.property("distanceToNext", 0);
 				le.property('deflectionAngle', Math.PI);
 			}
 		},
@@ -377,7 +378,7 @@ LaserCanvas.System = function () {
 		* @param {number=} kend_in Index of final element to calculate, if any. The element is included.
 		*/
 		calculateCartesianCoordinates = function (kstart_in, kend_in) {
-			var k, element,
+			var k, element, d,
 				loc,                                 // {object} Current element location (x, y, q, ...).
 				// /---TODO---------------------------------------------------------\
 				// | We always have to start at the beginning of the system because |
@@ -395,11 +396,12 @@ LaserCanvas.System = function () {
 				loc = element.location(k === kstart  // {object} Element transfer properties.
 					? null                       // Don't update first element ..
 					: ax);                       // ..only subsequent ones.
-				
+				d = element.property("distanceToNext");
+
 				// Traverse to next.
 				ax.q = loc.q;                   // {number} (rad) Next axis direction.
-				ax.x += loc.l * Math.cos(ax.q); // {number} (mm) Advance horizontal location.
-				ax.y += loc.l * Math.sin(ax.q); // {number} (mm) Advance vertical location.
+				ax.x += d * Math.cos(ax.q); // {number} (mm) Advance horizontal location.
+				ax.y += d * Math.sin(ax.q); // {number} (mm) Advance vertical location.
 			}
 			
 			// Align cavity end elements.
@@ -571,7 +573,7 @@ LaserCanvas.System = function () {
 		 */
 		fromJsonSource = function (jsonSource) {
 			try {
-				jsonSource(mprop, melements);
+				jsonSource(mprop, melements, this);
 			} catch (e) {
 				createNew(LaserCanvas.System.configuration.linear);
 			}
