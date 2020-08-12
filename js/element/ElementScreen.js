@@ -125,7 +125,11 @@ LaserCanvas.Element.Screen.prototype = {
 	* @returns {Array<object>} Array of property keys.
 	*/
 	userProperties: function () {
-		return [];
+		return [{
+			propertyName: 'distanceToNext',
+			increment: 5,
+			min: 0
+		}];
 	},
 	
 	/**
@@ -134,7 +138,7 @@ LaserCanvas.Element.Screen.prototype = {
 	*/
 	canSetProperty: function (propertyName) {
 		return {
-			distanceToNext: true,
+			distanceToNext: !this.endOptic,
 			insertElement: true,
 			outgoingAngle: this.prop.startOptic || this.prop.endOptic // Propagation system ends.
 		}[propertyName] || false;

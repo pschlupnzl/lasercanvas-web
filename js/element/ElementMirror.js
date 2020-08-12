@@ -74,22 +74,24 @@ LaserCanvas.Element.Mirror.prototype = {
 	* @returns {Array<object>} Array of property keys.
 	*/
 	userProperties: function () {
-		var props = [
-			{
-				propertyName: 'radiusOfCurvature',
-				increment: 5, // {number} Increment on up/down key.
-				standard: LaserCanvas.Element.Mirror.standard // {Array<number>} Standard values.
-			}
-		];
+		var props = [{
+			propertyName: 'radiusOfCurvature',
+			increment: 5, // {number} Increment on up/down key.
+			standard: LaserCanvas.Element.Mirror.standard // {Array<number>} Standard values.
+		}];
 		if (!(this.prop.startOptic || this.prop.endOptic)) {
-			props = props.concat(
-			[
-				{
-					propertyName: 'angleOfIncidence',
-					increment: 1,
-					wrap: 90
-				}
-			]);
+			props = props.concat([{
+				propertyName: 'angleOfIncidence',
+				increment: 1,
+				wrap: 90
+			}]);
+		}
+		if (!this.prop.endOptic) {
+			props.push({
+				propertyName: 'distanceToNext',
+				increment: 5,
+				min: 0
+			});
 		}
 		if (this.prop.startOptic || this.prop.endOptic) {
 			props.canDelete = false;

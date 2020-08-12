@@ -205,6 +205,10 @@ LaserCanvas.Element.Dispersion.prototype = {
 				propertyName: 'type',
 				options: ['Prism'], // , 'Grating'], // TODO: Grating.
 				infoPanel: false
+			}, {
+				propertyName: 'distanceToNext',
+				increment: 5,
+				min: 0
 			}];
 		switch (this.group[0].prop.type) {
 			case eType.Prism:

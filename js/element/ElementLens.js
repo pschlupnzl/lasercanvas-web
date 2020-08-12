@@ -94,13 +94,15 @@ LaserCanvas.Element.Lens.prototype = {
 	* @returns {Array<object>} Array of property keys.
 	*/
 	userProperties: function () {
-		return [
-			{
-				propertyName: 'focalLength',
-				increment: 10, // {number} Increment on up/down key.
-				standard: LaserCanvas.Element.Lens.standard // {Array<number>} Standard values.
-			}
-		];
+		return [{
+			propertyName: 'focalLength',
+			increment: 10, // {number} Increment on up/down key.
+			standard: LaserCanvas.Element.Lens.standard // {Array<number>} Standard values.
+		}, {
+			propertyName: 'distanceToNext',
+			increment: 5,
+			min: 0
+		}];
 	},
 	
 	/**
