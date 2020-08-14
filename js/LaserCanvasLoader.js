@@ -87,6 +87,14 @@ window.LaserCanvas = {
 		// Scripts to load.
 		files = [
 			"js/LaserCanvas.js",
+
+			"css/HelpPanel.css",
+			"css/InfoPanel.css",
+			"css/LaserCanvasInspect.css",
+			"css/LaserCanvasToolbar.css",
+			"css/SellmeierPanel.css",
+			"css/Themes.css",
+
 			"js/LaserCanvasTheme.js",
 			"js/Localize.js",
 			"js/Math.js",
@@ -110,11 +118,6 @@ window.LaserCanvas = {
 			"js/Utilities.js",
 
 			"js/panel/HelpPanel.js",
-			"css/HelpPanel.css",
-			"css/InfoPanel.css",
-			"css/LaserCanvasInspect.css",
-			"css/SellmeierPanel.css",
-			"css/Themes.css",
 			// Also:
 			// refractiveIndex.js - Used by Sellmeier.
 		],

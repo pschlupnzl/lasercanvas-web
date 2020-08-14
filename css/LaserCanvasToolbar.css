@@ -1,0 +1,101 @@
+/*
+* Toolbar.
+*/
+
+.laserCanvasToolbar {
+	bottom: 0;
+	width: 100%;
+	height: 80px;
+	margin-top: -1px;
+	border-top: 1px solid #ccc;
+	white-space: nowrap;
+	text-align: center;
+}
+
+.generalSelector {
+	display: inline-block;
+	margin: 0.5em;
+	font-size: inherit;
+	font-family: inherit;
+}
+
+	.generalSelector .slider,
+	.generalSelector .buttons {
+		display: inline-block;
+		vertical-align: middle;
+	}
+
+	.generalSelector button {
+		display: block;
+		padding: 0.2em;
+		border: none;
+		color: inherit;
+		background: none;
+		cursor: pointer;
+	}
+
+	.generalSelector .slider {
+		width: 1em;
+		height: 2.2em;
+		padding: 0.2em;
+		background: #999;
+		border-radius: 0.6em;
+	}
+	
+		.generalSelector .slider:after {
+			content: " ";
+			position: relative;
+			display: block;
+			top: 0;
+			width: 1em;
+			height: 1em;
+			background: white;
+			border-radius: 0.5em;
+			transition: top ease-out 150ms;
+		}
+	
+		[data-interaction="inspect"] .interactionSelector .slider:after,
+		[data-theme="light"] .themeSelector .slider:after {
+			top: 1.2em;
+		}
+		
+		[data-theme="dark"] .themeSelector .slider:after {
+			top: 2.4em;
+		}
+		
+.themeSelector .slider {
+	height: 3.4em;
+}
+		
+[data-insert-element] {
+	position: relative;
+	display: inline-block;
+	min-height: 64px;
+	background: #999;
+	border: none;
+	border-radius: 1em;
+	vertical-align: top;
+}
+
+	[data-insert-element]:after {
+		position: absolute;
+		content: " ";
+		top: -1.9em;
+		left: 50%;
+		width: 0;
+		margin-left: -1em;
+		border: 1em solid transparent;
+		border-bottom-color: #999;
+	}
+
+[data-theme="line"] [data-insert-element] {
+	background: #d7d7d7;
+}
+
+	[data-theme="line"] [data-insert-element]:after {
+		border-bottom-color: #d7d7d7;
+	}
+	
+[data-theme="line"] .generalSelector .slider {
+	background-color: #d7d7d7;
+}

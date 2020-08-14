@@ -75,20 +75,14 @@ window.LaserCanvas.Application = function (canvas, info) {
 				
 				pos = {
 					'#LaserCanvasFrame': {
-						left: 0, // wp,
+						left: 0,
 						top: 0,
-						width: w, // w - wp,
+						width: w,
 						height: h - ht
 					},
 					'#LaserCanvas': {
-						width: w, // w - wp,
-						height: h - ht
-					},
-					'#LaserCanvasToolbar': {
-						left: 0,
-						top: h - ht,
 						width: w,
-						height: ht
+						height: h - ht
 					},
 					'#LaserCanvasInfo': {
 						height: h - ht - 1
