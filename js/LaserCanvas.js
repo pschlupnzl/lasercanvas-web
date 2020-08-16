@@ -72,6 +72,7 @@ window.LaserCanvas.Application = function (canvas, info) {
 				w = window.innerWidth - sliver,  // {number} (px) Width of window.
 				h = window.innerHeight - sliver, // {number} (px) Height of window.
 				ht = 80,                         // {number} (px) Height of toolbar.
+ht=220,
 				
 				pos = {
 					'#LaserCanvasFrame': {
@@ -80,6 +81,12 @@ window.LaserCanvas.Application = function (canvas, info) {
 						width: w,
 						height: h - ht
 					},
+					// '#LaserCanvasToolbar': {
+					// 	height: ht
+					// },
+					// '#LaserCanvasGraphsBar': {
+					// 	height: ht
+					// },
 					'#LaserCanvas': {
 						width: w,
 						height: h - ht

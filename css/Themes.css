@@ -4,6 +4,7 @@
 [data-theme="line"] .laserCanvasInspect,
 [data-theme="light"] .laserCanvasInfo,
 [data-theme="light"] .laserCanvasToolbar,
+[data-theme="light"] .laserCanvasGraphsBar,
 [data-theme="light"] .laserCanvasInspect {
 	background-color: #f7f7f7;
 }
@@ -12,12 +13,14 @@
 	background-color: #f1f1f1;
 }
 
-[data-theme="dark"] .laserCanvasToolbar {
+[data-theme="dark"] .laserCanvasToolbar,
+[data-theme="dark"] .laserCanvasGraphsBar {
 	color: #f7f7f7;
 	background-color: #404040;
 }
 
-[data-theme="light"] .laserCanvasToolbar {
+[data-theme="light"] .laserCanvasToolbar,
+[data-theme="light"] .laserCanvasGraphsBar {
 	border-top-color: #676767;
 }
 

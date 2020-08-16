@@ -1,0 +1,62 @@
+.LaserCanvasGraph2d {
+	background: #fcfcfc;
+	border: 1px solid;
+	box-shadow: 0 0 1em rgba(0, 0, 0, 0.1) inset;
+}
+
+	.LaserCanvasGraph2d .plot {
+		position: absolute;
+		border: 1px solid;
+
+		left: 10px;
+		top: 10px;
+		width: 120px;
+		height: 80px;
+	}
+
+/*
+* Axes
+*/
+.LaserCanvasGraph2d .Graph2dAxis {
+	position: absolute;
+}
+
+	.LaserCanvasGraph2d .Graph2dAxis[data-direction="horizontal"] {
+		left: 0;
+		bottom: 0;
+		width: 100%;
+		border-top: 2px solid;
+		color: red;
+	}
+	
+	.LaserCanvasGraph2d .Graph2dAxis[data-direction="vertical"] {
+		left: 0;
+		bottom: 0;
+		height: 100%;
+		border-right: 2px solid;
+		color: blue;
+	}
+
+	.LaserCanvasGraph2d .Graph2dAxis .tick {
+		position: absolute;
+	}
+
+	.LaserCanvasGraph2d .Graph2dAxis .tick label {
+		position: absolute;
+	}
+
+		.LaserCanvasGraph2d .Graph2dAxis[data-direction="horizontal"] .tick label {
+			width: 5em;
+			margin-left: -2.5em;
+			text-align: center;
+		}
+		
+		.LaserCanvasGraph2d .Graph2dAxis[data-direction="vertical"] .tick label {
+			width: 5em;
+			height: 1.15em;
+			line-height: 1.15em;
+			margin-left: -5.2em;
+			margin-top: -.55em;
+			text-align: right;
+		}
+
