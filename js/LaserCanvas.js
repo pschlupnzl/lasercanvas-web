@@ -27,7 +27,7 @@ window.LaserCanvas.Application = function (canvas, info) {
 	*  - Help / documentation
 	*    Explanation and exposition of equations used.
 	*/	
-	var msystem, mrender, minfo,
+	var msystem, mrender, minfo, mvariables,
 		mprop,                     // {PropertiesPanel} Properties panel handler.
 		mlisteners = {
 			interactionchange: [],           // {Array<function>} Handlers when render interaction changes.
@@ -165,6 +165,10 @@ ht=220,
 					.update();
 			});
 			
+			mvariables = new LaserCanvas.Variables();
+			new LaserCanvas.VariablePanel(mvariables)
+				.appendTo(document.querySelector("#LaserCanvasVariablesPanel .variables"));
+
 			/*
 			* Toolbar handler.
 			*/
