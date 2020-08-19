@@ -91,12 +91,13 @@ window.LaserCanvas = {
 // TODO: Move component CSS to component directories
 			"css/HelpPanel.css",
 			"css/InfoPanel.css",
-			"css/LaserCanvasGraphsBar.css",
 			"css/LaserCanvasInspect.css",
 			"css/LaserCanvasToolbar.css",
 			"css/SellmeierPanel.css",
 			"css/Themes.css",
 			"js/Graph2d/Graph2d.css",
+			"js/NumberSlider/NumberSlider.css",
+			"js/VariablePanel/VariablePanel.css",
 
 			"js/LaserCanvasTheme.js",
 			"js/Localize.js",
@@ -109,6 +110,7 @@ window.LaserCanvas = {
 			"js/element/ElementScreen.js",
 			"js/Graph2d/Graph2d.js",
 			"js/Graph2d/Graph2dAxis.js",
+			"js/NumberSlider/NumberSlider.js",
 			"js/panel/GraphPanel.js",
 			"js/panel/PropertiesPanel.js",
 			"js/panel/InfoPanel.js",
@@ -121,6 +123,7 @@ window.LaserCanvas = {
 			"js/system/SystemLoad.js",
 			"js/system/SystemJson.js",
 			"js/Utilities.js",
+			"js/VariablePanel/VariablePanel.js",
 
 			"js/panel/HelpPanel.js",
 			// Also:

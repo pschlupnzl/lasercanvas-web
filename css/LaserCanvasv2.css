@@ -499,7 +499,8 @@ button[data-step="-1"] {
 #LaserCanvas,
 #LaserCanvasInfo,
 #LaserCanvasToolbar,
-#LaserCanvasToggleInfo {
+#LaserCanvasToggleInfo,
+#LaserCanvasToggleVariables {
 	 position: absolute;
 }
 
