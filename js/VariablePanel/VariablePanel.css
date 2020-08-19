@@ -47,6 +47,13 @@ button[data-action="toggleVariables"] {
 	flex-direction: row;
 }
 
-	#LaserCanvasVariablesPanel .variables {
-		width: 15em;
+#LaserCanvasVariablesPanel .variables {
+	width: 15em;
+}
+
+	#LaserCanvasVariablesPanel .variables .heading {
+		margin: 0 0.5em;
+		font-weight: bold;
+		border-bottom: 1px solid;
+		text-align: center;
 	}
