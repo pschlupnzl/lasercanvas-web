@@ -169,6 +169,7 @@ body {
 
 	[data-interaction="inspect"] .laserCanvasFrame .laserCanvasInspect {
 		display: block;
+		white-space: nowrap;
 	}
 
 
