@@ -10,7 +10,8 @@
 	/** Regular expression matching a number such as -.3e-7. */
 	var reNumber = /^(\+|-)?[0-9]*(?:\.[0-9]*)?(?:e(\+|-)?[0-9]+)?$/i;
 
-	var NumberSlider = function () {
+	var NumberSlider = function (label) {
+		this.label = label;
 		this.min = 0;
 		this.max = 1;
 		this.value = 0.5;
@@ -45,9 +46,11 @@
 			'</div>', // range
 			'<div class="limits">',
 				'<input type="text" value="min" data-prop="min" />',
+				'<label class="variableLabel"></label>',
 				'<input type="text" value="max" data-prop="max" />',
 			'</div>'
 		].join("");
+		el.querySelector(".variableLabel").innerText = this.label;
 		LaserCanvas.Utilities.draggable(el.querySelector(".thumb"), {
 			handle: el.querySelector(".handle"),
 			axis: "x",
