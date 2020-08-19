@@ -1,0 +1,72 @@
+.LaserCanvasNumberSlider {
+	position: relative;
+}
+
+	.LaserCanvasNumberSlider input[data-prop] {
+		width: 5em;
+		border: none;
+		background: none;
+		font-size: inherit;
+		font-family: inherit;
+	}
+
+	/* Slider range */
+
+	.LaserCanvasNumberSlider .range {
+		margin-top: 2.2em;
+		padding: 0 2.5em;
+	}
+
+	.LaserCanvasNumberSlider .trough {
+		position: relative;
+		padding: 0 0.5em;
+		margin: 0.3em 0;
+		height: 0.7em;
+		background-color: #999;
+		border-radius: 1em;
+	}
+
+	.LaserCanvasNumberSlider .thumb {
+		position: absolute;
+		top: 0;
+		left: 0;
+	}
+
+	.LaserCanvasNumberSlider .handle {
+		margin-left: -0.7em;
+		margin-top: -0.3em;
+		width: 1.4em;
+		height: 1.4em;
+		background-color: #666;
+		border-radius: 1em;
+	}
+
+	.LaserCanvasNumberSlider .callout {
+		position: absolute;
+		top: -2.2em;
+		left: -2.5em;
+		width: 5em;
+		text-align: center;
+	}
+
+		.LaserCanvasNumberSlider .callout input {
+			width: 100%;
+			text-align: center;
+		}
+
+	/* Limits */
+
+	.LaserCanvasNumberSlider .limits {
+		display: flex;
+		flex-direction: row;
+		justify-content: space-between;
+		padding: 0 2.5em;
+	}
+
+	.LaserCanvasNumberSlider input[data-prop="min"] {
+		text-align: left;
+	}
+
+	.LaserCanvasNumberSlider input[data-prop="max"] {
+		text-align: right;
+	}
