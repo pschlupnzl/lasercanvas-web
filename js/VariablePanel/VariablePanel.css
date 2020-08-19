@@ -13,10 +13,10 @@
 		bottom: 0;
 	}
 
-/** Toggle variables button */
+/* Toggle variables button */
 
 button[data-action="toggleVariables"] {
-	left: 0;
+	left: 1em;
 	width: 3em;
 	border-top-left-radius: 0.8em;
 	border-top-right-radius: 0.8em;
@@ -34,9 +34,19 @@ button[data-action="toggleVariables"] {
 		}
 
 	[data-variables-visible="true"] button[data-action="toggleVariables"] {
-		bottom: 220px;
+		bottom: 219px;
 	}
 
 		[data-variables-visible="true"] button[data-action="toggleVariables"]:after {
 			content: "\2304"
 		}
+
+/* Content. */
+#LaserCanvasVariablesPanel .content {
+	display: flex;
+	flex-direction: row;
+}
+
+	#LaserCanvasVariablesPanel .variables {
+		width: 10em;
+	}
