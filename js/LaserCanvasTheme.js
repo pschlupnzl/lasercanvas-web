@@ -36,7 +36,7 @@ window.LaserCanvas.theme.light = {
 window.LaserCanvas.theme.line = {
 	block: 'Block-Line.png',
 	blockFill: 'Block-Fill-Line.png',
-	grid: '',
+	grid: null,
 	lensConcave: 'Lens-Concave-Line.png',
 	lensConvex: 'Lens-Convex-Line.png',
 	mirrorConcave: 'Mirror-Concave-Line.png',
@@ -94,7 +94,8 @@ window.LaserCanvas.theme.set = (function () {
 				
 				for (k in images) {
 					if (images.hasOwnProperty(k) 
-						&& k !== 'grid' && k !== 'drawMethod'
+						&& k !== 'grid'
+						&& k !== 'drawMethod'
 						&& typeof images[k] === 'string') {
 						semaphore += 1;
 						img = new Image();
@@ -110,7 +111,10 @@ window.LaserCanvas.theme.set = (function () {
 				ready();
 			};
 
-		style.sheet.insertRule('[data-theme="' + name + '"] .laserCanvasFrame { background-image: url("' + window.LaserCanvas.theme.baseUrl + current.grid + '"); }', 0);
+		if (current.grid) {
+			style.sheet.insertRule('[data-theme="' + name + '"] .laserCanvasFrame { background-image: url("' + window.LaserCanvas.theme.baseUrl + current.grid + '"); }', 0);
+			// style.sheet.insertRule(`[data-theme="${name}"] .laserCanvasFrame { background-image: url("${window.LaserCanvas.theme.baseUrl + current.grid}"); }`, 0);
+		}
 		document.body.setAttribute('data-theme', name);
 		loadImages();
 	};
