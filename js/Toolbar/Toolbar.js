@@ -2,6 +2,18 @@
  * Handler for the toolbar (dragging optics into system, etc.)
  */
 (function (LaserCanvas) {
+	var
+		/**
+		* Attach a click handler to the given selector item(s).
+		* @param {string} sel Selector of item(s) to attach click handler to.
+		* @param {function} onclick Click handler.
+		*/
+		attachClickHandler = function (sel, onclick) {
+			LaserCanvas.Utilities.foreach(document.querySelectorAll(sel), function () {
+				this.onclick = onclick;
+			});
+		};
+
 	var Toolbar = function (msystem, mrender, fireEventListeners) {
 		this.msystem = msystem;
 		this.mrender = mrender;
@@ -15,7 +27,6 @@
 		var msystem = this.msystem,
 			mrender = this.mrender,
 			fireEventListeners = this.fireEventListeners,
-			Utilities = window.LaserCanvas.Utilities,
 		
 			// Get the next button value.
 			// @param {string} curAttr Body attribute for current value.
@@ -68,25 +79,10 @@
 				var infoPanel = document.querySelector('.laserCanvasInfo'),
 					attr = 'data-' + this.getAttribute('data-attribute');
 				infoPanel.setAttribute(attr, infoPanel.getAttribute(attr) === 'true' ? 'false' : 'true');
-			},
-			
-			// Set a theme based on a button click.
-			// @this {HTMLButtonElement} Triggering button.
-			createSystem = function () {
-				launch(this.getAttribute('data-create-system'));
-			},
-			
-			// Attach a click handler to the given selector item(s).
-			// @param {string} sel Selector of item(s) to attach click handler to.
-			// @param {function} onclick Click handler.
-			attachClickHandler = function (sel, onclick) {
-				Utilities.foreach(document.querySelectorAll(sel), function () {
-					this.onclick = onclick;
-				});
 			};
+			
 		attachClickHandler('[data-render-interaction="toggle"], button[data-render-interaction]', setInteraction);
 		attachClickHandler('[data-set-theme="toggle"], button[data-set-theme]', setTheme);
-		attachClickHandler('button[data-create-system]', createSystem);
 		attachClickHandler('.toggleHelp', window.LaserCanvas.showHelp);
 		attachClickHandler('[data-action="toggleRender"]', toggleRenderProperty);
 		attachClickHandler('[data-action="toggleInfopanel"]', toggleInfoAttribute);
@@ -112,6 +108,20 @@
 		// Initialize from local storage, if possible.
 		msystem.fromJsonSource(LaserCanvas.SystemUtil.fromLocalStorage);
 		return this;
+	};
+
+	/**
+	 * Initialize the new system buttons.
+	 */
+	Toolbar.prototype.initSystemNew = function (launch) {
+		var
+			// Set a theme based on a button click.
+			// @this {HTMLButtonElement} Triggering button.
+			createSystem = function () {
+				launch(this.getAttribute('data-create-system'));
+			};
+
+		attachClickHandler('button[data-create-system]', createSystem);
 	};
 
 	/**

@@ -166,6 +166,9 @@ ht=220,
 			});
 			
 			mvariables = new LaserCanvas.Variables();
+			mvariables.addEventListener("change", function () {
+console.log("LaserCanvas variables change");
+			});
 			new LaserCanvas.VariablePanel(mvariables)
 				.appendTo(document.querySelector("#LaserCanvasVariablesPanel .variables"));
 
@@ -174,7 +177,8 @@ ht=220,
 			*/
 			new LaserCanvas.Toolbar(msystem, mrender, fireEventListeners)
 				.init()
-				.initDrag();
+				.initDrag()
+				.initSystemNew(launch);
 		},
 		
 		/**

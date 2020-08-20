@@ -25,7 +25,7 @@
 
 	/** Callback from slider. */
 	VariablePanel.prototype.onSliderChange = function (name, value) {
-console.log(`${name} --> ${value}`);
+		this.mvariables.set(name, value);
 	};
 
 	/** Update the slider and values. */
