@@ -112,8 +112,7 @@ window.LaserCanvas.theme.set = (function () {
 			};
 
 		if (current.grid) {
-			style.sheet.insertRule('[data-theme="' + name + '"] .laserCanvasFrame { background-image: url("' + window.LaserCanvas.theme.baseUrl + current.grid + '"); }', 0);
-			// style.sheet.insertRule(`[data-theme="${name}"] .laserCanvasFrame { background-image: url("${window.LaserCanvas.theme.baseUrl + current.grid}"); }`, 0);
+			style.sheet.insertRule(`[data-theme="${name}"] .laserCanvasFrame { background-image: url(${window.LaserCanvas.theme.baseUrl + current.grid}); }`, 0);
 		}
 		document.body.setAttribute('data-theme', name);
 		loadImages();
