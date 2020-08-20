@@ -26,11 +26,27 @@
 	NumberSlider.prototype.init = function () {
 		var self = this,
 			el = document.createElement("div"),
+			inputFocus = function () {
+				this.setAttribute("data-last-value", this.value);
+			},
 			inputChange = function () {
 				self.inputChange(this.getAttribute("data-prop"), this.value);
 			},
 			inputBlur = function () {
 				self.inputBlur(this.getAttribute("data-prop"));
+			},
+			inputKeydown = function (e) {
+				switch (e.which || e.charCode) {
+					case 10:
+					case 13:
+						this.blur();
+						return false;
+					case 27:
+						this.value = this.getAttribute("data-last-value");
+						self.inputChange(this.getAttribute("data-prop"), this.value);
+						this.blur();
+						return false;
+				}
 			};
 
 		el.className = "LaserCanvasNumberSlider";
@@ -67,8 +83,10 @@
 			}
 		}, this);
 		Array.prototype.forEach.call(el.querySelectorAll("input[data-prop]"), function (input) {
+			input.onfocus = inputFocus;
 			input.onchange = input.onkeyup = inputChange;
 			input.onblur = inputBlur;
+			input.onkeydown = inputKeydown;
 		});
 		return el;
 	};
