@@ -10,8 +10,9 @@
 	/** Regular expression matching a number such as -.3e-7. */
 	var reNumber = /^(\+|-)?[0-9]*(?:\.[0-9]*)?(?:e(\+|-)?[0-9]+)?$/i;
 
-	var NumberSlider = function (label) {
-		this.label = label;
+	var NumberSlider = function (name) {
+		this.name = name;
+		this.changeEventListener = null;
 		this.min = 0;
 		this.max = 1;
 		this.value = 0.5;
@@ -26,7 +27,7 @@
 		var self = this,
 			el = document.createElement("div"),
 			inputChange = function () {
-				self.inputChange(this.value, this.getAttribute("data-prop"));
+				self.inputChange(this.getAttribute("data-prop"), this.value);
 			},
 			inputBlur = function () {
 				self.inputBlur(this.getAttribute("data-prop"));
@@ -46,11 +47,11 @@
 			'</div>', // range
 			'<div class="limits">',
 				'<input type="text" value="min" data-prop="min" />',
-				'<label class="variableLabel"></label>',
+				'<label class="variableName"></label>',
 				'<input type="text" value="max" data-prop="max" />',
 			'</div>'
 		].join("");
-		el.querySelector(".variableLabel").innerText = this.label;
+		el.querySelector(".variableName").innerText = this.name;
 		LaserCanvas.Utilities.draggable(el.querySelector(".thumb"), {
 			handle: el.querySelector(".handle"),
 			axis: "x",
@@ -58,7 +59,7 @@
 				var v, w = el.querySelector(".trough").offsetWidth;
 				pt.x = limit(0, w, pt.x);
 				v = pt.x / w;
-				this.value = this.min + (this.max - this.min) * v;
+				this.setProp("value", this.min + (this.max - this.min) * v);
 				this.updateValue();
 			},
 			onEnd: function () {
@@ -80,19 +81,39 @@
 		element.appendChild(this.el);
 	};
 
+	/** Sets the callback function on change. */
+	NumberSlider.prototype.setChangeEventListener = function (callback, thisArg) {
+		this.changeEventListener = callback ? callback.bind(thisArg) : null;
+	};
+
+	/** Fire the change event, if it is registered. */
+	NumberSlider.prototype.fireChangeEvent = function () {
+		if (this.changeEventListener) {
+			this.changeEventListener(this.name, this.value);
+		}
+	};
+
+	/** Update a property, firing the change event as needed. */
+	NumberSlider.prototype.setProp = function (prop, value) {
+		if (reNumber.test(value)) {
+			value = +value;
+			if (!isNaN(value)) {
+				this[prop] = +value;
+				if (prop === "value") {
+					this.fireChangeEvent();
+				}
+				this.updateThumb();
+			}
+		}
+	};
+
 	/**
 	 * A value in one of the input fields has changed.
 	 * @param {string} value The string value in the input field.
 	 * @param {string} prop Property being changed "min"|"max"|"value".
 	 */
-	NumberSlider.prototype.inputChange = function (value, prop) {
-		if (reNumber.test(value)) {
-			value = +value;
-			if (!isNaN(value)) {
-				this[prop] = +value;
-				this.updateThumb();
-			}
-		}
+	NumberSlider.prototype.inputChange = function (prop, value) {
+		this.setProp(prop, value);
 	};
 
 	/**
@@ -101,16 +122,16 @@
 	 */
 	NumberSlider.prototype.inputBlur = function (prop) {
 		if (this.max <= this.min) {
-			this.max = this.min + 1;
+			this.setProp("max", this.min + 1);
 		}
 		if (prop === "value" && this.value > this.max) {
-			this.max = this.value;
+			this.setProp("max", this.value);
 		} else if (prop === "value" && this.value < this.min) {
-			this.min = this.value;
+			this.setProp("min", this.value);
 		} else if (prop === "min" && this.value < this.min) {
-			this.value = this.min;
+			this.setProp("value", this.min);
 		} else if (prop === "max" && this.value > this.max) {
-			this.value = this.max;
+			this.setProp("value", this.max);
 		}
 		this.update();
 	};

@@ -1,7 +1,7 @@
 (function (LaserCanvas) {
 	var VariablePanel = function (mvariables) {
 		this.mvariables = mvariables;
-		this.numberSliders = [];
+		this.numberSliders = {};
 		this.el = this.init();
 	};
 
@@ -11,8 +11,9 @@
 		el.className = "laserCanvasVariables";
 		this.mvariables.forEach(function (name, value) {
 			var slider = new LaserCanvas.NumberSlider(name);
+			slider.setChangeEventListener(this.onSliderChange, this);
 			slider.appendTo(el);
-			this.numberSliders.push();
+			this.numberSliders[name] = slider;
 		}, this);
 		return el;
 	};
@@ -22,12 +23,10 @@
 		parent.appendChild(this.el);
 	};
 
-	/** Set the current value (e.g. by dragging the thumb). */
-	VariablePanel.prototype.setValue = function (val) {
-		this.value = val;
-		this.update();
+	/** Callback from slider. */
+	VariablePanel.prototype.onSliderChange = function (name, value) {
+console.log(`${name} --> ${value}`);
 	};
-
 
 	/** Update the slider and values. */
 	VariablePanel.prototype.update = function () {
@@ -40,8 +39,3 @@
 
 	LaserCanvas.VariablePanel = VariablePanel;
 }(window.LaserCanvas));
-
-// setTimeout(function () {
-// 	var v = new LaserCanvas.VariablePanel();
-// 	document.querySelector("#LaserCanvasGraphsBar").appendChild(v.element());
-// }, 100);
