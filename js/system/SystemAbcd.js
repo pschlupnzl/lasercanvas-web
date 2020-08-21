@@ -5,12 +5,13 @@
 * property.
 * @param {Array<Element>} melements Optical elements to calculate for.
 * @param {object} systemProperties System properties to read and write.
+* @param {object} variables Current variable values, passed to property getters.
 * @returns {object} Object to store for system solution.
 */
-window.LaserCanvas.systemAbcd = function (melements, systemProperties) {
-	"use strict";
+(function (LaserCanvas) {
+LaserCanvas.systemAbcd = function (melements, systemProperties, variables) {
 	var 
-		Matrix2x2 = window.LaserCanvas.Math.Matrix2x2, // {function} Constructor function for matrix.
+		Matrix2x2 = LaserCanvas.Math.Matrix2x2, // {function} Constructor function for matrix.
 		
 		// Calculate the element ABCD.
 		// @param {number} indx Index of element whose following space to calculate.
@@ -34,7 +35,7 @@ window.LaserCanvas.systemAbcd = function (melements, systemProperties) {
 			// if (typeof element.spaceAbcd === 'function') {
 			// 	return element.spaceAbcd(dir, plane);
 			// }
-			L = element.property('distanceToNext');
+			L = element.get("distanceToNext", variables);
 			n = element.spaceRefractiveIndex 
 				? element.spaceRefractiveIndex()            // e.g. propagation within prism pair.
 				: element.property('refractiveIndex') || 1; // Default elements.
@@ -202,7 +203,7 @@ window.LaserCanvas.systemAbcd = function (melements, systemProperties) {
 		
 
 		
-	var modePlane = window.LaserCanvas.Enum.modePlane,
+	var modePlane = LaserCanvas.Enum.modePlane,
 		abcd = {
 			sag: null,
 			tan: null
@@ -226,7 +227,7 @@ window.LaserCanvas.systemAbcd = function (melements, systemProperties) {
 		// @returns {object} Data to store for system in this plane.
 		calculatePlane = function (plane, lam, len) {
 			var Q, dir, indx, w0,
-				configuration = window.LaserCanvas.System.configuration, // {object} Configuration enum.
+				configuration = LaserCanvas.System.configuration, // {object} Configuration enum.
 				mx = Matrix2x2.eye();
 
 			if (systemProperties.configuration === configuration.propagation) {
@@ -319,7 +320,7 @@ window.LaserCanvas.systemAbcd = function (melements, systemProperties) {
 * @param {number} d Distance to propagate.
 * @returns {object} Modified parameters (for now only w).
 */
-window.LaserCanvas.systemAbcd.propagateParameters = function (params, n, d) {
+LaserCanvas.systemAbcd.propagateParameters = function (params, n, d) {
 	var w0 = params.w0,     // {number} (um) Waist size.
 		zR = n * params.zR,  // {number} (mm) Rayleigh length, reduced by refractive index.
 		z0 = n * params.z0,  // {number} (mm) Distance to waist, reduced by refractive index.
@@ -329,4 +330,4 @@ window.LaserCanvas.systemAbcd.propagateParameters = function (params, n, d) {
 		w: w0 * Math.sqrt(1 + z * z)
 	};
 };
-
+}(window.LaserCanvas));

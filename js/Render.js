@@ -4,8 +4,8 @@
 * @param {InfoPanel} info Info panel, used e.g. with highlightElement.
 * @param {HTMLCanvasElement} canvas DOM element where to render.
 */
-window.LaserCanvas.Render = function (system, info, canvas) {
-	"use strict";
+(function (LaserCanvas) {
+LaserCanvas.Render = function (system, info, canvas) {
 	var
 		mpageOffset = {     // Offset of canvas to page (for mouse events).
 			left: 0,         // {number} (px) Horizontal offset to canvas.
@@ -35,17 +35,29 @@ window.LaserCanvas.Render = function (system, info, canvas) {
 			insertMove: []    // Mouse move listeners when inserting a new item.
 		},
 		
-		minteraction = window.LaserCanvas.Render.interaction.layout, // {Render.interaction} Current interaction state.
+		minteraction = LaserCanvas.Render.interaction.layout, // {Render.interaction} Current interaction state.
 		
 		mprop = {
 			showDistance: true,   // {boolean} Value indicating whether to show distances.
 			showAnnotation: false // {boolean} Value indicating whether to show element annotations.
 		},
 		
+		mvariablesGetter = null,  // {function|null} Function to retrieve current variable values.
+
 		// -------------------------------------------------
 		//  Properties.
 		// -------------------------------------------------
-		
+
+		/** Sets the callback function used to retrieve variable values. */
+		setVariablesGetter = function (getter) {
+			mvariablesGetter = getter;
+		},
+
+		/** Retrieves current variables, or returns empty object as callback. */
+		getVariables = function () {
+			return mvariablesGetter ? mvariablesGetter() : {};
+		},
+
 		/**
 		* Gets or sets a property value.
 		* @param {string} propertyName Name of property to set.
@@ -74,7 +86,7 @@ window.LaserCanvas.Render = function (system, info, canvas) {
 		* The canvas is resized.
 		*/
 		onResize = function () {
-			mpageOffset = window.LaserCanvas.Utilities.elementOffset(canvas);
+			mpageOffset = LaserCanvas.Utilities.elementOffset(canvas);
 			mzoom.xCanvas = 0.5 * canvas.width;  // (px) Canvas horizontal origin (centered).
 			mzoom.yCanvas = 0.5 * canvas.height; // (px) Canvas vertical origin (centered).
 			update.call(this);
@@ -87,7 +99,7 @@ window.LaserCanvas.Render = function (system, info, canvas) {
 		setInteraction = function (interaction) {
 			minteraction = interaction;
 			document.body.setAttribute('data-interaction', minteraction);
-			if (minteraction === window.LaserCanvas.Render.interaction.inspect) {
+			if (minteraction === LaserCanvas.Render.interaction.inspect) {
 				inspectLocation.call(this, { x: 0, y: 0 }); // Inspect location, show mode info.
 			}
 		},
@@ -207,7 +219,7 @@ window.LaserCanvas.Render = function (system, info, canvas) {
 		* The mouse is released on the document somewhere.
 		*/
 		onUp = function () {
-			document.removeEventListener('mouseup', onUp, false);
+			document.removeEventListener('mouseup', onMouseUp, false);
 			system.dragElementEnd();
 			mdrag.isDrag = mdrag.isPan = false;
 		},
@@ -226,7 +238,7 @@ window.LaserCanvas.Render = function (system, info, canvas) {
 		*/
 		onMove = function (pt) {
 			var element, seg,
-				interaction = window.LaserCanvas.Render.interaction;
+				interaction = LaserCanvas.Render.interaction;
 
 			switch (minteraction) {
 				case interaction.insert:
@@ -240,7 +252,7 @@ window.LaserCanvas.Render = function (system, info, canvas) {
 					if (minteraction === interaction.inspect) {
 						inspectLocation.call(this, pt); // Inspect location, show mode info.
 					}
-					element = system.elementAtLocation(pt, window.LaserCanvas.Render.tolerance / mzoom.s);
+					element = system.elementAtLocation(pt, LaserCanvas.Render.tolerance / mzoom.s);
 				
 					// Switch cursors.
 					if (!mdrag.element && element) {
@@ -292,7 +304,7 @@ window.LaserCanvas.Render = function (system, info, canvas) {
 			} else if (mdrag.element) {
 				onDragElement.call(this, pt);
 			}
-			if (minteraction === window.LaserCanvas.Render.interaction.inspect) {
+			if (minteraction === LaserCanvas.Render.interaction.inspect) {
 				inspectLocation.call(this, pt);
 			}
 			updateHighlight();
@@ -304,10 +316,10 @@ window.LaserCanvas.Render = function (system, info, canvas) {
 		* @param {Event} e Triggering event.
 		*/
 		onMouseDown = function (e) {
-			var interaction = window.LaserCanvas.Render.interaction, // {Render.interaction} Interaction states.
+			var interaction = LaserCanvas.Render.interaction, // {Render.interaction} Interaction states.
 				pt = eventToWorld(e),              // {Point} Current mouse point in world coordinates.
 				el = system.elementAtLocation(pt,  // {Element} Current element.
-					window.LaserCanvas.Render.tolerance / mzoom.s);
+					LaserCanvas.Render.tolerance / mzoom.s);
 
 			switch (minteraction) {
 				case interaction.inspect:
@@ -475,7 +487,7 @@ window.LaserCanvas.Render = function (system, info, canvas) {
 				pt = !e ? null : eventToWorld(e);
 			if (ev.touches.length === 1) {
 				el = system.elementAtLocation(pt,
-					window.LaserCanvas.Render.tolerance / mzoom.s);
+					LaserCanvas.Render.tolerance / mzoom.s);
 				if (el) {
 					mdrag.element = el;
 					onDown.call(this, pt);
@@ -519,7 +531,6 @@ window.LaserCanvas.Render = function (system, info, canvas) {
 		*/
 		inspectLocation = function (pt, filterBy) {
 			var s, sagw, tanw, // size = 25,  // {number} (mm) Marker size.
-				LaserCanvas = window.LaserCanvas,
 				modePlane = LaserCanvas.Enum.modePlane, // {number:modePlane} Plane to inspect.
 				numberFormat = LaserCanvas.Utilities.numberFormat, // {function} Formatter for number.
 				seg = system.segmentNearLocation(pt, filterBy),
@@ -904,7 +915,7 @@ window.LaserCanvas.Render = function (system, info, canvas) {
 		update = function () {
 			save();
 			getContext().font = '11pt "Open Sans",Helvetica,Arial,sans-serif';
-			window.LaserCanvas.Render.update(system, this, mprop);
+			LaserCanvas.Render.update(system, this, mprop);
 			restore();
 			
 			
@@ -949,6 +960,7 @@ window.LaserCanvas.Render = function (system, info, canvas) {
 	this.addEventListener = addEventListener;       // Attach an event listener.
 	this.getCanvas = getCanvas;                     // Retrieve this canvas element.
 	this.getTransform = getTransform;               // Retrieve the mapping factors.
+	this.getVariables = getVariables;               // Retrieve the current variable values.
 	this.highlightElement = highlightElement;       // Sets or clears the element highlight.
 	this.onInsert = onInsert;                       // Trigger to insert a new element.
 	this.onResize = onResize;                       // Call in response to canvas resizing.
@@ -956,6 +968,7 @@ window.LaserCanvas.Render = function (system, info, canvas) {
 	this.removeEventListener = removeEventListener; // Remove an existing event listener.
 	this.resetTransform = resetTransform;           // Reset the world transform.
 	this.setInteraction = setInteraction;           // Change the interaction mode.
+	this.setVariablesGetter = setVariablesGetter;   // Set the callback to retrieve variable values.
 	this.triggerEvent = triggerEvent;               // Explicitly trigger a DOM event.
 	this.update = update;                           // Draw the given system.
 	
@@ -975,8 +988,8 @@ window.LaserCanvas.Render = function (system, info, canvas) {
 	this.save = save;             // Save the current context state.
 	this.setStroke = setStroke;   // Set stroke and line width.
 	this.stroke = stroke;         // Stroke the current line.
-
 };
+}(window.LaserCanvas));
 
 /**
 * Update the system display. This may be used for the standard
@@ -985,11 +998,12 @@ window.LaserCanvas.Render = function (system, info, canvas) {
 * @param {Render|RenderSvg} render Renderer where to draw.
 * @param {object} options Rendering options 'showDistance'|'showAnnotation'|'drawMethod'.
 */
-window.LaserCanvas.Render.update = function (system, render, options) {
-	"use strict";
+(function (LaserCanvas) {
+LaserCanvas.Render.update = function (system, render, options) {
 	var
+		variables = render.getVariables(),
 		drawMethod = (options || {}).drawMethod // {string} Drawing method to invoke on element.
-			|| window.LaserCanvas.theme.current.drawMethod 
+			|| LaserCanvas.theme.current.drawMethod 
 			|| 'draw',
 		
 		/**
@@ -1001,10 +1015,10 @@ window.LaserCanvas.Render.update = function (system, render, options) {
 		*/
 		drawToNext = function (element, nextElement, layer) {
 			var abcdQ, plane, n, ctx,
-				renderLayer = window.LaserCanvas.Enum.renderLayer, // {Enum} Rendering layers.
-				modePlane = window.LaserCanvas.Enum.modePlane, // {Enum} Rendering planes.
+				renderLayer = LaserCanvas.Enum.renderLayer, // {Enum} Rendering layers.
+				modePlane = LaserCanvas.Enum.modePlane, // {Enum} Rendering planes.
 				loc = element.location(),         // {object} Element location.
-				distanceToNext = element.property("distanceToNext"), // {number} (mm) Distance to next element.
+				distanceToNext = element.get("distanceToNext", variables), // {number} (mm) Distance to next element.
 				nextLoc = nextElement.location(); // {object} Next element location.
 			
 			switch (layer) {
@@ -1061,7 +1075,6 @@ window.LaserCanvas.Render.update = function (system, render, options) {
 		*/
 		renderMode = function (loc, b, plane) {
 			var 
-				LaserCanvas = window.LaserCanvas,
 				modeScale = 0.25,       // {number} Mode scale factor.
 				cos = Math.cos(loc.q),  // {number} Cosine of segment rotation.
 				sin = Math.sin(loc.q),  // {number} Sine of segment rotation.
@@ -1149,9 +1162,7 @@ window.LaserCanvas.Render.update = function (system, render, options) {
 		* @param {LaserCanvas.renderLayer} layer Layer to render.
 		*/
 		updateLayer = function (layer) {
-			var LaserCanvas = window.LaserCanvas,     // {object} Namespace.
-				renderLayer = LaserCanvas.Enum.renderLayer, // {Enum} Rendering layers.
-				k, element, 
+			var k, element, 
 				elements = system.elements(),          // {Array<Element>} Elements in system.
 				nextElement = elements[0];             // {Element} Starting element.
 				
@@ -1180,7 +1191,7 @@ window.LaserCanvas.Render.update = function (system, render, options) {
 		* Draw the system.
 		*/
 		update = function () {
-			var renderLayer = window.LaserCanvas.Enum.renderLayer; // {Enum} Rendering layers.
+			var renderLayer = LaserCanvas.Enum.renderLayer; // {Enum} Rendering layers.
 			render.clear();
 			updateLayer(renderLayer.axis);
 			updateLayer(renderLayer.tangential); // Tangential is in the plane of the table.
@@ -1200,18 +1211,19 @@ window.LaserCanvas.Render.update = function (system, render, options) {
 };		
 		
 // Tolerance for finding optic at centerline.
-window.LaserCanvas.Render.tolerance = 15;
+LaserCanvas.Render.tolerance = 15;
 
 // Pre-calculated mode plotting points for the
 // curved beam mode around a waist.
-window.LaserCanvas.Render.modePoints = {
+LaserCanvas.Render.modePoints = {
 	wz: [-6, -4, -2, -1, -0.8, -0.6, -0.4, -0.2, 0, 0.20, 0.40, 0.60, 0.80, 1.00, 2.00, 4.00, 6.00],
 	ww: [6.08, 4.12, 2.24, 1.41, 1.28, 1.17, 1.08, 1.02, 1, 1.02, 1.08, 1.17, 1.28, 1.41, 2.24, 4.12, 6.08]
 };
 
 // Editing states.
-window.LaserCanvas.Render.interaction = {
+LaserCanvas.Render.interaction = {
 	insert: 'insert',   // Insert a new optic (it's being dragged in).
 	inspect: 'inspect', // Inspect the mode size at given location.
 	layout: 'layout'    // Adjust the layout of the cavity.
 };
+}(window.LaserCanvas));

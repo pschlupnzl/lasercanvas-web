@@ -21,6 +21,12 @@
 			"pi": "Math.PI",
 		},
 
+		/** Anticipated variable strings. */
+		variableStrings = ["x", "y"],
+
+		/** Regular expression matching an isolated string corresponding to a variable. */
+		reVariables = new RegExp(`(^|\\W)(${variableStrings.join("|")})(\\W|$)`, "g"),
+
 		/** Allowed strings of more than one character. */
 		allowedStrings = (function (strings) {
 			var allowed = {};
@@ -28,7 +34,7 @@
 				allowed[str] = str;
 			}
 			return allowed;
-		}([].concat(mathStrings, constantStrings))),
+		}([].concat(mathStrings, constantStrings, variableStrings))),
 
 		/** Regular expression matching strings to be validated. */
 		reValidate = /\w{2,}/g,
@@ -59,7 +65,7 @@
 	/**
 	 * Set the equation value, e.g. in response to user input. Only
 	 * number and strings are accepted.
-	 * @param {string|number} value Value or expression to set.
+	 * @param {string|number|object} value Value or expression to set.
 	 */
 	Equation.prototype.set = function (value) {
 		if (typeof value === "number" && !isNaN(value)) {
@@ -68,22 +74,28 @@
 		} else if (typeof value === "string" && validate(value)) {
 			this.number = null;
 			this.expression = value;
+		} else if (typeof value === "object" 
+				&& value.hasOwnProperty("number") 
+				&& value.hasOwnProperty("expression")) {
+			this.number = value.number;
+			this.expression = value.expression
 		}
 	};
 
 	/** Returns the numeric or expression value. */
-	Equation.prototype.val = function () {
+	Equation.prototype.value = function (variables) {
 		var expr;
 		if (this.number !== null) {
 			return this.number;
 		} else {
-			var expr = this.expression
-				// .replace(/(x|y|z)/g, function (m, name) {
-				// 	return "(" + variables[name].value + ")";
-				// })
+			variables = variables || {};
+			expr = this.expression
+				.replace(reVariables, function (m, pre, name, post) {
+					return `${pre}(${variables[name] || 0})${post}`;
+				})
 				.replace(reMath, "$1Math.$2$3")
-				.replace(reConstants, function (m, pre, c, post) {
-					return `${pre}${constants[c]}${post}`;
+				.replace(reConstants, function (m, pre, name, post) {
+					return `${pre}${constants[name]}${post}`;
 				});
 
 			// We can use `eval` because the expression is validated in `set`.

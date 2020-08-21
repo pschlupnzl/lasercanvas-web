@@ -21,6 +21,7 @@ LaserCanvas.System = function () {
 			modeSpacing: 0,          // {number} (MHz) Optical mode spacing.
 			initialWaist: 100        // {number} (um) Initial waist size.
 		},
+		mvariablesGetter = null,     // {function|null} Function to retrieve current variable values.
 		
 		// -------------------------------------------------
 		//  Accessors.
@@ -211,7 +212,7 @@ LaserCanvas.System = function () {
 			for (k = 0; k < kmax; k += 1) {
 				if (!filterBy || melements[k].canSetProperty(filterBy)) {
 					loc = melements[k].location(); // {Point} Current optic location.
-					zMax = melements[k].property("distanceToNext"); // {number} (mm) Distance to next element.
+					zMax = melements[k].get("distanceToNext"); // {number} (mm) Distance to next element.
 					
 					// Calculate dot product.
 					V = new Vector([   // Normalized axis vector.
@@ -322,6 +323,16 @@ LaserCanvas.System = function () {
 		//  Calculations.
 		// -------------------------------------------------
 
+		/** Sets the callback function used to retrieve variable values. */
+		setVariablesGetter = function (getter) {
+			mvariablesGetter = getter;
+		},
+
+		/** Retrieves current variables, or returns empty object as callback. */
+		getVariables = function () {
+			return mvariablesGetter ? mvariablesGetter() : {};
+		},
+
 		/**
 		* Update the rotation of the cavity end elements. The
 		* elements are most likely mirrors.
@@ -363,11 +374,11 @@ LaserCanvas.System = function () {
 				el.property('deflectionAngle', Math.atan2(Z.cross(U), Z.dot(U))); // Updates angleOfIncidence.
 				le.property('deflectionAngle', Math.atan2(V.cross(Z), V.dot(Z))); // Updates angleOfIncidence.
 				le.loc.q = Z.atan2();
-				le.property("distanceToNext", l);
+				le.set("distanceToNext", l);
 			} else {
 				// Linear cavity: Normal incidence.
 				el.loc.p = el.loc.q + Math.PI;
-				le.property("distanceToNext", 0);
+				le.set("distanceToNext", 0);
 				le.property('deflectionAngle', Math.PI);
 			}
 		},
@@ -378,7 +389,8 @@ LaserCanvas.System = function () {
 		* @param {number=} kend_in Index of final element to calculate, if any. The element is included.
 		*/
 		calculateCartesianCoordinates = function (kstart_in, kend_in) {
-			var k, element, d,
+			var variables = getVariables(),
+				k, element, d,
 				loc,                                 // {object} Current element location (x, y, q, ...).
 				// /---TODO---------------------------------------------------------\
 				// | We always have to start at the beginning of the system because |
@@ -396,8 +408,7 @@ LaserCanvas.System = function () {
 				loc = element.location(k === kstart  // {object} Element transfer properties.
 					? null                       // Don't update first element ..
 					: ax);                       // ..only subsequent ones.
-				d = element.property("distanceToNext");
-
+				d = element.get("distanceToNext", variables);
 				// Traverse to next.
 				ax.q = loc.q;                   // {number} (rad) Next axis direction.
 				ax.x += d * Math.cos(ax.q); // {number} (mm) Advance horizontal location.
@@ -412,7 +423,7 @@ LaserCanvas.System = function () {
 		* Calculate the system ABCD coordinates.
 		*/
 		calculateAbcd = function () {
-			mabcd = LaserCanvas.systemAbcd(melements, mprop);
+			mabcd = LaserCanvas.systemAbcd(melements, mprop, getVariables());
 		},
 		
 		/**
@@ -520,8 +531,8 @@ LaserCanvas.System = function () {
 				element = melements[seg.indx + 1];
 			} else {
 				element = new Element(); // {Element} Newly created element.
-				element.property('distanceToNext', prevElement.property('distanceToNext') - seg.z); // Remaining distance.
-				prevElement.property('distanceToNext', seg.z); // Set new distance.
+				element.set("distanceToNext", prevElement.get("distanceToNext") - seg.z); // Remaining distance.
+				prevElement.set("distanceToNext", seg.z); // Set new distance.
 				if (element.init) {
 					element.init(this);
 				}
@@ -548,8 +559,8 @@ LaserCanvas.System = function () {
 					if (typeof element.removeGroup === 'function') {
 						n = element.removeGroup(prevElement);
 					} else {
-						prevElement.property('distanceToNext',
-							prevElement.property('distanceToNext') + melements[k].property('distanceToNext'));
+						prevElement.set("distanceToNext",
+							prevElement.get("distanceToNext", getVariables()) + melements[k].get("distanceToNext"));
 					}
 					if (element.destroy) {
 						element.destroy();
@@ -648,6 +659,7 @@ LaserCanvas.System = function () {
 		removeElement: removeElement,             // Remove the given element.
 		removeEventListener: removeEventListener, // Remove an event handler.
 		segmentNearLocation: segmentNearLocation, // Segment point closest to point.
+		setVariablesGetter: setVariablesGetter,   // Set the callback to retrieve variable values.
 		toJsonDestination: toJsonDestination,     // Write JSON to a destination.
 		update: update,                           // Update system calculation.
 		userProperties: userProperties            // Retrieve properties for read/write by user.

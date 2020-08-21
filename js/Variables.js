@@ -26,6 +26,11 @@
 		this.fireEvent("change");
 	};
 
+	/** Returns a new object containing the current variable values. */
+	Variables.prototype.value = function () {
+		return LaserCanvas.Utilities.extend({}, this.byName);
+	},
+
 	/** Add an event listener. */
 	Variables.prototype.addEventListener = function (eventName, handler) {
 		this.eventListeners[eventName].push(handler);

@@ -167,8 +167,12 @@ ht=220,
 			
 			mvariables = new LaserCanvas.Variables();
 			mvariables.addEventListener("change", function () {
-console.log("LaserCanvas variables change");
+				msystem.update(true);
 			});
+
+			msystem.setVariablesGetter(mvariables.value.bind(mvariables));
+			mrender.setVariablesGetter(mvariables.value.bind(mvariables));
+
 			new LaserCanvas.VariablePanel(mvariables)
 				.appendTo(document.querySelector("#LaserCanvasVariablesPanel .variables"));
 
