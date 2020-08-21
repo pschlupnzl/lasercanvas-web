@@ -432,7 +432,7 @@ LaserCanvas.System = function () {
 		* @param {Element} elDrag Element being dragged.
 		* @returns {object|boolean} dragData Data to be passed to dragElement() method, or FALSE if elements can't be found.
 		*/
-		adjust = LaserCanvas.systemAdjust(melements, calculateCartesianCoordinates),
+		adjust = LaserCanvas.systemAdjust(melements, calculateCartesianCoordinates, getVariables),
 		
 		/**
 		* Start dragging an element.
