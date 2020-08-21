@@ -550,6 +550,7 @@ LaserCanvas.System = function () {
 		*/
 		removeElement = function (element) {
 			var k, prevElement,
+				variables = getVariables(),
 				n = 1; // {number} Count of items to remove.
 				
 			// Don't delete last or first elements.
@@ -560,7 +561,7 @@ LaserCanvas.System = function () {
 						n = element.removeGroup(prevElement);
 					} else {
 						prevElement.set("distanceToNext",
-							prevElement.get("distanceToNext", getVariables()) + melements[k].get("distanceToNext"));
+							prevElement.get("distanceToNext", variables) + melements[k].get("distanceToNext", variables));
 					}
 					if (element.destroy) {
 						element.destroy();

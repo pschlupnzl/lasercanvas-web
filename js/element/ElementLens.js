@@ -3,7 +3,6 @@
 * Also used as thermal lens within a block.
 */
 (function (LaserCanvas) {
-"use strict";
 LaserCanvas.Element.Lens = function () {
 	this.type = 'Lens'; // {string} Primitive element type.
 	this.name = 'L'; // {string} Name of this element (updated by System).
@@ -14,7 +13,7 @@ LaserCanvas.Element.Lens = function () {
 		q: 0        // {number} (rad) Rotation angle of outgoing axis.
 	};
 	this.prop = {
-		distanceToNext: 0,  // {number} (mm) Distance to next element.
+		distanceToNext: new LaserCanvas.Equation(0),  // {number} (mm) Distance to next element.
 		focalLength: 250    // {number} (mm) Focal length, 0 for infinite.
 	};
 	this.priv = {
@@ -47,6 +46,7 @@ LaserCanvas.Element.Lens.prototype = {
 		this.name = json.name;
 		LaserCanvas.Utilities.extend(this.loc, json.loc || {});
 		LaserCanvas.Utilities.extend(this.prop, json.prop || {});
+		this.prop.distanceToNext = new LaserCanvas.Equation(json.prop.distanceToNext);
 	},
 
 	/**
@@ -118,6 +118,33 @@ LaserCanvas.Element.Lens.prototype = {
 		}[propertyName] || false;
 	},
 	
+	/**
+	 * Sets an internal property equation to a new value.
+	 * @param {string} propertyName Name of property to set, "distanceToNext"|...
+	 * @param {string|number} newValue New value to set. It is passed to the equation.
+	 */
+	set: function (propertyName, newValue, arg) {
+		switch (propertyName) {
+			case "distanceToNext":
+				this.prop[propertyName].set(newValue);
+				break;
+		}
+	},
+
+	/**
+	 * Returns the property evaluated using the given variable values.
+	 * @param {string} propertyName Name of property to evaluate and return.
+	 * @param {object} variables Variable values, keyed by variable names.
+	 */
+	get: function (propertyName, variables) {
+		var value = this.prop[propertyName].value(variables);
+		switch (propertyName) {
+			case "distanceToNext":
+				return Math.max(0, value);
+		}
+		return value;
+	},
+
 	/**
 	* Sets internal parameters to match new property value -OR- gets the current value.
 	* @param {string} propertyName Name of property to set 'distanceToNext' etc.

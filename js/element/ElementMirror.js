@@ -46,13 +46,8 @@ LaserCanvas.Element.Mirror.prototype = {
 	fromJson: function (json) {
 		this.name = json.name;
 		LaserCanvas.Utilities.extend(this.loc, json.loc);
-		for (var key in this.prop) {
-			if (key === "distanceToNext") {
-				this.prop[key].set(json.prop[key]);
-			} else {
-				this.prop[key] = json.prop[key];
-			}
-		}
+		LaserCanvas.Utilities.extend(this.prop, json.prop);
+		this.prop.distanceToNext = new LaserCanvas.Equation(json.prop.distanceToNext);
 	},
 
 	// ----------------------------------------------------
