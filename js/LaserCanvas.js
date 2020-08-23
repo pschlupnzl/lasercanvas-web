@@ -129,11 +129,9 @@ ht=220,
 			
 			// Child members.
 			msystem = new LaserCanvas.System();                 // {System} Optical system.
-			minfo = new LaserCanvas.InfoPanel(info);   // {InfoPanel} System information.
+			minfo = new LaserCanvas.InfoPanel(info); // {InfoPanel} System information.
 			mrender = new LaserCanvas.Render(msystem, minfo, canvas);  // {Render} Rendering engine.
 			mprop = new LaserCanvas.PropertiesPanel(mrender, msystem);  // {PropertiesPanel} Properties panel.
-
-			minfo.init(msystem, mrender);
 
 			onResize();
 			window.addEventListener('resize', onResize, false);
@@ -172,6 +170,7 @@ ht=220,
 
 			msystem.setVariablesGetter(mvariables.value.bind(mvariables));
 			mrender.setVariablesGetter(mvariables.value.bind(mvariables));
+			minfo.init(msystem, mrender, mvariables.value.bind(mvariables));
 
 			new LaserCanvas.VariablePanel(mvariables)
 				.appendTo(document.querySelector("#LaserCanvasVariablesPanel .variables"));

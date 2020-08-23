@@ -6,6 +6,7 @@ window.LaserCanvas.InfoPanel = function (info) {
 	"use strict";
 	this.system = null; // {System} Reference to system, set in init().
 	this.render = null; // {Render} Reference to renderer, set in init().
+	this.variablesGetter = null; // {function|null} Method to retrieve variable values.
 	this.info = info; // {HTMLDivElement} Information panel.
 };
 
@@ -194,6 +195,8 @@ window.LaserCanvas.InfoPanel.createPanel = function (system, info) {
 		};
 		
 	clearItems();    // Clear existing items.
+	new LaserCanvas.InfoPropertiesPanel(system, this.variablesGetter)
+		.appendTo(systems);
 	systemPanel();   // Create system entries.
 	elementPanels(); // Create entries for each element.
 };
@@ -360,9 +363,11 @@ window.LaserCanvas.InfoPanel.prototype = {
 	 * @param {System} system Reference to system.
 	 * @param {Render} render Reference to renderer.
 	 */
-	init: function (system, render) {
+	init: function (system, render, variablesGetter) {
 		this.system = system;
 		this.render = render;
+		this.variablesGetter = variablesGetter;
+		return this;
 	},
 
 	/**
@@ -430,7 +435,7 @@ window.LaserCanvas.InfoPanel.prototype = {
 	*/
 	change: function () {
 		"use strict";
-		window.LaserCanvas.InfoPanel.createPanel(this.system, this.info);
+		window.LaserCanvas.InfoPanel.createPanel.call(this, this.system, this.info);
 		this.activatePanel();
 		return this;
 	},
