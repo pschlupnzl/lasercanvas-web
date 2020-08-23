@@ -24,26 +24,28 @@ LaserCanvas.systemAbcd = function (melements, systemProperties, variables) {
 			return melements[indx].elementAbcd(dir, plane);
 		},
 		
-		// Calculate element or default ABCD for gap
-		// between given element and the next.
-		// @param {number} indx Index of element whose following space to calculate.
-		// @param {number} dir Direction -1:backwards|+1:forwards.
-		// @param {number.Enum:modePlane} plane Sagittal or tangential plane.
-		// @param {object=} len Physical and optical length to accumulate, if supplied.
-		// @returns {Matrix2x2} Transfer matrix.
+		/**
+		* Calculate element or default ABCD for gap
+		* between given element and the next.
+		* @param {number} indx Index of element whose following space to calculate.
+		* @param {number} dir Direction -1:backwards|+1:forwards.
+		* @param {number.Enum:modePlane} plane Sagittal or tangential plane.
+		* @param {object=} len Physical and optical length to accumulate, if supplied.
+		* @returns {Matrix2x2} Transfer matrix.
+		*/
 		spaceAbcd = function (indx, dir, plane, len) {
 			var L, n, gdd,
 				element = melements[indx]; // {Element} Element whose following space to calculate.
-			// if (typeof element.spaceAbcd === 'function') {
-			// 	return element.spaceAbcd(dir, plane);
-			// }
-			L = element.get("distanceToNext", variables);
-			n = element.spaceRefractiveIndex 
-				? element.spaceRefractiveIndex()            // e.g. propagation within prism pair.
-				: element.property('refractiveIndex') || 1; // Default elements.
-			gdd = element.groupDelayDispersion
-				? element.groupDelayDispersion(wavelength)
-				: 0;
+				// if (typeof element.spaceAbcd === 'function') {
+				// 	return element.spaceAbcd(dir, plane);
+				// }
+				L = element.get("distanceToNext", variables);
+				n = element.spaceRefractiveIndex 
+					? element.spaceRefractiveIndex()            // e.g. propagation within prism pair.
+					: element.property('refractiveIndex') || 1; // Default elements.
+				gdd = element.groupDelayDispersion
+					? element.groupDelayDispersion(wavelength, L)
+					: 0;
 
 			if (len) {
 				len.physicalLength += L;

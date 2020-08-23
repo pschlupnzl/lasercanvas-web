@@ -258,12 +258,14 @@ window.LaserCanvas.Element.atLocation = function (pt, tol) {
 * group. If the parameter L is not supplied, the element's
 * distanceToNext property is used as the propagation length.
 * @this {Element} Grouped element, e.g. Dispersion or Dielectric.
-	* @param {number} lam (nm) Wavelength (note units nm!).
-* @param {number=} L (mm) Optional length, if different to distanceToNext.
+* @param {number} lam (nm) Wavelength (note units nm!).
+* @param {number} L (mm) Physical length of propagation through material.
 * @returns {number} (fs^2/rad) Group delay dispersion for first element in group, otherwise 0.
 */
 window.LaserCanvas.Element.groupDelayDispersion = function (lam, L) {
 	"use strict";
+	// TODO: Remove this check: We've made L compulsory argument now.
+	if (L === undefined) console.error(`groupDelayDispersion called without distance`);
 	// Group delay dispersion (see e.g. https://www.newport.com/n/the-effect-of-dispersion-on-ultrashort-pulses)
 	// 
 	//         lam^3      d^2 n
@@ -284,6 +286,6 @@ window.LaserCanvas.Element.groupDelayDispersion = function (lam, L) {
 	return this === this.group[0]
 		? 1e-6 * lam * lam * lam / (2 * Math.PI * c * c) 
 			* this.prop.groupVelocityDispersion 
-			* (L !== undefined ? L : this.property("distanceToNext"))
+			* (L !== undefined ? L : this.get("distanceToNext", variables))
 		: false;
 };
