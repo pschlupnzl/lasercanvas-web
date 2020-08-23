@@ -93,6 +93,7 @@ window.LaserCanvas = {
 			"css/InfoPanel.css",
 			"css/LaserCanvasInspect.css",
 			"css/LaserCanvasToolbar.css",
+			"css/PropertyInput.css",
 			"css/SellmeierPanel.css",
 			"css/Themes.css",
 			"js/Graph2d/Graph2d.css",

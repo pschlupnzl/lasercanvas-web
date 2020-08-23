@@ -135,6 +135,7 @@
 	PropertyInput.prototype.get = function () {
 		// TODO: Remove this once all properties support `get`.
 		if (typeof this.source.get === "function") {
+// return this.source.expr(this.prop.propertyName);
 			return this.source.get(this.prop.propertyName, this.variablesGetter());
 		}
 		return this.source.property(this.prop.propertyName);
@@ -145,14 +146,16 @@
 	 * @param {string} prop Name and configuration of property to manipulate.
 	 */
 	PropertyInput.prototype.init = function (prop) {
+// TODO: prop for inc/dec buttons
 		var el = document.createElement("div");
+		el.className = "propertyInput";
 		el.innerHTML = [
-			'<button class="lcbutton" data-action="increment">&minus;</button>',
+			'<button data-step="-1">&minus;</button>',
+			'<span>',
 			'<input type="text" />',
-			'<button class="lcbutton" data-action="increment">+</button>'
+			'</span>',
+			'<button data-step="+1">+</button>'
 		].join("");
-		// input = el.querySelector("input");
-		// input.setAttribute("data-property-name", prop.propertyName);
 		el.querySelectorAll("button")[0].onclick = this.onDecrementClick.bind(this);
 		el.querySelectorAll("button")[1].onclick = this.onIncrementClick.bind(this);
 		el.querySelector("input").onkeyup =
@@ -173,6 +176,7 @@
 	 * Update the displayed value of the input field.
 	 */
 	PropertyInput.prototype.update = function () {
+// this.el.querySelector("input").value = this.get(); return;
 		this.el.querySelector("input").value = LaserCanvas.Utilities.numberFormat(this.get());
 	};
 	
