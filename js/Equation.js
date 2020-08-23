@@ -56,9 +56,9 @@
 	 */
 	var Equation = function (value) {
 		/** Numeric value, which takes precedence unless it is NULL. */
-		this.number = 0;
+		this._number = 0;
 		/** Expression to evaluate. */
-		this.expression = null;
+		this._expression = null;
 		this.set(value);
 	};
 
@@ -69,27 +69,27 @@
 	 */
 	Equation.prototype.set = function (value) {
 		if (typeof value === "number" && !isNaN(value)) {
-			this.number = value;
-			this.expression = null;
+			this._number = value;
+			this._expression = null;
 		} else if (typeof value === "string" && validate(value)) {
-			this.number = null;
-			this.expression = value;
+			this._number = null;
+			this._expression = value;
 		} else if (typeof value === "object" 
-				&& value.hasOwnProperty("number") 
-				&& value.hasOwnProperty("expression")) {
-			this.number = value.number;
-			this.expression = value.expression
+				&& value.hasOwnProperty("_number") 
+				&& value.hasOwnProperty("_expression")) {
+			this._number = value._number;
+			this._expression = value._expression
 		}
 	};
 
-	/** Returns the numeric or expression value. */
+	/** Returns the numeric value. */
 	Equation.prototype.value = function (variables) {
 		var expr;
-		if (this.number !== null) {
-			return this.number;
+		if (this._number !== null) {
+			return this._number;
 		} else {
 			variables = variables || {};
-			expr = this.expression
+			expr = this._expression
 				.replace(reVariables, function (m, pre, name, post) {
 					return `${pre}(${variables[name] || 0})${post}`;
 				})
@@ -103,5 +103,10 @@
 		}
 	};
 
+	/** Returns the string expression. */
+	Equation.prototype.expression = function () {
+		return this._expression || this._number.toString();
+	}
+	
 	LaserCanvas.Equation = Equation;
 }(window.LaserCanvas));

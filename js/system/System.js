@@ -104,11 +104,11 @@ LaserCanvas.System = function () {
 		 */
 		set = function (propertyName, newValue) {
 console.log(`set ${propertyName}=${newValue}`)
-			if (propertyName === "wavelength" || propertyName === "initialWaist") {
-				mprop[propertyName].set(newValue);
-				fireEventListeners('update');
+			if (propertyName !== "wavelength" && propertyName !== "initialWaist") {
+				console.error(`set should not be called with propertyName=${propertyName}`);
 			}
-			console.error(`set should not be called with propertyName=${propertyName}`);
+			mprop[propertyName].set(newValue);
+			fireEventListeners('update');
 		},
 
 		/**
@@ -121,6 +121,13 @@ console.log(`set ${propertyName}=${newValue}`)
 				return mprop[propertyName].value(variables);
 			}
 			return property(propertyName);
+		},
+
+		expression = function (propertyName) {
+			if (propertyName !== "wavelength" && propertyName !== "initialWaist") {
+				console.error(`expression should not be called with propertyName=${propertyName}`);
+			}
+			return mprop[propertyName].expression();
 		},
 
 		/**
@@ -679,6 +686,7 @@ console.log(`set ${propertyName}=${newValue}`)
 		elementAtLocation: elementAtLocation,     // Find an element at the given mouse location.
 		element: element,                         // Returns the element at the given index.
 		elements: elements,                       // Retrieve elements for this system.
+		expression: expression,                   // Retrieve the expression of a variable.
 		fromJsonSource: fromJsonSource,           // Reset the system to the given JSON state.
 		fromTextFile: fromTextFile,               // Load a LaserCanvas 5 text file.
 		get: get,                                 // Retrieve a value.

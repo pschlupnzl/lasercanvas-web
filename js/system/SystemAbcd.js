@@ -12,6 +12,8 @@
 LaserCanvas.systemAbcd = function (melements, systemProperties, variables) {
 	var 
 		Matrix2x2 = LaserCanvas.Math.Matrix2x2, // {function} Constructor function for matrix.
+		wavelength = systemProperties.wavelength.value(variables),
+		initialWaist = systemProperties.initialWaist.value(variables),
 		
 		// Calculate the element ABCD.
 		// @param {number} indx Index of element whose following space to calculate.
@@ -40,7 +42,7 @@ LaserCanvas.systemAbcd = function (melements, systemProperties, variables) {
 				? element.spaceRefractiveIndex()            // e.g. propagation within prism pair.
 				: element.property('refractiveIndex') || 1; // Default elements.
 			gdd = element.groupDelayDispersion
-				? element.groupDelayDispersion(systemProperties.wavelength)
+				? element.groupDelayDispersion(wavelength)
 				: 0;
 
 			if (len) {
@@ -235,7 +237,7 @@ LaserCanvas.systemAbcd = function (melements, systemProperties, variables) {
 				//  1          lam        1
 				// --- = -i ---------  + ---
 				//  q        pi w0^2      R
-				w0 = systemProperties.initialWaist; // {number} (mm) Waist.
+				w0 = initialWaist; // {number} (mm) Waist.
 				Q = {
 					R: 0,                         // {number} (mm^-1) Wavefront curvature.
 					V: lam / (Math.PI * w0 * w0), // {number} Normalized waist.
@@ -304,8 +306,8 @@ LaserCanvas.systemAbcd = function (melements, systemProperties, variables) {
 		systemProperties.groupDelayDispersion = 0;
 	
 	// System matrices.
-	abcd.sag = calculatePlane(modePlane.sagittal, systemProperties.wavelength, systemProperties);
-	abcd.tan = calculatePlane(modePlane.tangential, systemProperties.wavelength);
+	abcd.sag = calculatePlane(modePlane.sagittal, wavelength, systemProperties);
+	abcd.tan = calculatePlane(modePlane.tangential, wavelength);
 	
 	// Update system properties.
 	systemProperties.modeSpacing = 299792.458 / (2 * systemProperties.opticalLength); // c / 2nL

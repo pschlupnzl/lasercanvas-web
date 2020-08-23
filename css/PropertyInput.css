@@ -48,11 +48,11 @@
 		text-align: right;
 		font-family: inherit;
 		font-size: inherit;
+		transition: all 150ms;
 	}
 
 		.propertyInput input:focus {
 			width: 6em;
 			margin-left: -1.5em;
 			margin-right: -1.5em;
-			transition: all 150ms;
 		}
