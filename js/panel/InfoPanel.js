@@ -195,8 +195,6 @@ window.LaserCanvas.InfoPanel.createPanel = function (system, info) {
 		};
 		
 	clearItems();    // Clear existing items.
-	new LaserCanvas.InfoPropertiesPanel(system, this.variablesGetter)
-		.appendTo(systems);
 	systemPanel();   // Create system entries.
 	elementPanels(); // Create entries for each element.
 };
@@ -367,6 +365,7 @@ window.LaserCanvas.InfoPanel.prototype = {
 		this.system = system;
 		this.render = render;
 		this.variablesGetter = variablesGetter;
+		this.systemPropertiesPanel = null;
 		return this;
 	},
 
@@ -437,6 +436,13 @@ window.LaserCanvas.InfoPanel.prototype = {
 		"use strict";
 		window.LaserCanvas.InfoPanel.createPanel.call(this, this.system, this.info);
 		this.activatePanel();
+
+		if (!this.systemPropertiesPanel) {
+			// TODO: Check that the system panel can stay on system change.
+			this.systemPropertiesPanel = new LaserCanvas.InfoPropertiesPanel(this.system, this.variablesGetter)
+				.appendTo(this.info.querySelector(".systems"));
+		}
+
 		return this;
 	},
 	
@@ -448,6 +454,7 @@ window.LaserCanvas.InfoPanel.prototype = {
 	update: function () {
 		"use strict";
 		window.LaserCanvas.InfoPanel.updatePanel(this.system, this.info);
+		this.systemPropertiesPanel.update();
 		return this;
 	},
 

@@ -40,13 +40,6 @@
 			});
 	};
 
-	// /** Create a single non-interactive unary value row. */
-	// InfoPropertiesPanel.prototype.initUnaryProperty = function (propertyName, source) {
-	// 	var tr = document.createElement("tr");
-	// 	tr.innerHTML = InfoPropertiesPanel.unary;
-	// 	tr.querySelector('[data-cell="label"]').innerText = prettify(prop);
-	// };
-
 	/**
 	 * Trigger the child components to update.
 	 */
@@ -63,6 +56,13 @@
 	InfoPropertiesPanel.prototype.appendTo = function (parent) {
 		parent.appendChild(this.el);
 		return this;
+	};
+
+	/** Remove the component from the DOM. */
+	InfoPropertiesPanel.prototype.remove = function () {
+		if (this.el.parentElement) {
+			this.el.parentElement.removeChild(this.el);
+		}
 	};
 
 	LaserCanvas.InfoPropertiesPanel = InfoPropertiesPanel;

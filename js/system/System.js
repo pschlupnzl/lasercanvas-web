@@ -117,9 +117,14 @@ console.log(`set ${propertyName}=${newValue}`)
 		 * @param {object} variables Variable values, keyed by variable names.
 		 */
 		get = function (propertyName, variables) {
-			if (propertyName === "wavelength" || propertyName === "initialWaist") {
-				return mprop[propertyName].value(variables);
+			var value;
+			switch (propertyName) {
+				case "wavelength":
+				case "initialWaist":
+					value = mprop[propertyName].value(variables);
+					return Math.max(0, value);
 			}
+			// Properties also includes non-equation, derived quantities.
 			return property(propertyName);
 		},
 
