@@ -62,6 +62,8 @@
 		 */
 		fromJson = function (json, mprop, melements, system) {
 			LaserCanvas.Utilities.extend(mprop, json.prop);
+			mprop.wavelength = new LaserCanvas.Equation(mprop.wavelength);
+			mprop.initialWaist = new LaserCanvas.Equation(mprop.initialWaist);
 			LaserCanvas.SystemUtil.resetElements(melements);
 			for (var elementJson of json.elements) {
 				var element = newElement(elementJson.type);

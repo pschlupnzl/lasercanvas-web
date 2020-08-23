@@ -14,12 +14,12 @@ LaserCanvas.System = function () {
 		mprop = {                   // {object} System properties read/write by SystemAbcd.
 			name: 'System',          // {string} Name of system.
 			configuration: LaserCanvas.System.configuration.linear,
-			wavelength: 1000,        // {number} (nm) System wavelength
+			wavelength: new LaserCanvas.Equation(1000), // {number} (nm) System wavelength
 			physicalLength: 0,       // {number} (mm) Physical length.
 			opticalLength: 0,        // {number} (mm) Optical length.
 			groupDelayDispersion: 0, // {number} (fs^2/rad) System group delay dispersion.
 			modeSpacing: 0,          // {number} (MHz) Optical mode spacing.
-			initialWaist: 100        // {number} (um) Initial waist size.
+			initialWaist: new LaserCanvas.Equation(100) // {number} (um) Initial waist size.
 		},
 		mvariablesGetter = null,     // {function|null} Function to retrieve current variable values.
 		
@@ -97,6 +97,33 @@ LaserCanvas.System = function () {
 		},
 		
 		/**
+		 * Sets an internal property equation to a new value.
+		 * @param {string} propertyName Name of property to set, "distanceToNext"|...
+		 * @param {string|number} newValue New value to set. It is passed to the equation.
+		 * @param {boolean} arg Additional argument, e.g. for outgoing angle whether first optic.
+		 */
+		set = function (propertyName, newValue) {
+console.log(`set ${propertyName}=${newValue}`)
+			if (propertyName === "wavelength" || propertyName === "initialWaist") {
+				mprop[propertyName].set(newValue);
+				fireEventListeners('update');
+			}
+			console.error(`set should not be called with propertyName=${propertyName}`);
+		},
+
+		/**
+		 * Returns the property evaluated using the given variable values.
+		 * @param {string} propertyName Name of property to evaluate and return.
+		 * @param {object} variables Variable values, keyed by variable names.
+		 */
+		get = function (propertyName, variables) {
+			if (propertyName === "wavelength" || propertyName === "initialWaist") {
+				return mprop[propertyName].value(variables);
+			}
+			return property(propertyName);
+		},
+
+		/**
 		* Retrieve one of the system property values.
 		* @param {string} propertyName Name of property to retrieve.
 		* @param {number|...=} newValue New value to set to, if changing.
@@ -107,10 +134,11 @@ LaserCanvas.System = function () {
 				switch (propertyName) {
 					case 'initialWaist':
 					case 'wavelength':
-						if (!isNaN(+newValue)) {
-							mprop[propertyName] = +newValue;
-							fireEventListeners('update');
-						}
+						set(propertyName, newValue);
+						// if (!isNaN(+newValue)) {
+						// 	mprop[propertyName] = +newValue;
+						// 	fireEventListeners('update');
+						// }
 						break;
 				}
 			} else {
@@ -653,6 +681,7 @@ LaserCanvas.System = function () {
 		elements: elements,                       // Retrieve elements for this system.
 		fromJsonSource: fromJsonSource,           // Reset the system to the given JSON state.
 		fromTextFile: fromTextFile,               // Load a LaserCanvas 5 text file.
+		get: get,                                 // Retrieve a value.
 		insertElement: insertElement,             // Insert a new element near the given point.
 		inspectSegment: inspectSegment,           // Inspect beam on a segment (from segmentNearLocation).
 		iterateElements: iterateElements,         // Iterate all elements in the system.
@@ -660,6 +689,7 @@ LaserCanvas.System = function () {
 		removeElement: removeElement,             // Remove the given element.
 		removeEventListener: removeEventListener, // Remove an event handler.
 		segmentNearLocation: segmentNearLocation, // Segment point closest to point.
+		set: set,                                 // Set a property value.
 		setVariablesGetter: setVariablesGetter,   // Set the callback to retrieve variable values.
 		toJsonDestination: toJsonDestination,     // Write JSON to a destination.
 		update: update,                           // Update system calculation.

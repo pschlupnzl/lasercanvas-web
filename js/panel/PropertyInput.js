@@ -135,7 +135,7 @@
 	PropertyInput.prototype.get = function () {
 		// TODO: Remove this once all properties support `get`.
 		if (typeof this.source.get === "function") {
-			return this.source.get(this.prop.propertyName, this.variablesGetter);
+			return this.source.get(this.prop.propertyName, this.variablesGetter());
 		}
 		return this.source.property(this.prop.propertyName);
 	};
