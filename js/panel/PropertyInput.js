@@ -118,36 +118,35 @@
 	 * @param {string} prop Name and configuration of property to manipulate.
 	 * @param {Element|System} source Data source, element or system, with property.
 	 * @param {function} variablesGetter Callback to retrieve current variable values.
-	 * @param {function} onChange Handler to call on an input change.
 	 */
-	var PropertyInput = function (prop, source, variablesGetter, onChange) {
+	var PropertyInput = function (prop, source, variablesGetter) {
 		this.prop = prop;
 		this.source = source;
 		this.variablesGetter = variablesGetter;
-		this.onChange = onChange;
+		this.isFocused = false;
+		this.lastValue = "";
 		this.el = this.init(prop);
+		this.input = this.el.querySelector("input");
 		this.update();
 	};
 	
-	/**
-	 * Returns the current value of the data source.
-	 */
-	PropertyInput.prototype.get = function () {
-		// TODO: Remove this once all properties support `get`.
-		if (typeof this.source.get === "function") {
-// return this.source.expr(this.prop.propertyName);
-			return this.source.get(this.prop.propertyName, this.variablesGetter());
-		}
-		return this.source.property(this.prop.propertyName);
-	};
-
 	/**
 	 * Initialize a new control and return the container DOM element.
 	 * @param {string} prop Name and configuration of property to manipulate.
 	 */
 	PropertyInput.prototype.init = function (prop) {
 // TODO: prop for inc/dec buttons
-		var el = document.createElement("div");
+		var self = this,
+			el = document.createElement("div"),
+			/** Attach listeners to the input field. */
+			attachInputHandlers = function (input) {
+				input.onkeydown = self.onInputKeydown.bind(self);
+				input.onkeyup = 
+				input.onchange = self.onInputChange.bind(self);
+				input.onfocus = self.onInputFocus.bind(self);
+				input.onblur = self.onInputBlur.bind(self);
+			};
+
 		el.className = "propertyInput";
 		el.innerHTML = [
 			'<button data-step="-1">&minus;</button>',
@@ -156,10 +155,10 @@
 			'</span>',
 			'<button data-step="+1">+</button>'
 		].join("");
-		el.querySelectorAll("button")[0].onclick = this.onDecrementClick.bind(this);
-		el.querySelectorAll("button")[1].onclick = this.onIncrementClick.bind(this);
-		el.querySelector("input").onkeyup =
-		el.querySelector("input").onchange = this.onInputChange.bind(this);
+		LaserCanvas.Utilities.foreach(el.querySelectorAll("button"), function () {
+			this.onclick = self.onButtonClick.bind(self);
+		});
+		attachInputHandlers(el.querySelector("input"));
 		return el;
 	};
 
@@ -172,37 +171,83 @@
 		return this;
 	};
 
+	// ----------------
+	//  Update values.
+	// ----------------
+
+	/**
+	 * Returns the current value of the data source.
+	 */
+	PropertyInput.prototype.get = function () {
+		// TODO: Remove this once all properties support `get`.
+		if (typeof this.source.get !== "function") {
+console.warn(`PropertyInput.get ${this.prop.propertyName} doesn't support equation`);
+			return this.source.property(this.prop.propertyName);
+		}
+		if (this.isFocused) {
+			return this.source.expression(this.prop.propertyName);
+		} else {
+			return LaserCanvas.Utilities.numberFormat(
+				this.source.get(this.prop.propertyName, this.variablesGetter())
+			);
+		}
+	};
+
 	/**
 	 * Update the displayed value of the input field.
 	 */
 	PropertyInput.prototype.update = function () {
-// this.el.querySelector("input").value = this.get(); return;
-		this.el.querySelector("input").value = LaserCanvas.Utilities.numberFormat(this.get());
+		var displayValue = this.get();
+		if (this.input.value !== displayValue) {
+			this.input.value = displayValue;
+		}
 	};
 	
 	// ---------
 	//  Events.
 	// ---------
 
-	/** The decrement button is clicked. */
-	PropertyInput.prototype.onDecrementClick = function () {
-console.log(`decrement ${this.prop.propertyName}`);
+	/** A focused input field shows the expression. */
+	PropertyInput.prototype.onInputFocus = function () {
+		this.isFocused = true;
+		this.update();
+		this.lastValue = this.input.value;
+	};
+
+	/** A blurred input field shows the expression. */
+	PropertyInput.prototype.onInputBlur = function () {
+		this.isFocused = false;
+		this.update();
+	};
+
+	/** Blur the field on enter or escape. */
+	PropertyInput.prototype.onInputKeydown = function (keyboardEvent) {
+		switch (keyboardEvent.which || keyboardEvent.keyCode) {
+			case 10:
+			case 13:
+				this.input.blur();
+				break;
+			case 27:
+				this.input.value = this.lastValue;
+				this.input.blur();
+				break;
+		}
+	}
+
+	/** Handle a change or keyup event. */
+	PropertyInput.prototype.onInputChange = function () {
+		var value = this.input.value;
+console.log(`Keyup ${this.prop.propertyName} = ${value}`);
 	};
 
 	/** The decrement button is clicked. */
-	PropertyInput.prototype.onIncrementClick = function () {
-console.log(`increment ${this.prop.propertyName}`);
+	PropertyInput.prototype.onButtonClick = function () {
+console.log(`onButtonClick ${this.prop.propertyName}`);
 	};
 
 	/** Increment or decrement the value by the given step. */
 	PropertyInput.prototype.increment = function (step) {
 console.log(`Increment by ${step}`);
-	};
-
-	/** Handle a change or keyup event. */
-	PropertyInput.prototype.onInputChange = function () {
-		var value = this.el.querySelector("input").value;
-console.log(`Keyup ${this.prop.propertyName} = ${value}`);
 	};
 
 	/** Fire the change event. */
