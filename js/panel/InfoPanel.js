@@ -439,8 +439,10 @@ window.LaserCanvas.InfoPanel.prototype = {
 
 		if (!this.systemPropertiesPanel) {
 			// TODO: Check that the system panel can stay on system change.
-			this.systemPropertiesPanel = new LaserCanvas.InfoPropertiesPanel(this.system, this.variablesGetter)
+			this.systemPropertiesPanel = new LaserCanvas.InfoPropertiesPanel(this.system.get("name"), this.system, this.variablesGetter)
 				.appendTo(this.info.querySelector(".systems"));
+			this.systemPropertiesPanel.addAbcdRow("abcdSag");
+			this.systemPropertiesPanel.addAbcdRow("abcdTan");
 		}
 
 		return this;

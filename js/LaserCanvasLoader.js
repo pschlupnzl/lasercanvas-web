@@ -91,6 +91,7 @@ window.LaserCanvas = {
 // TODO: Move component CSS to component directories
 			"css/HelpPanel.css",
 			"css/InfoPanel.css",
+			"css/InfoPropertiesPanel.css",
 			"css/LaserCanvasInspect.css",
 			"css/LaserCanvasToolbar.css",
 			"css/PropertyInput.css",

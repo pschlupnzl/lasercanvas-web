@@ -143,11 +143,11 @@
 				this.control.update();
 				break;
 			case InputPropertyRow.eType.unary:
-				this.el.querySelector('[data-cell="value"]').innerText = Utilities.numberFormat(value);
+				this.el.querySelector('[data-cell="value"]').innerText = Utilities.numberFormat(value, true);
 				break;
 			case InputPropertyRow.eType.sagTan:
-				this.el.querySelector('[data-cell="sag"]').innerText = Utilities.numberFormat(value[0]);
-				this.el.querySelector('[data-cell="tan"]').innerText = Utilities.numberFormat(value[1]);
+				this.el.querySelector('[data-cell="sag"]').innerText = Utilities.numberFormat(value[0], true);
+				this.el.querySelector('[data-cell="tan"]').innerText = Utilities.numberFormat(value[1], true);
 				break;
 		}
 	};
@@ -157,5 +157,50 @@
 		this.onChange && this.onChange(this.prop.propertyName, value);
 	};
 
+
+	// -----------
+	//  Abcd row.
+	// -----------
+
+	/**
+	 * Initialize a new ABCD matrix row. The data is updated manually by
+	 * the caller as it has no data source at initialization.
+	 * @param {string} propertyName Name or key of property displayed by this control.
+	 */
+	var AbcdPropertyRow = function (propertyName) {
+		this.propertyName = propertyName;
+		this.el = this.init();
+	};
+
+	/**
+	 * Initialize the DOM element, returning the container.
+	 */
+	AbcdPropertyRow.prototype.init = function () {
+		var tr = document.createElement("tr");
+		tr.innerHTML = InputPropertyRow.template.mx;
+		tr.querySelector('[data-cell="label"]').innerText = LaserCanvas.Utilities.prettify(this.propertyName);
+		return tr;
+	};
+
+	/** Attaches tihs component's DOM element to the given parent. */
+	AbcdPropertyRow.prototype.appendTo = function (parent) {
+		parent.appendChild(this.el);
+		return this;
+	};
+
+	/**
+	 * Updates the value displayed in this matrix row.
+	 * @param {Matrix2x2} mx Matrix values to set.
+	 */
+	AbcdPropertyRow.prototype.update = function (mx) {
+		for (var r = 0; r < 2; r += 1) {
+			for (var c = 0; c < 2; c += 1) {
+				this.el.querySelector(`[data-cell="mx-${r + 1}-${c + 1}"]`).innerText
+					= LaserCanvas.Utilities.numberFormat(mx[r][c], true);
+			}
+		}
+	};
+
+	LaserCanvas.AbcdPropertyRow = AbcdPropertyRow;
 	LaserCanvas.InputPropertyRow = InputPropertyRow;
 }(window.LaserCanvas));

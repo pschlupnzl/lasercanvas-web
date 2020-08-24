@@ -4,23 +4,27 @@
 (function (LaserCanvas) {
 	/**
 	 * Initialize a new information panel to manipulate system properties.
-	 * @param {System} system Reference to system to manipulate.
+	 * @param {string} label Display label for panel heading.
+	 * @param {System} source Reference to data source (system, element) to manipulate.
 	 * @param {function} variablesGetter Callback to retrieve current variable values.
 	 */
-	var InfoPropertiesPanel = function (source, variablesGetter) {
+	var InfoPropertiesPanel = function (label, source, variablesGetter) {
 		this.source = source;
 		this.variablesGetter = variablesGetter;
-		this.el = this.init();
-		this.controls = this.initControls();
+		this.el = this.init(label);
+		this.rows = this.initRows();
+		this.customRows = {};
 	};
 
 	/**
 	 * Initialize the DOM elements, returning the container element.
+	 * @param {string} label Display label for panel heading.
 	 */
-	InfoPropertiesPanel.prototype.init = function () {
+	InfoPropertiesPanel.prototype.init = function (label) {
 		var el = document.createElement("div");
+		el.className = "infoPropertiesPanel";
 		el.innerHTML = [
-			'<h1>Info Properties Panel</h1>',
+			`<h1>${label}</h1>`,
 			'<table><tbody></tbody></table>',
 		].join("");
 		return el;
@@ -29,7 +33,7 @@
 	/**
 	 * Create the controls for the source's user properties.
 	 */
-	InfoPropertiesPanel.prototype.initControls = function () {
+	InfoPropertiesPanel.prototype.initRows = function () {
 		var source = this.source,
 			variablesGetter = this.variablesGetter,
 			tbody = this.el.querySelector("tbody"),
@@ -45,10 +49,34 @@
 	 * Trigger the child components to update.
 	 */
 	InfoPropertiesPanel.prototype.update = function () {
-		for (var control of this.controls) {
-			control.update();
+		for (var row of this.rows) {
+			row.update();
 		}
+		this.customRows.abcdSag && this.customRows.abcdSag.update(this.source.abcd().sag.mx);
+		this.customRows.abcdTan && this.customRows.abcdTan.update(this.source.abcd().tan.mx);
 	};
+
+	// --------------
+	//  Custom rows.
+	// --------------
+
+	/**
+	 * Attach a custom row, perhaps read-only ABCD value.
+	 * @param {string} propertyName Name by which to key the new control.
+	 */
+	InfoPropertiesPanel.prototype.addAbcdRow = function (propertyName) {
+		this.customRows[propertyName] = new LaserCanvas.AbcdPropertyRow(propertyName)
+			.appendTo(this.el.querySelector("tbody"));
+	};
+
+	/** Update the named custom row to the given value. */
+	InfoPropertiesPanel.prototype.updateCustomRow = function (propertyName, value) {
+		this.customRows[propertyName].update(value);
+	};
+
+	// -------------------
+	//  DOM manipulation.
+	// -------------------
 
 	/**
 	 * Attach the panel DOM to the parent element.
@@ -65,6 +93,10 @@
 			this.el.parentElement.removeChild(this.el);
 		}
 	};
+
+	// ---------
+	//  Events.
+	// ---------
 
 	/** Handle a notified change in an input property. */
 	InfoPropertiesPanel.prototype.onPropertyChange = function (propertyName, value) {

@@ -1,0 +1,11 @@
+.infoPropertiesPanel h1 {
+	margin: 0;
+	padding: 0.2em 0;
+	text-align: center;
+	font-size: 1em;
+}
+
+.infoPropertiesPanel table {
+	width: 100%;
+}
+
