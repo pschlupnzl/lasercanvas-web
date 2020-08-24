@@ -37,7 +37,7 @@
 		}([].concat(mathStrings, constantStrings, variableStrings))),
 
 		/** Regular expression matching strings to be validated. */
-		reValidate = /\w{2,}/g,
+		reValidate = /[A-Za-z]{2,}/g,
 
 		/** Validate the string to ensure it's safe to `eval`. */
 		validate = function (stringValue) {
@@ -84,7 +84,7 @@
 
 	/** Returns the numeric value. */
 	Equation.prototype.value = function (variables) {
-		var expr;
+		var expr, value;
 		if (this._number !== null) {
 			return this._number;
 		} else {
@@ -98,8 +98,13 @@
 					return `${pre}${constants[name]}${post}`;
 				});
 
-			// We can use `eval` because the expression is validated in `set`.
-			return eval(expr);
+			// `eval` should be safe from arbitrary scripts ibecause the expression is validated in `set`.
+			try {
+				value = eval(expr);
+			} catch (e) {
+				value = 0;
+			}
+			return value;
 		}
 	};
 
