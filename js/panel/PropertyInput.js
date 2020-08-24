@@ -2,6 +2,7 @@
  * Input control for manipulating properties in popups and info panel.
  */
 (function (LaserCanvas) {
+/*
 	var
 		kpropertyNames = ['propertyName', 'increment', 'max', 'min', 'standard', 'wrap'], // {Array<string>} Properties to set.
 		
@@ -106,7 +107,7 @@
 			
 			LaserCanvas.Element.activateInputProperty(input, handlers, element, system);
 		};
-
+*/
 
 
 
@@ -118,11 +119,13 @@
 	 * @param {string} prop Name and configuration of property to manipulate.
 	 * @param {Element|System} source Data source, element or system, with property.
 	 * @param {function} variablesGetter Callback to retrieve current variable values.
+	 * @param {function} onChange Change event handler callback.
 	 */
-	var PropertyInput = function (prop, source, variablesGetter) {
+	var PropertyInput = function (prop, source, variablesGetter, onChange) {
 		this.prop = prop;
 		this.source = source;
 		this.variablesGetter = variablesGetter;
+		this.onChange = onChange;
 		this.isFocused = false;
 		this.lastValue = "";
 		this.el = this.init(prop);
@@ -237,7 +240,7 @@ console.warn(`PropertyInput.get ${this.prop.propertyName} doesn't support equati
 	/** Handle a change or keyup event. */
 	PropertyInput.prototype.onInputChange = function () {
 		var value = this.input.value;
-console.log(`Keyup ${this.prop.propertyName} = ${value}`);
+		this.fireChangeEvent(value);
 	};
 
 	/** The decrement button is clicked. */
@@ -250,9 +253,9 @@ console.log(`onButtonClick ${this.prop.propertyName}`);
 console.log(`Increment by ${step}`);
 	};
 
-	/** Fire the change event. */
-	PropertyInput.prototype.fireChangeEvent = function () {
-
+	/** Notify the parent controller that the value has changed. */
+	PropertyInput.prototype.fireChangeEvent = function (value) {
+		this.onChange(value);
 	};
 
 	// /**

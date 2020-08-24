@@ -103,11 +103,14 @@ LaserCanvas.System = function () {
 		 * @param {boolean} arg Additional argument, e.g. for outgoing angle whether first optic.
 		 */
 		set = function (propertyName, newValue) {
-console.log(`set ${propertyName}=${newValue}`)
-			if (propertyName !== "wavelength" && propertyName !== "initialWaist") {
-				console.error(`set should not be called with propertyName=${propertyName}`);
+			switch (propertyName) {
+				case "wavelength":
+				case "initialWaist":
+					mprop[propertyName].set(newValue);
+					break;
+				default:
+					console.error(`set should not be called with propertyName=${propertyName}`);
 			}
-			mprop[propertyName].set(newValue);
 			fireEventListeners('update');
 		},
 

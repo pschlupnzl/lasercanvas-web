@@ -7,11 +7,13 @@
 	 * @param {string|object} prop Property name (for read-only) or object of property to manipulate.
 	 * @param {System|Element} source Data source.
 	 * @param {function} variablesGetter Callback to retrieve current variable values.
+	 * @param {function=} onChange Change event handler callback.
 	 */
-	var InputPropertyRow = function (prop, source, variablesGetter) {
+	var InputPropertyRow = function (prop, source, variablesGetter, onChange) {
 		this.prop = prop;
 		this.source = source;
 		this.variablesGetter = variablesGetter;
+		this.onChange = onChange;
 		this.propertyName = typeof prop === "string" ? prop : prop.propertyName;
 		this.type = this.getType();
 		this.el = this.init();
@@ -109,13 +111,17 @@
 	 */
 	InputPropertyRow.prototype.initControl = function () {
 		if (this.type === InputPropertyRow.eType.action) {
-			return new LaserCanvas.PropertyInput(this.prop, this.source, this.variablesGetter)
-				.appendTo(this.el.querySelector('[data-cell="action"]'));
+			return new LaserCanvas.PropertyInput(
+					this.prop,
+					this.source,
+					this.variablesGetter,
+					this.onInputChange.bind(this)
+				).appendTo(this.el.querySelector('[data-cell="action"]'));
 		} else {
 			this.update();
 			return null;
 		}
-	}
+	};
 
 	/**
 	 * Attaches this component's DOM element to the given parent.
@@ -144,6 +150,11 @@
 				this.el.querySelector('[data-cell="tan"]').innerText = Utilities.numberFormat(value[1]);
 				break;
 		}
+	};
+
+	/** Respond to a change in the input's value. */
+	InputPropertyRow.prototype.onInputChange = function (value) {
+		this.onChange && this.onChange(this.prop.propertyName, value);
 	};
 
 	LaserCanvas.InputPropertyRow = InputPropertyRow;

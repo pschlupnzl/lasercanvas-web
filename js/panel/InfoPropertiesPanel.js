@@ -32,10 +32,11 @@
 	InfoPropertiesPanel.prototype.initControls = function () {
 		var source = this.source,
 			variablesGetter = this.variablesGetter,
-			tbody = this.el.querySelector("tbody");
+			tbody = this.el.querySelector("tbody"),
+			onPropertyChange = this.onPropertyChange.bind(this);
 		return this.source.userProperties()
 			.map(function (prop) {
-				return new LaserCanvas.InputPropertyRow(prop, source, variablesGetter)
+				return new LaserCanvas.InputPropertyRow(prop, source, variablesGetter, onPropertyChange)
 					.appendTo(tbody);
 			});
 	};
@@ -62,6 +63,16 @@
 	InfoPropertiesPanel.prototype.remove = function () {
 		if (this.el.parentElement) {
 			this.el.parentElement.removeChild(this.el);
+		}
+	};
+
+	/** Handle a notified change in an input property. */
+	InfoPropertiesPanel.prototype.onPropertyChange = function (propertyName, value) {
+		if (typeof this.source.set === "function") {
+			this.source.set(propertyName, value);
+		} else {
+console.warn(`InfoPropertiesPanel.onPropertyChange ${propertyName}=${value} using legacy property() call`);
+			this.source.property(propertyName, value);
 		}
 	};
 
