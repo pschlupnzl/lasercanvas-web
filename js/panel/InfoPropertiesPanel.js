@@ -53,6 +53,29 @@
 		}
 	};
 
+	/** Add an event handler to the component DOM element. */
+	InfoPropertiesPanel.prototype.addEventListener = function (eventName, handler) {
+		var source = this.source;
+		this.el.addEventListener(eventName, function (e) {
+			handler(e, source);
+		});
+		return this;
+	};
+
+	/** 
+	 * Toggle the highlight state, i.e. whether the equivalent element is
+	 * hovered on the canvas.
+	 * @param {boolean} isHighlight Value indicating whether the highlight should be applied.
+	 */
+	InfoPropertiesPanel.prototype.setHighlight = function (isHighlight) {
+		var panelHighlightClass = "panel-highlight";
+		if (isHighlight) {
+			this.el.classList.add(panelHighlightClass);
+		} else {
+			this.el.classList.remove(panelHighlightClass);
+		}
+	};
+
 	// --------------
 	//  Custom rows.
 	// --------------

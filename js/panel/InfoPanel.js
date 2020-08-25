@@ -452,11 +452,21 @@ window.LaserCanvas.InfoPanel.prototype = {
 		this.systemPropertiesPanel.addAbcdPropertyRow("abcdTan", "tan");
 		
 		// Element panels.
+		var render = this.render;
+		var onElementEnter = function (e, source) {
+			render.highlightElement(source);
+		};
+		var onElementLeave = function (e, source) {
+			render.highlightElement(null);
+		};
+		
 		while (this.elementPropertiesPanels.length > 0) {
 			this.elementPropertiesPanels.pop().remove();
 		}
 		this.elementPropertiesPanels = this.system.elements().map(function (element) {
 			var panel = new LaserCanvas.InfoPropertiesPanel(element.name, element, variablesGetter)
+				.addEventListener("mouseenter", onElementEnter)
+				.addEventListener("mouseleave", onElementLeave)
 				.appendTo(panelElements);
 			panel.addAbcdQPropertyRow("modeSize", "w");
 			panel.addAbcdQPropertyRow("distanceToWaist", "z0");
@@ -490,24 +500,35 @@ window.LaserCanvas.InfoPanel.prototype = {
 	 * @param {Element} element Element to highlight.
 	 */
 	highlightElement: function (element) {
-		var elem, // {HTMLElement} Element gaining or losing highlight.
-			elements = this.system.elements(),
-			elementIndex = window.LaserCanvas.Utilities.firstIndex(
-				elements,
-				function () {
-					return this === element;
-				});
-		if (elementIndex >= 0) {
-			elem = this.info.querySelector('[data-element-index="' + elementIndex + '"] h1');
-			if (elem) {
-				elem.setAttribute('data-highlight-element', 'true');
-			}
-		} else {
-			elem = this.info.querySelector('[data-highlight-element]');
-			if (elem) {
-				elem.removeAttribute('data-highlight-element');
-			}
-		}
+		var elements = this.system.elements();
+		this.elementPropertiesPanels.forEach(function (panel, index) {
+			panel.setHighlight(element === elements[index]);
+		});
+//		return;
+// 		var elementPropertiesPanels = this.elementPropertiesPanels;
+// 		this.system.elements.forEach(function (el, index) {
+
+// 		})
+// 		var elem, // {HTMLElement} Element gaining or losing highlight.
+// 			elements = this.system.elements(),
+// 			elementIndex = window.LaserCanvas.Utilities.firstIndex(
+// 				elements,
+// 				function () {
+// 					return this === element;
+// 				});
+// console.log(this.elementPropertiesPanels[elementIndex]);
+// 		this.elementPropertiesPanels[elementIndex].highlight();
+// 		if (elementIndex >= 0) {
+// 			elem = this.info.querySelector('[data-element-index="' + elementIndex + '"] h1');
+// 			if (elem) {
+// 				elem.setAttribute('data-highlight-element', 'true');
+// 			}
+// 		} else {
+// 			elem = this.info.querySelector('[data-highlight-element]');
+// 			if (elem) {
+// 				elem.removeAttribute('data-highlight-element');
+// 			}
+// 		}
 	}
 };
 
