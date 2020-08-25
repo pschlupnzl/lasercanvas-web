@@ -270,19 +270,19 @@ window.LaserCanvas.constant = {
 * Standard units.
 */
 window.LaserCanvas.unit = {
-	angleOfIncidence: '&deg;',
+	angleOfIncidence: '°',
 	curvatureFace1: 'mm',
 	curvatureFace2: 'mm',
 	distanceToNext: 'mm',
 	distanceToWaist: 'mm',
-	faceAngle: '&deg;',
+	faceAngle: '°',
 	focalLength: 'mm',
-	groupDelayDispersion: 'fs&#178;', // Actually fs^2/rad.
-	groupVelocityDispersion: '&micro;m&#8315;&#178;',
-	indexDispersion: '&micro;m&#8315;&#185;',
-	indexSecondDerivative: '&micro;m&#8315;&#178;',
-	initialWaist: '&micro;m',
-	modeSize: '&micro;m',
+	groupDelayDispersion: 'fs²', // Actually fs^2/rad.
+	groupVelocityDispersion: 'µm⁻²',
+	indexDispersion: 'µm⁻¹',
+	indexSecondDerivative: 'µm⁻²',
+	initialWaist: 'µm',
+	modeSize: 'µm',
 	modeSpacing: 'MHz',
 	opticalLength: 'mm',
 	physicalLength: 'mm',
@@ -291,7 +291,7 @@ window.LaserCanvas.unit = {
 	raleighLength: 'mm',
 	thermalLens: 'mm',
 	thickness: 'mm',
-	waistSize: '&micro;m',
+	waistSize: 'µm',
 	wavefrontROC: 'mm',
 	wavelength: 'nm'
 };
