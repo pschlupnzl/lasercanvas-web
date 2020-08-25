@@ -92,11 +92,11 @@
 			document.querySelector("[data-action='openFile'] > input"),
 			msystem, mrender);
 		document.querySelector('button[data-action="download-svg"]').onclick = function () {
-			LaserCanvas.getScript('RenderSvg.js', function () {
+			// LaserCanvas.getScript('js/RenderSvg.js', function () {
 				window.globalRenderSvg = new window.LaserCanvas.RenderSvg(msystem)
 					.update()
 					.download();
-			}, this);
+			// }, this);
 		};
 
 		// On every change, store to local storage.
