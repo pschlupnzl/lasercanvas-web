@@ -112,11 +112,11 @@
 	InputPropertyRow.prototype.initControl = function () {
 		if (this.type === InputPropertyRow.eType.action) {
 			return new LaserCanvas.PropertyInput(
-					this.prop,
-					this.source,
-					this.variablesGetter,
-					this.onInputChange.bind(this)
-				).appendTo(this.el.querySelector('[data-cell="action"]'));
+				this.prop,
+				this.source,
+				this.variablesGetter,
+				this.onInputChange.bind(this)
+			).appendTo(this.el.querySelector('[data-cell="action"]'));
 		} else {
 			this.update();
 			return null;
@@ -166,9 +166,13 @@
 	 * Initialize a new ABCD matrix row. The data is updated manually by
 	 * the caller as it has no data source at initialization.
 	 * @param {string} propertyName Name or key of property displayed by this control.
+	 * @param {modePlane|string} plane Optional plane for auto-setting rows.
+	 * @param {Element} source Optional data source for auto-setting rows. 
 	 */
-	var AbcdPropertyRow = function (propertyName) {
+	var AbcdPropertyRow = function (propertyName, plane, source) {
 		this.propertyName = propertyName;
+		this.plane = plane;
+		this.source = source;
 		this.el = this.init();
 	};
 
@@ -188,11 +192,22 @@
 		return this;
 	};
 
-	/**
-	 * Updates the value displayed in this matrix row.
-	 * @param {Matrix2x2} mx Matrix values to set.
-	 */
-	AbcdPropertyRow.prototype.updateWith = function (mx) {
+	/** Return the desired matrix. */
+	AbcdPropertyRow.prototype.get = function () {
+		// Element ABCD, e.g. Mirror.
+		if (typeof this.source.elementAbcd === "function") {
+			return this.source.elementAbcd(1, this.plane);
+		}
+
+		// Roundtrip ABCD, e.g. System.
+		if (typeof this.source.abcd === "function") {
+			return this.source.abcd()[this.plane].mx;
+		}
+	};
+
+	/** Update the readout based on a configured data source abcd() method. */
+	AbcdPropertyRow.prototype.update = function () {
+		var mx = this.get();
 		for (var r = 0; r < 2; r += 1) {
 			for (var c = 0; c < 2; c += 1) {
 				this.el.querySelector(`[data-cell="mx-${r + 1}-${c + 1}"]`).innerText

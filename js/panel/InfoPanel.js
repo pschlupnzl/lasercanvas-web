@@ -444,12 +444,12 @@ window.LaserCanvas.InfoPanel.prototype = {
 
 		// System panel.
 		if (this.systemPropertiesPanel) {
-			this.systemPanel.remove();
+			this.systemPropertiesPanel.remove();
 		}
 		this.systemPropertiesPanel = new LaserCanvas.InfoPropertiesPanel(this.system.get("name"), this.system, variablesGetter)
 			.appendTo(panelSystem);
-		this.systemPropertiesPanel.addAbcdRow("abcdSag");
-		this.systemPropertiesPanel.addAbcdRow("abcdTan");
+		this.systemPropertiesPanel.addAbcdPropertyRow("abcdSag", "sag");
+		this.systemPropertiesPanel.addAbcdPropertyRow("abcdTan", "tan");
 		
 		// Element panels.
 		while (this.elementPropertiesPanels.length > 0) {
@@ -463,6 +463,8 @@ window.LaserCanvas.InfoPanel.prototype = {
 			panel.addAbcdQPropertyRow("wavefrontROC", "r");
 			panel.addAbcdQPropertyRow("waistSize", "w0");
 			panel.addAbcdQPropertyRow("rayleighLength", "zR");
+			panel.addAbcdPropertyRow("abcdSag", LaserCanvas.Enum.modePlane.sagittal);
+			panel.addAbcdPropertyRow("abcdTan", LaserCanvas.Enum.modePlane.tangential);
 			return panel;
 		});
 		return this;

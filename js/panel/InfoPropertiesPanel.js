@@ -13,7 +13,6 @@
 		this.variablesGetter = variablesGetter;
 		this.el = this.init(label);
 		this.rows = this.initRows();
-		this.customRows = {};
 	};
 
 	/**
@@ -52,14 +51,6 @@
 		for (var row of this.rows) {
 			row.update();
 		}
-		this.customRows.abcdSag && this.customRows.abcdSag.updateWith(this.source.abcd().sag.mx);
-		this.customRows.abcdTan && this.customRows.abcdTan.updateWith(this.source.abcd().tan.mx);
-
-		for (var propertyName in this.customRows) {
-			if (typeof this.customRows[propertyName].update === "function") {
-				this.customRows[propertyName].update();
-			}
-		}
 	};
 
 	// --------------
@@ -69,21 +60,17 @@
 	/**
 	 * Attach a custom row, perhaps read-only ABCD value.
 	 * @param {string} propertyName Name by which to key the new control.
+	 * @param {modePlane|string} plane Mode plane or key for auto-updating sources.
 	 */
-	InfoPropertiesPanel.prototype.addAbcdRow = function (propertyName) {
-		this.customRows[propertyName] = new LaserCanvas.AbcdPropertyRow(propertyName)
-			.appendTo(this.el.querySelector("tbody"));
-	};
-
-	/** Update the named custom row to the given value. */
-	InfoPropertiesPanel.prototype.updateCustomRow = function (propertyName, value) {
-		this.customRows[propertyName].update(value);
+	InfoPropertiesPanel.prototype.addAbcdPropertyRow = function (propertyName, plane) {
+		this.rows.push(new LaserCanvas.AbcdPropertyRow(propertyName, plane, this.source)
+			.appendTo(this.el.querySelector("tbody")));
 	};
 
 	/** Add a sag/tan custom row, perhaps mode size. */
 	InfoPropertiesPanel.prototype.addAbcdQPropertyRow = function (propertyName, fieldName) {
-		this.customRows[propertyName] = new LaserCanvas.AbcdQPropertyRow(propertyName, fieldName, this.source)
-			.appendTo(this.el.querySelector("tbody"));
+		this.rows.push(new LaserCanvas.AbcdQPropertyRow(propertyName, fieldName, this.source)
+			.appendTo(this.el.querySelector("tbody")));
 	};
 
 	// -------------------
