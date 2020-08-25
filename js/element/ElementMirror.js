@@ -159,7 +159,7 @@ LaserCanvas.Element.Mirror.prototype = {
 			case "distanceToNext":
 				return this.prop[propertyName].expression();
 			default:
-				return this.property(propertyName).toString();
+				return this.property(propertyName);
 		}
 	},
 

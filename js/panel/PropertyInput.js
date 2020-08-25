@@ -183,7 +183,6 @@
 	PropertyInput.prototype.get = function () {
 		// TODO: Remove this once all properties support `get`.
 		if (typeof this.source.get !== "function") {
-console.warn(`PropertyInput.get ${this.prop.propertyName} doesn't support equation`);
 			return this.source.property(this.prop.propertyName);
 		}
 
@@ -200,7 +199,8 @@ console.warn(`PropertyInput.get ${this.prop.propertyName} doesn't support equati
 	 * Update the displayed value of the input field.
 	 */
 	PropertyInput.prototype.update = function () {
-		var displayValue = this.get();
+		var value = this.get(),
+			displayValue = typeof value === "number" ? LaserCanvas.Utilities.numberFormat(value) : value;
 		if (this.input.value !== displayValue) {
 			this.input.value = displayValue;
 		}

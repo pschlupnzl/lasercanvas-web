@@ -71,6 +71,9 @@
 		if (typeof value === "number" && !isNaN(value)) {
 			this._number = value;
 			this._expression = null;
+		} else if (typeof value === "string" && !isNaN(+value)) {
+			this._number = +value;
+			this._expression = null;
 		} else if (typeof value === "string" && validate(value)) {
 			this._number = null;
 			this._expression = value;
@@ -110,7 +113,7 @@
 
 	/** Returns the string expression. */
 	Equation.prototype.expression = function () {
-		return this._expression || this._number.toString();
+		return this._expression || this._number;
 	}
 	
 	LaserCanvas.Equation = Equation;
