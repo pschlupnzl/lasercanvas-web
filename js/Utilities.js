@@ -223,7 +223,7 @@ window.LaserCanvas.Utilities = {
 		} else if (typeof val !== 'number') {
 			str = val;
 		} else if (Math.abs(val) === Infinity) {
-			str = (val < 0 ? '&minus;' : '') + '&infin;';
+			str = (val < 0 ? '−' : '') + '∞';
 		} else if (Math.abs(val) > 1e4) {
 			str = val.toPrecision(2);
 		} else if (Math.abs(val) >= 100) {
