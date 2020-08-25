@@ -127,6 +127,9 @@ LaserCanvas.Element.Mirror.prototype = {
 			case "distanceToNext":
 				this.prop[propertyName].set(newValue);
 				break;
+			default:
+				this.property(propertyName, newValue, arg);
+				break;
 		}
 	},
 
@@ -136,17 +139,28 @@ LaserCanvas.Element.Mirror.prototype = {
 	 * @param {object} variables Variable values, keyed by variable names.
 	 */
 	get: function (propertyName, variables) {
-		// TODO: Remove this once user properties are equations.
-		if (propertyName !== "distanceToNext") {
-			return this.property(propertyName);
-		}
-
-		var value = this.prop[propertyName].value(variables);
+		var value =
+			typeof this.prop[propertyName].value === "function"
+				// Property as Equation.
+				? this.prop[propertyName].value(variables)
+				// Legacy property as value.
+				: this.property(propertyName);
 		switch (propertyName) {
 			case "distanceToNext":
 				return Math.max(0, value);
+			default:
+				return value;
 		}
-		return value;
+	},
+
+	/** Returns a property's source equation. */
+	expression: function (propertyName) {
+		switch (propertyName) {
+			case "distanceToNext":
+				return this.prop[propertyName].expression();
+			default:
+				return this.property(propertyName).toString();
+		}
 	},
 
 	/**

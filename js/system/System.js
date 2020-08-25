@@ -131,11 +131,16 @@ LaserCanvas.System = function () {
 			return property(propertyName);
 		},
 
+		/** Returns a property's source equation. */
 		expression = function (propertyName) {
-			if (propertyName !== "wavelength" && propertyName !== "initialWaist") {
-				console.error(`expression should not be called with propertyName=${propertyName}`);
+			switch (propertyName) {
+				case "wavelength":
+				case "initialWaist":
+					return mprop[propertyName].expression();
+				default:
+					console.error(`expression should not be called with propertyName=${propertyName}`);
+					return "";
 			}
-			return mprop[propertyName].expression();
 		},
 
 		/**

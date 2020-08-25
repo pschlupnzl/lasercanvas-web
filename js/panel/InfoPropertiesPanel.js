@@ -11,6 +11,7 @@
 	var InfoPropertiesPanel = function (label, source, variablesGetter) {
 		this.source = source;
 		this.variablesGetter = variablesGetter;
+		this.eventListeners = { change: [] };
 		this.el = this.init(label);
 		this.rows = this.initRows();
 	};
@@ -53,13 +54,27 @@
 		}
 	};
 
-	/** Add an event handler to the component DOM element. */
+	/**
+	 * Add an event handler to the component DOM element, e.g. mouseenter,
+	 * mouseleave, or custom events e.g. "change".
+	 */
 	InfoPropertiesPanel.prototype.addEventListener = function (eventName, handler) {
 		var source = this.source;
-		this.el.addEventListener(eventName, function (e) {
-			handler(e, source);
-		});
+		if (this.eventListeners.hasOwnProperty(eventName)) {
+			this.eventListeners[eventName].push(handler);
+		} else {
+			this.el.addEventListener(eventName, function (e) {
+				handler(e, source);
+			});
+		}
 		return this;
+	};
+
+	/** Fire attached event listeners, e.g. "change" event. */
+	InfoPropertiesPanel.prototype.fireEvent = function (eventName) {
+		this.eventListeners[eventName].forEach(function (handler) {
+			handler();
+		});
 	};
 
 	/** 
@@ -128,6 +143,7 @@
 console.warn(`InfoPropertiesPanel.onPropertyChange ${propertyName}=${value} using legacy property() call`);
 			this.source.property(propertyName, value);
 		}
+		this.fireEvent("change");
 	};
 
 	LaserCanvas.InfoPropertiesPanel = InfoPropertiesPanel;

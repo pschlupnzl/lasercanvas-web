@@ -138,13 +138,12 @@
 	 * @param {string} prop Name and configuration of property to manipulate.
 	 */
 	PropertyInput.prototype.init = function (prop) {
-// TODO: prop for inc/dec buttons
 		var self = this,
 			el = document.createElement("div"),
 			/** Attach listeners to the input field. */
 			attachInputHandlers = function (input) {
 				input.onkeydown = self.onInputKeydown.bind(self);
-				input.onkeyup = 
+				input.onkeyup = self.onInputKeyup.bind(self);
 				input.onchange = self.onInputChange.bind(self);
 				input.onfocus = self.onInputFocus.bind(self);
 				input.onblur = self.onInputBlur.bind(self);
@@ -152,11 +151,11 @@
 
 		el.className = "propertyInput";
 		el.innerHTML = [
-			'<button data-step="-1">&minus;</button>',
+			'<button data-step="-1" disabled>&minus;</button>',
 			'<span>',
 			'<input type="text" />',
 			'</span>',
-			'<button data-step="+1">+</button>'
+			'<button data-step="+1" disabled>+</button>'
 		].join("");
 		LaserCanvas.Utilities.foreach(el.querySelectorAll("button"), function () {
 			this.onclick = self.onButtonClick.bind(self);
@@ -187,6 +186,7 @@
 console.warn(`PropertyInput.get ${this.prop.propertyName} doesn't support equation`);
 			return this.source.property(this.prop.propertyName);
 		}
+
 		if (this.isFocused) {
 			return this.source.expression(this.prop.propertyName);
 		} else {
@@ -213,14 +213,14 @@ console.warn(`PropertyInput.get ${this.prop.propertyName} doesn't support equati
 	/** A focused input field shows the expression. */
 	PropertyInput.prototype.onInputFocus = function () {
 		this.isFocused = true;
-		this.update();
+		this.update(); // Update now with expression.
 		this.lastValue = this.input.value;
 	};
 
 	/** A blurred input field shows the expression. */
 	PropertyInput.prototype.onInputBlur = function () {
 		this.isFocused = false;
-		this.update();
+		this.update(); // Update now with value.
 	};
 
 	/** Blur the field on enter or escape. */
@@ -235,12 +235,16 @@ console.warn(`PropertyInput.get ${this.prop.propertyName} doesn't support equati
 				this.input.blur();
 				break;
 		}
-	}
+	};
 
-	/** Handle a change or keyup event. */
+	/** Handle a keyup event. */
+	PropertyInput.prototype.onInputKeyup = function () {
+		this.fireChangeEvent(this.input.value);
+	};
+
+	/** Handle a change event. */
 	PropertyInput.prototype.onInputChange = function () {
-		var value = this.input.value;
-		this.fireChangeEvent(value);
+		this.fireChangeEvent(this.input.value);
 	};
 
 	/** The decrement button is clicked. */

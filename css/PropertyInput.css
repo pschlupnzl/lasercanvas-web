@@ -21,6 +21,12 @@
 			text-shadow: 0.1em 0.1em 0.2em rgba(0, 0, 0, 0.3);
 		}
 
+			.propertyInput button[disabled],
+			.propertyInput button[disabled]:hover {
+				background: #ccc;
+				text-shadow: none;
+			}
+
 		.propertyInput button[data-step="-1"] {
 			border-top-right-radius: 0;
 			border-bottom-right-radius: 0;

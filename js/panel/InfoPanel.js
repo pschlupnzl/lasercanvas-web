@@ -32,7 +32,18 @@
 	InfoPanel.prototype.change = function () {
 		var variablesGetter = this.variablesGetter,
 			panelSystem = this.info.querySelector(".systems"),
-			panelElements = this.info.querySelector(".elements")
+			panelElements = this.info.querySelector(".elements"),
+			system = this.system,
+			render = this.render,
+			onElementEnter = function (e, source) {
+				render.highlightElement(source);
+			},
+			onElementLeave = function (e, source) {
+				render.highlightElement(null);
+			},
+			onChange = function () {
+				system.update(true);
+			};
 
 		// System panel.
 		if (this.systemPropertiesPanel) {
@@ -44,14 +55,6 @@
 		this.systemPropertiesPanel.addAbcdPropertyRow("abcdTan", "tan");
 		
 		// Element panels.
-		var render = this.render;
-		var onElementEnter = function (e, source) {
-			render.highlightElement(source);
-		};
-		var onElementLeave = function (e, source) {
-			render.highlightElement(null);
-		};
-
 		while (this.elementPropertiesPanels.length > 0) {
 			this.elementPropertiesPanels.pop().remove();
 		}
@@ -59,6 +62,7 @@
 			var panel = new LaserCanvas.InfoPropertiesPanel(element.name, element, variablesGetter)
 				.addEventListener("mouseenter", onElementEnter)
 				.addEventListener("mouseleave", onElementLeave)
+				.addEventListener("change", onChange)
 				.appendTo(panelElements);
 			panel.addAbcdQPropertyRow("modeSize", "w");
 			panel.addAbcdQPropertyRow("distanceToWaist", "z0");
