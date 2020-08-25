@@ -14,6 +14,8 @@
 	left: -350px;
 	width: 340px;
 	padding: 0 5px;
+	overflow: auto;
+	background: white;
 }
 
 .laserCanvasInfo {
@@ -61,73 +63,6 @@ button[data-action="toggleInfo"] {
 			content: "\2039";
 		}
 
-.laserCanvasInfo {
-	overflow: auto;
-	background: white;
-}
-
-	.laserCanvasInfo .template {
-		display: none;
-	}
-
-	.laserCanvasInfo .system h1,
-	.laserCanvasInfo .element h1 {
-		margin: 0;
-		padding: 0.2em 0;
-		text-align: center;
-		font-size: 1em;
-	}
-
-	.laserCanvasInfo .element h1 {
-		cursor: default;
-		transition: background-color 150ms;
-	}
-
-	.laserCanvasInfo .element h1[data-highlight-element="true"],
-	.laserCanvasInfo .element h1:hover {
-			background-color: rgba(217, 218, 57, 0.5);
-	}
-	
-	.laserCanvasInfo .system table,
-	.laserCanvasInfo .element table	{
-		width: 100%;
-		border-collapse: collapse;
-	}
-
-		.laserCanvasInfo .system table thead,
-		.laserCanvasInfo .element table thead,
-		.laserCanvasInfo .render table thead,
-		.laserCanvasInfo .render h1 {
-			display: none;
-		}
-
-		.laserCanvasInfo .system table td,
-		.laserCanvasInfo .element table td {
-			padding: 0.2em;
-			border-top: 1px solid;
-			border-bottom: 1px solid;
-			border-color: #aaa;
-		}
-	
-		.laserCanvasInfo .element[data-unused="true"] {
-			display: none;
-		}
-	
-	.laserCanvasInfo [data-cell="action"],
-	.laserCanvasInfo [data-cell="value"],
-	.laserCanvasInfo [data-cell="sag"],
-	.laserCanvasInfo [data-cell="tan"],
-	.laserCanvasInfo [data-cell="mx-col-1"],
-	.laserCanvasInfo [data-cell="mx-col-2"] {
-		text-align: right;
-	}
-	
-	.laserCanvasInfo[data-show-abcd="false"] .propertyDerived,
-	.laserCanvasInfo[data-show-element="false"] .propertyElement,
-	.laserCanvasInfo[data-show-advanced="false"] .advanced {
-		display: none;
-	}
-	
 	.laserCanvasInfo ul {
 		list-style-type: none;
 		padding: 0;

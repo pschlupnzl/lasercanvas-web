@@ -201,6 +201,10 @@ window.LaserCanvas.Utilities = {
 	*/
 	prettify: function (propertyName) {
 		"use strict";
+		var localized = window.LaserCanvas.localize(propertyName);
+		if (localized !== propertyName) {
+			return localized;
+		}
 		return propertyName[0].toUpperCase() + propertyName.slice(1).replace(/([a-z])([A-Z0-9])/g, '$1 $2');
 	},
 	

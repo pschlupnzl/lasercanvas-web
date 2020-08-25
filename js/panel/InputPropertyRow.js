@@ -101,6 +101,7 @@
 	InputPropertyRow.prototype.init = function () {
 		var tr = document.createElement("tr");
 		tr.innerHTML = InputPropertyRow.template[this.type];
+		tr.setAttribute("data-property-name", this.propertyName);
 		tr.querySelector('[data-cell="label"]').innerText = LaserCanvas.Utilities.prettify(this.propertyName);
 		tr.querySelector('[data-cell="unit"]').innerText = window.LaserCanvas.unit[this.propertyName] || "";
 		return tr;
@@ -182,6 +183,7 @@
 	AbcdPropertyRow.prototype.init = function () {
 		var tr = document.createElement("tr");
 		tr.innerHTML = InputPropertyRow.template.mx;
+		tr.setAttribute("data-property-name", this.propertyName);
 		tr.querySelector('[data-cell="label"]').innerText = LaserCanvas.Utilities.prettify(this.propertyName);
 		return tr;
 	};
@@ -237,6 +239,7 @@
 	AbcdQPropertyRow.prototype.init = function () {
 		var tr = document.createElement("tr");
 		tr.innerHTML = InputPropertyRow.template.sagTan;
+		tr.setAttribute("data-property-name", this.propertyName);
 		tr.querySelector('[data-cell="label"]').innerText = LaserCanvas.Utilities.prettify(this.propertyName);
 		tr.querySelector('[data-cell="unit"]').innerText = window.LaserCanvas.unit[this.propertyName] || "";
 		return tr;

@@ -1,24 +1,40 @@
-.infoPropertiesPanel {
-	box-shadow: 0 0 1em green inset;
-}
-
 .infoPropertiesPanel h1 {
+	margin: 0.5em 0 0 0;
+	padding: 0.2em 0;
+	text-align: center;
+	font-size: 1em;
 	cursor: default;
 	transition: background-color 150ms;
 }
 
-.infoPropertiesPanel.panel-highlight h1 {
-		background-color: rgba(217, 218, 57, 0.5);
-}
-
-.infoPropertiesPanel h1 {
-	margin: 0;
-	padding: 0.2em 0;
-	text-align: center;
-	font-size: 1em;
-}
+	.infoPropertiesPanel.panel-highlight h1 {
+			background-color: rgba(217, 218, 57, 0.5);
+	}
 
 .infoPropertiesPanel table {
 	width: 100%;
+	border-collapse: collapse;
 }
 
+	.infoPropertiesPanel table td {
+		padding: 0.2em;
+		border-top: 1px solid;
+		border-bottom: 1px solid;
+		border-color: #aaa;
+	}
+
+[data-show-advanced="false"] .infoPropertiesPanel [data-property-name="physicalLength"],
+[data-show-advanced="false"] .infoPropertiesPanel [data-property-name="opticalLength"],
+[data-show-advanced="false"] .infoPropertiesPanel [data-property-name="modeSpacing"],
+[data-show-advanced="false"] .infoPropertiesPanel [data-property-name="groupDelayDispersion"],
+[data-show-advanced="false"] .infoPropertiesPanel .systems [data-property-name="groupVelocityDispersion"],
+[data-show-advanced="false"] .infoPropertiesPanel [data-property-name="abcdSag"],
+[data-show-advanced="false"] .infoPropertiesPanel [data-property-name="abcdTan"],
+[data-show-advanced="false"] .infoPropertiesPanel [data-property-name="distanceToNext"],
+[data-show-advanced="false"] .infoPropertiesPanel [data-property-name="radiusOfCurvature"],
+[data-show-advanced="false"] .infoPropertiesPanel [data-property-name="focalLength"],
+[data-show-advanced="false"] .infoPropertiesPanel [data-property-name="wavefrontROC"],
+[data-show-advanced="false"] .infoPropertiesPanel [data-property-name="waistSize"],
+[data-show-advanced="false"] .infoPropertiesPanel [data-property-name="rayleighLength"] {
+	display: none;
+}
