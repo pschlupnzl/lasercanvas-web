@@ -192,7 +192,7 @@
 	 * Updates the value displayed in this matrix row.
 	 * @param {Matrix2x2} mx Matrix values to set.
 	 */
-	AbcdPropertyRow.prototype.update = function (mx) {
+	AbcdPropertyRow.prototype.updateWith = function (mx) {
 		for (var r = 0; r < 2; r += 1) {
 			for (var c = 0; c < 2; c += 1) {
 				this.el.querySelector(`[data-cell="mx-${r + 1}-${c + 1}"]`).innerText
@@ -201,6 +201,52 @@
 		}
 	};
 
+	// ------------------------------------------
+	//  Sagittal / tangential value readout row.
+	// ------------------------------------------
+
+	/**
+	 * Initialize a new sag/tan property readout.
+	 * @param {string} propertyName Name of property.
+	 * @param {string} fieldName Name of field within abcdQ property.
+	 * @param {Element} source Data source, used to retrieve current values in update().
+	 */
+	var AbcdQPropertyRow = function (propertyName, fieldName, source) {
+		this.propertyName = propertyName;
+		this.fieldName = fieldName;
+		this.source = source;
+		this.el = this.init();
+	};
+
+	/** Initialize the DOM, returning the container. */
+	AbcdQPropertyRow.prototype.init = function () {
+		var tr = document.createElement("tr");
+		tr.innerHTML = InputPropertyRow.template.sagTan;
+		tr.querySelector('[data-cell="label"]').innerText = LaserCanvas.Utilities.prettify(this.propertyName);
+		tr.querySelector('[data-cell="unit"]').innerText = window.LaserCanvas.unit[this.propertyName] || "";
+		return tr;
+	};
+
+	/** Attaches tihs component's DOM element to the given parent. */
+	AbcdQPropertyRow.prototype.appendTo = function (parent) {
+		parent.appendChild(this.el);
+		return this;
+	};
+
+	/** Return the current value. */
+	AbcdQPropertyRow.prototype.get = function () {
+		var abcdQ = this.source.abcdQ;
+		return [abcdQ[0][this.fieldName], abcdQ[1][this.fieldName]];
+	};
+
+	/** Update the value. */
+	AbcdQPropertyRow.prototype.update = function () {
+		var value = this.get();
+		this.el.querySelector('[data-cell="sag"]').innerText = LaserCanvas.Utilities.numberFormat(value[0], true);
+		this.el.querySelector('[data-cell="tan"]').innerText = LaserCanvas.Utilities.numberFormat(value[1], true);
+	};
+
 	LaserCanvas.AbcdPropertyRow = AbcdPropertyRow;
 	LaserCanvas.InputPropertyRow = InputPropertyRow;
+	LaserCanvas.AbcdQPropertyRow = AbcdQPropertyRow;
 }(window.LaserCanvas));

@@ -366,6 +366,7 @@ window.LaserCanvas.InfoPanel.prototype = {
 		this.render = render;
 		this.variablesGetter = variablesGetter;
 		this.systemPropertiesPanel = null;
+		this.elementPropertiesPanels = [];
 		return this;
 	},
 
@@ -437,14 +438,33 @@ window.LaserCanvas.InfoPanel.prototype = {
 		window.LaserCanvas.InfoPanel.createPanel.call(this, this.system, this.info);
 		this.activatePanel();
 
-		if (!this.systemPropertiesPanel) {
-			// TODO: Check that the system panel can stay on system change.
-			this.systemPropertiesPanel = new LaserCanvas.InfoPropertiesPanel(this.system.get("name"), this.system, this.variablesGetter)
-				.appendTo(this.info.querySelector(".systems"));
-			this.systemPropertiesPanel.addAbcdRow("abcdSag");
-			this.systemPropertiesPanel.addAbcdRow("abcdTan");
-		}
+		var variablesGetter = this.variablesGetter,
+			panelSystem = this.info.querySelector(".systems"),
+			panelElements = this.info.querySelector(".elements")
 
+		// System panel.
+		if (this.systemPropertiesPanel) {
+			this.systemPanel.remove();
+		}
+		this.systemPropertiesPanel = new LaserCanvas.InfoPropertiesPanel(this.system.get("name"), this.system, variablesGetter)
+			.appendTo(panelSystem);
+		this.systemPropertiesPanel.addAbcdRow("abcdSag");
+		this.systemPropertiesPanel.addAbcdRow("abcdTan");
+		
+		// Element panels.
+		while (this.elementPropertiesPanels.length > 0) {
+			this.elementPropertiesPanels.pop().remove();
+		}
+		this.elementPropertiesPanels = this.system.elements().map(function (element) {
+			var panel = new LaserCanvas.InfoPropertiesPanel(element.name, element, variablesGetter)
+				.appendTo(panelElements);
+			panel.addAbcdQPropertyRow("modeSize", "w");
+			panel.addAbcdQPropertyRow("distanceToWaist", "z0");
+			panel.addAbcdQPropertyRow("wavefrontROC", "r");
+			panel.addAbcdQPropertyRow("waistSize", "w0");
+			panel.addAbcdQPropertyRow("rayleighLength", "zR");
+			return panel;
+		});
 		return this;
 	},
 	
@@ -457,6 +477,9 @@ window.LaserCanvas.InfoPanel.prototype = {
 		"use strict";
 		window.LaserCanvas.InfoPanel.updatePanel(this.system, this.info);
 		this.systemPropertiesPanel.update();
+		this.elementPropertiesPanels.forEach(function (panel) {
+			panel.update();
+		});
 		return this;
 	},
 

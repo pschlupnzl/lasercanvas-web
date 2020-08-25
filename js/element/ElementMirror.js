@@ -136,6 +136,11 @@ LaserCanvas.Element.Mirror.prototype = {
 	 * @param {object} variables Variable values, keyed by variable names.
 	 */
 	get: function (propertyName, variables) {
+		// TODO: Remove this once user properties are equations.
+		if (propertyName !== "distanceToNext") {
+			return this.property(propertyName);
+		}
+
 		var value = this.prop[propertyName].value(variables);
 		switch (propertyName) {
 			case "distanceToNext":

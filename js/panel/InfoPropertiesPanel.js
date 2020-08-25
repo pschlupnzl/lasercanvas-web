@@ -52,8 +52,14 @@
 		for (var row of this.rows) {
 			row.update();
 		}
-		this.customRows.abcdSag && this.customRows.abcdSag.update(this.source.abcd().sag.mx);
-		this.customRows.abcdTan && this.customRows.abcdTan.update(this.source.abcd().tan.mx);
+		this.customRows.abcdSag && this.customRows.abcdSag.updateWith(this.source.abcd().sag.mx);
+		this.customRows.abcdTan && this.customRows.abcdTan.updateWith(this.source.abcd().tan.mx);
+
+		for (var propertyName in this.customRows) {
+			if (typeof this.customRows[propertyName].update === "function") {
+				this.customRows[propertyName].update();
+			}
+		}
 	};
 
 	// --------------
@@ -72,6 +78,12 @@
 	/** Update the named custom row to the given value. */
 	InfoPropertiesPanel.prototype.updateCustomRow = function (propertyName, value) {
 		this.customRows[propertyName].update(value);
+	};
+
+	/** Add a sag/tan custom row, perhaps mode size. */
+	InfoPropertiesPanel.prototype.addAbcdQPropertyRow = function (propertyName, fieldName) {
+		this.customRows[propertyName] = new LaserCanvas.AbcdQPropertyRow(propertyName, fieldName, this.source)
+			.appendTo(this.el.querySelector("tbody"));
 	};
 
 	// -------------------

@@ -288,6 +288,7 @@ window.LaserCanvas.unit = {
 	physicalLength: 'mm',
 	prismInsertion: 'mm',
 	radiusOfCurvature: 'mm',
+	raleighLength: 'mm',
 	thermalLens: 'mm',
 	thickness: 'mm',
 	waistSize: '&micro;m',
