@@ -23,6 +23,14 @@
 		border-color: #aaa;
 	}
 
+	.infoPropertiesPanel td[data-cell] {
+		text-align: right;
+	}
+	.infoPropertiesPanel td[data-cell="label"],
+	.infoPropertiesPanel td[data-cell="unit"] {
+		text-align: left;
+	}
+
 [data-show-advanced="false"] .infoPropertiesPanel [data-property-name="physicalLength"],
 [data-show-advanced="false"] .infoPropertiesPanel [data-property-name="opticalLength"],
 [data-show-advanced="false"] .infoPropertiesPanel [data-property-name="modeSpacing"],
