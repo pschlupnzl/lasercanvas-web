@@ -42,7 +42,7 @@ LaserCanvas.systemAbcd = function (melements, systemProperties, variables) {
 				L = element.get("distanceToNext", variables);
 				n = element.spaceRefractiveIndex 
 					? element.spaceRefractiveIndex()            // e.g. propagation within prism pair.
-					: element.property('refractiveIndex') || 1; // Default elements.
+					: element.get("refractiveIndex") || 1; // Default elements.
 				gdd = element.groupDelayDispersion
 					? element.groupDelayDispersion(wavelength, L)
 					: 0;

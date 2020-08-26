@@ -230,7 +230,7 @@ window.LaserCanvas.Element.propertyStep = function (input, action, step, element
 		
 		input.value = numberFormat(value);
 		
-		element.property(propertyName, value);
+		element.set(propertyName, value);
 		system.update(true);
 	}
 };

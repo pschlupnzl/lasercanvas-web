@@ -349,7 +349,7 @@ LaserCanvas.systemAdjust = function (melements, calculateCartesianCoordinates, g
 				locPrev = {},           // {object} Retain previous configuration to cancel drags.
 				distPrev = null,        // {number} Retain previous distance to next to cancel drags.
 				prevPivotOutgoingAngle = mdragData.prev.pivot // {number} (rad) Initial outgoing angle after pivot.
-					? mdragData.prev.pivot.element.property('outgoingAngle')
+					? mdragData.prev.pivot.element.get("outgoingAngle")
 					: null,
 
 				// Calculate new stretch and angles.
@@ -414,7 +414,7 @@ LaserCanvas.systemAdjust = function (melements, calculateCartesianCoordinates, g
 								
 								if (dir === -1) {
 									// Standard elements, calculating backward.
-									data.pivot.element.property('outgoingAngle', q, data.pivot.index === 0);
+									data.pivot.element.set("outgoingAngle", q, data.pivot.index === 0);
 
 								} else if (!mdragData.prev.construct) {
 									// First element, calculating forwards.
@@ -423,7 +423,7 @@ LaserCanvas.systemAdjust = function (melements, calculateCartesianCoordinates, g
 										y: pt.y,
 										q: 0 // Angle set separately, below.
 									});
-									mdragData.drag.element.property('outgoingAngle', 0, true); // Set outgoing angle isFirstElement: true.
+									mdragData.drag.element.set("outgoingAngle", 0, true); // Set outgoing angle isFirstElement: true.
 									calculateCartesianCoordinates(0, mdragData.next.pivot.index);
 
 									// I can't for the life of me figure out the correct outgoing
@@ -432,11 +432,11 @@ LaserCanvas.systemAdjust = function (melements, calculateCartesianCoordinates, g
 									// then rotate the element's axis so that the pivot is back
 									// where it's supposed to be.
 									loc = mdragData.next.pivot.element.location();
-									mdragData.drag.element.property('outgoingAngle', C.atan2() - new Vector(loc.x - pt.x, loc.y - pt.y).atan2(), true);
+									mdragData.drag.element.set("outgoingAngle", C.atan2() - new Vector(loc.x - pt.x, loc.y - pt.y).atan2(), true);
 									calculateCartesianCoordinates(0, mdragData.next.pivot.index);
 									
 									// Restore next pivot angle.
-									mdragData.next.pivot.element.property('outgoingAngle', mdragData.next.pivot.loc.q); // Restore original outgoing direction.
+									mdragData.next.pivot.element.set("outgoingAngle", mdragData.next.pivot.loc.q); // Restore original outgoing direction.
 									calculateCartesianCoordinates(mdragData.drag.index);
 								}
 							}
@@ -470,17 +470,17 @@ LaserCanvas.systemAdjust = function (melements, calculateCartesianCoordinates, g
 						q = Math.asin(V.cross(W));
 						
 						// Apply angle.
-						mdragData.drag.element.property('outgoingAngle', dragLoc.q + q); // Deflect cavity to restore next pivot point.
+						mdragData.drag.element.set("outgoingAngle", dragLoc.q + q); // Deflect cavity to restore next pivot point.
 						calculateCartesianCoordinates(mdragData.prev.pivot.index, mdragData.next.pivot.index);
 						
 						// Restore next pivot angle.
-						mdragData.next.pivot.element.property('outgoingAngle', mdragData.next.pivot.loc.q); // Restore original outgoing direction.
+						mdragData.next.pivot.element.set("outgoingAngle", mdragData.next.pivot.loc.q); // Restore original outgoing direction.
 						calculateCartesianCoordinates(mdragData.drag.index);
 						return true;
 						
 					} else {
 						// Illegal placement - restore previous.
-						mdragData.prev.pivot.element.property('outgoingAngle', prevPivotOutgoingAngle);
+						mdragData.prev.pivot.element.set("outgoingAngle", prevPivotOutgoingAngle);
 						return false;
 					}
 				},
@@ -492,7 +492,7 @@ LaserCanvas.systemAdjust = function (melements, calculateCartesianCoordinates, g
 						+ mdragData.prev.stretch.loc.l
 						- mdragData.prev.stretch.element.get("distanceToNext", getVariables()); // {number} (mm) Amount moved.
 					if (a > 0) {
-						mdragData.next.stretch.element.set('distanceToNext', a);
+						mdragData.next.stretch.element.set("distanceToNext", a);
 						calculateCartesianCoordinates();
 						return true;
 					}

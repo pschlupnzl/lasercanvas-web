@@ -137,12 +137,7 @@
 
 	/** Handle a notified change in an input property. */
 	InfoPropertiesPanel.prototype.onPropertyChange = function (propertyName, value) {
-		if (typeof this.source.set === "function") {
-			this.source.set(propertyName, value);
-		} else {
-console.warn(`InfoPropertiesPanel.onPropertyChange ${propertyName}=${value} using legacy property() call`);
-			this.source.property(propertyName, value);
-		}
+		this.source.set(propertyName, value);
 		this.fireEvent("change");
 	};
 

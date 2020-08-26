@@ -108,8 +108,6 @@ LaserCanvas.System = function () {
 				case "initialWaist":
 					mprop[propertyName].set(newValue);
 					break;
-				default:
-					console.error(`set should not be called with propertyName=${propertyName}`);
 			}
 			fireEventListeners('update');
 		},
@@ -126,9 +124,15 @@ LaserCanvas.System = function () {
 				case "initialWaist":
 					value = mprop[propertyName].value(variables);
 					return Math.max(0, value);
+
+				case 'stability':
+					return [
+						(mabcd.sag.mx[0][0] + mabcd.sag.mx[1][1]) / 2,
+						(mabcd.tan.mx[0][0] + mabcd.tan.mx[1][1]) / 2
+					];
 			}
 			// Properties also includes non-equation, derived quantities.
-			return property(propertyName);
+			return mprop[propertyName];
 		},
 
 		/** Returns a property's source equation. */
@@ -143,39 +147,6 @@ LaserCanvas.System = function () {
 			}
 		},
 
-		/**
-		* Retrieve one of the system property values.
-		* @param {string} propertyName Name of property to retrieve.
-		* @param {number|...=} newValue New value to set to, if changing.
-		* @returns {number} Property value.
-		*/
-		property = function (propertyName, newValue) {
-			if (newValue !== undefined) {
-				switch (propertyName) {
-					case 'initialWaist':
-					case 'wavelength':
-						set(propertyName, newValue);
-						// if (!isNaN(+newValue)) {
-						// 	mprop[propertyName] = +newValue;
-						// 	fireEventListeners('update');
-						// }
-						break;
-				}
-			} else {
-				switch (propertyName) {
-					case 'wavelength':
-						return mprop[propertyName];
-						
-					case 'stability':
-						return [
-							(mabcd.sag.mx[0][0] + mabcd.sag.mx[1][1]) / 2,
-							(mabcd.tan.mx[0][0] + mabcd.tan.mx[1][1]) / 2
-						];
-				}
-				return mprop[propertyName];
-			}
-		},
-		
 		/**
 		* Determine whether a given element property should
 		* be shown. For example, group velocity dispersion is
@@ -310,7 +281,7 @@ LaserCanvas.System = function () {
 			var element = melements[seg.indx];
 			return LaserCanvas.systemAbcd.propagateParameters(
 				element.abcdQ[plane], 
-				element.property('refractiveIndex') || 1,
+				element.get("refractiveIndex") || 1,
 				seg.z);
 		},
 		
@@ -419,15 +390,15 @@ LaserCanvas.System = function () {
 
 				// Alignments.
 				el.loc.p = Z.atan2();
-				el.property('deflectionAngle', Math.atan2(Z.cross(U), Z.dot(U))); // Updates angleOfIncidence.
-				le.property('deflectionAngle', Math.atan2(V.cross(Z), V.dot(Z))); // Updates angleOfIncidence.
+				el.set("deflectionAngle", Math.atan2(Z.cross(U), Z.dot(U))); // Updates angleOfIncidence.
+				le.set("deflectionAngle", Math.atan2(V.cross(Z), V.dot(Z))); // Updates angleOfIncidence.
 				le.loc.q = Z.atan2();
 				le.set("distanceToNext", l);
 			} else {
 				// Linear cavity: Normal incidence.
 				el.loc.p = el.loc.q + Math.PI;
 				le.set("distanceToNext", 0);
-				le.property('deflectionAngle', Math.PI);
+				le.set("deflectionAngle", Math.PI);
 			}
 		},
 		
@@ -706,7 +677,6 @@ LaserCanvas.System = function () {
 		insertElement: insertElement,             // Insert a new element near the given point.
 		inspectSegment: inspectSegment,           // Inspect beam on a segment (from segmentNearLocation).
 		iterateElements: iterateElements,         // Iterate all elements in the system.
-		property: property,                       // Retrieve a property value.
 		removeElement: removeElement,             // Remove the given element.
 		removeEventListener: removeEventListener, // Remove an event handler.
 		segmentNearLocation: segmentNearLocation, // Segment point closest to point.

@@ -79,8 +79,8 @@ if (element.init && !system) {
 				melements.push(element);
 			}
 			LaserCanvas.Element.Dielectric.collectGroups(melements);
-			melements[0].property("startOptic", true);
-			melements[melements.length - 1].property("endOptic", true);
+			melements[0].set("startOptic", true);
+			melements[melements.length - 1].set("endOptic", true);
 		};
 
 	LaserCanvas.SystemUtil = LaserCanvas.SystemUtil || {};

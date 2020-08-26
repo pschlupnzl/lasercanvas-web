@@ -181,16 +181,11 @@
 	 * Returns the current value of the data source.
 	 */
 	PropertyInput.prototype.get = function () {
-		// TODO: Remove this once all properties support `get`.
-		if (typeof this.source.get !== "function") {
-			return this.source.property(this.prop.propertyName);
-		}
-
 		if (this.isFocused) {
 			return this.source.expression(this.prop.propertyName);
 		} else {
 			return LaserCanvas.Utilities.numberFormat(
-				this.source.get(this.prop.propertyName, this.variablesGetter())
+				this.source.get(this.prop.propertyName)
 			);
 		}
 	};

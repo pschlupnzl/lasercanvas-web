@@ -57,15 +57,15 @@ LaserCanvas.Element.Dispersion.propertyDefault = {
  */
 LaserCanvas.Element.Dispersion.createGroup = function (prevElement, segZ) {
 	var Dispersion = LaserCanvas.Element.Dispersion, // {object} Namespace.
-		segLen = prevElement.property('distanceToNext'), // {number} (mm) Distance on segment being inserted.
+		segLen = prevElement.get("distanceToNext"), // {number} (mm) Distance on segment being inserted.
 		elements = [
 			new this(Dispersion.eType.Prism), // {Dispersion} First element, with all the properties.
 			new this()                        // {Dispersion} Second element.
 		];
 	elements[0].group = elements[1].group = elements;
 	elements[0].setDefaults();
-	elements[2].property('distanceToNext', Math.max(0, segLen - segZ));
-	prevElement.property('distanceToNext', Math.max(0, segZ));
+	elements[2].set("distanceToNext", Math.max(0, segLen - segZ));
+	prevElement.set("distanceToNext", Math.max(0, segZ));
 	return elements;
 };
 
@@ -190,7 +190,7 @@ LaserCanvas.Element.Dispersion.prototype = {
 			this.loc.y = ax.y;
 			this.loc.p = this.loc.q = ax.q;  // {number} (rad) Incoming axis.
 			
-			this.loc.q += this.property('deflectionAngle');
+			this.loc.q += this.get("deflectionAngle");
 		}
 		return LaserCanvas.clone(this.loc);
 	},
@@ -351,7 +351,7 @@ LaserCanvas.Element.Dispersion.prototype = {
 			// Variables.
 			c = LaserCanvas.constant.c; // {number} (um/fs) Speed of light.
 			l3pic2 = lam * lam * lam / (Math.PI * c * c); // Factor lam^2 / pi c^2.
-			A = this.property("distanceToNext"); // {number} (mm) Distance between prisms.
+			A = this.get("distanceToNext"); // {number} (mm) Distance between prisms.
 			B = 0;          // {number} (mm) Insertion.
 			
 			// Calculation (approximate).
@@ -411,7 +411,7 @@ LaserCanvas.Element.Dispersion.prototype = {
 			i = this === this.group[0] ? 0    // {number} (mm) Prism insertion.
 				: this.group[0].prop.prismInsertion, // Assign to second prism only (although stored on first).
 			r = Math.max(40, 1.5 * i),        // {number} Prism length.
-			qc = -this.loc.p - this.property('deflectionAngle') / 2, // {number} (rad) Display angle on canvas.
+			qc = -this.loc.p - this.get("deflectionAngle") / 2, // {number} (rad) Display angle on canvas.
 			renderLayer = LaserCanvas.Enum.renderLayer; // {Enum} Layer to draw.
 		
 		// Second of pair opposite sense.

@@ -151,7 +151,7 @@ window.LaserCanvas.PropertiesPanel = function (render, system) {
 		* @param {boolean=} systemChanged Value indicating whether the system has changed, e.g. Dielectric plate / Brewster / crystal.
 		*/
 		propertyChange = function (propertyName, newValue, systemChanged) {
-			currentElement.property(propertyName, newValue);
+			currentElement.set(propertyName, newValue);
 			system.update(true, systemChanged);
 		},
 
@@ -179,7 +179,7 @@ window.LaserCanvas.PropertiesPanel = function (render, system) {
 			var 
 				// The Sellmeier object is ready.
 				ready = function () {
-					var l = 1e-3 * system.property('wavelength'); // {number} (um) Wavelength.
+					var l = 1e-3 * system.get("wavelength"); // {number} (um) Wavelength.
 					sellmeier.setApplyAction(onApplySellmeier); // Apply button to capture values.
 					sellmeier.updateCalculation(l);
 				};
@@ -301,7 +301,7 @@ window.LaserCanvas.PropertiesPanel = function (render, system) {
 				}
 				
 				// Set the value.
-				val = element.property(propertyName);
+				val = element.get(propertyName);
 				if (typeof val === 'boolean') {
 					input.checked = val;
 				} else if (typeof val === 'number') {

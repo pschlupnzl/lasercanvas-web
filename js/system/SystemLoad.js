@@ -245,8 +245,8 @@
 			if (jsonElements.length < 2) {
 				throw "Need at least two elements in the cavity.";
 			}
-			jsonElements[0].prop.startOptic = true;
-			jsonElements[jsonElements.length - 1].prop.endOptic = true;
+			jsonElements[0].set("startOptic", true);
+			jsonElements[jsonElements.length - 1].set("endOptic", true);
 
 			return jsonElements;
 		},

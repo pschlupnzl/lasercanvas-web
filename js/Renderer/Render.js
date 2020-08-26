@@ -1046,7 +1046,7 @@ LaserCanvas.Render.update = function (system, render, options) {
 					plane = layer === renderLayer.sagittal 
 						? modePlane.sagittal : modePlane.tangential;
 					abcdQ = element.abcdQ[plane];
-					n = element.property('refractiveIndex') || 1;
+					n = element.get("refractiveIndex") || 1;
 					if (abcdQ) {
 						renderMode(loc, {
 							dist: distanceToNext,
@@ -1181,7 +1181,7 @@ LaserCanvas.Render.update = function (system, render, options) {
 				// Draw interval to next.
 				if (nextElement !== null) {
 					drawToNext(element, nextElement, layer); // Render space to next element.
-				} else if (system.property('configuration') === LaserCanvas.System.configuration.ring) {
+				} else if (system.get("configuration") === LaserCanvas.System.configuration.ring) {
 					drawToNext(element, elements[0], layer);
 				}
 			}

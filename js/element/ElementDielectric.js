@@ -50,7 +50,7 @@ LaserCanvas.Element.Dielectric.propertyDefault = {
 // @returns {Array<Element>} Elements to insert.
 LaserCanvas.Element.Dielectric.createGroup = function (prevElement, segZ) {
 	var Dielectric = LaserCanvas.Element.Dielectric, // {object} Namespace.
-		segLen = prevElement.property('distanceToNext'), // {number} (mm) Distance on segment being inserted.
+		segLen = prevElement.get("distanceToNext"), // {number} (mm) Distance on segment being inserted.
 		propertyDefault = Dielectric.propertyDefault,    // {object} Default values for properties.
 		len = propertyDefault.thickness,     // {number} (mm) Thickness of dielectric group.
 		n = propertyDefault.refractiveIndex, // {number} Refractive index.
@@ -61,15 +61,15 @@ LaserCanvas.Element.Dielectric.createGroup = function (prevElement, segZ) {
 		];
 	// Input face.
 	elements[0].group = elements[2].group = elements;
-	elements[0].property('thickness', len);        // {number} (mm) Thickness of dielectric block group.
-	elements[0].property('refractiveIndex', n);    // {number} Refractive index.
+	elements[0].set("thickness", len);        // {number} (mm) Thickness of dielectric block group.
+	elements[0].set("refractiveIndex", n);    // {number} Refractive index.
 	
 	// Thermal lens.
 	elements[0].updateThermalLens();
 	
 	// Distances.
-	elements[2].property('distanceToNext', Math.max(0, segLen - segZ - len / 2)); // Remaining distance.
-	prevElement.property('distanceToNext', Math.max(0, segZ - len / 2)); // Set new distance.
+	elements[2].set("distanceToNext", Math.max(0, segLen - segZ - len / 2)); // Remaining distance.
+	prevElement.set("distanceToNext", Math.max(0, segZ - len / 2)); // Set new distance.
 	return elements;
 };
 
@@ -89,7 +89,7 @@ LaserCanvas.Element.Dielectric.collectGroups = function (elements) {
 			// Start a new group.
 			group = [element];
 			if (element.type === 'Dielectric') {
-				element.priv.thickness = element.property("distanceToNext");
+				element.priv.thickness = element.get("distanceToNext");
 			}
 			
 		} else if (group) {
@@ -270,10 +270,10 @@ LaserCanvas.Element.Dielectric.prototype = {
 	* @returns {number} Count of elements in this group.
 	*/
 	removeGroup: function (prevElement) {
-		prevElement.property('distanceToNext', 
-			prevElement.property('distanceToNext') 
-			+ this.group[0].property('thickness')
-			+ this.group[this.group.length - 1].property('distanceToNext'));
+		prevElement.set("distanceToNext", 
+			prevElement.get("distanceToNext") 
+			+ this.group[0].get("thickness")
+			+ this.group[this.group.length - 1].get("distanceToNext"));
 		return this.group.length;
 	},
 	
@@ -465,8 +465,8 @@ LaserCanvas.Element.Dielectric.prototype = {
 				case 'thickness':
 					if (this.priv.thickness !== newValue) {
 						// Compensate thickness change.
-						this.group[this.group.length - 1].property('distanceToNext', Math.max(0, 
-							this.group[this.group.length - 1].property('distanceToNext') 
+						this.group[this.group.length - 1].set("distanceToNext", Math.max(0, 
+							this.group[this.group.length - 1].get("distanceToNext") 
 							+ this.priv.thickness - newValue));
 						this.priv[propertyName] = newValue;
 						this.updateThermalLens();
@@ -752,8 +752,8 @@ LaserCanvas.Element.Dielectric.prototype = {
 					// Parameters.
 					endcap = this.prop.type === eType.Endcap;
 					r = 20;                          // {number} Radius ('width') of dielectric block.
-					l = this.property("distanceToNext") // {number} Length of dielectric block.
-						+ this.group[1].property('distanceToNext'); // Plus thermal lens.
+					l = this.get("distanceToNext") // {number} Length of dielectric block.
+						+ this.group[1].get("distanceToNext"); // Plus thermal lens.
 					qf = -this.prop.faceAngle;       // {number} (rad) Angle of face, relative to internal propagation axis.
 					tan2 = r * Math.tan(qf || 1e-3); // {number} Face angle secant, for face offset.
 					tan1 = endcap ? 0 : tan2;        // {number} Face angle on first face.

@@ -88,11 +88,7 @@
 	 * Returns the current value of the data source.
 	 */
 	InputPropertyRow.prototype.get = function () {
-		// TODO: Remove this once all properties support `get`.
-		if (typeof this.source.get === "function") {
-			return this.source.get(this.propertyName);
-		}
-		return this.source.property(this.propertyName);
+		return this.source.get(this.propertyName);
 	};
 
 	/**
