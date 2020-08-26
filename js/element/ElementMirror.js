@@ -169,34 +169,25 @@ LaserCanvas.Element.Mirror.prototype = {
 	 * @param {string} propertyName Name of property to evaluate and return.
 	 */
 	get: function (propertyName) {
-		var i, variables = this.variablesGetter();
+		var i, variables = this.variablesGetter(),
+			value = this.prop[propertyName] && this.prop[propertyName].value(variables);
 		switch (propertyName) {
 			case "distanceToNext":
-				return Math.max(0, this.prop[propertyName].value(variables));
+				return Math.max(0, value);
 			case "radiusOfCurvature":
-				return this.prop[propertyName].value(variables);
+				return value;
 			case "angleOfIncidence":
-				return Math.max(-Math.PI / 2, Math.min(Math.PI / 2, this.prop[propertyName].value(variables)));
+				return Math.max(-Math.PI / 2, Math.min(Math.PI / 2, value));
 
 			case "deflectionAngle": // {number} (rad) New deflection angle.
 				i = this.get("angleOfIncidence");
 				return (i < 0 ? -1 : +1) * (Math.PI - 2 * Math.abs(i));
-				
-			default:
-				return this.prop[propertyName];
 		}
 	},
 
 	/** Returns a property's source equation. */
 	expression: function (propertyName) {
-		switch (propertyName) {
-			case "distanceToNext":
-			case "radiusOfCurvature":
-			case "angleOfIncidence":
-				return this.prop[propertyName].expression();
-			// default:
-			// 	return this.property(propertyName);
-		}
+		return this.prop[propertyName].expression();
 	},
 
 	/**
