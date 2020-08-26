@@ -578,7 +578,7 @@ LaserCanvas.System = function () {
 				Array.prototype.splice.apply(melements, [seg.indx + 1, 0].concat(Element.createGroup(prevElement, seg.z)));
 				element = melements[seg.indx + 1];
 			} else {
-				element = new Element(); // {Element} Newly created element.
+				element = new Element(mvariablesGetter); // {Element} Newly created element.
 				element.set("distanceToNext", prevElement.get("distanceToNext") - seg.z); // Remaining distance.
 				prevElement.set("distanceToNext", seg.z); // Set new distance.
 				if (element.init) {
@@ -633,9 +633,9 @@ LaserCanvas.System = function () {
 		 */
 		fromJsonSource = function (jsonSource) {
 			try {
-				jsonSource(mprop, melements, this);
+				jsonSource(mprop, melements, this, mvariablesGetter);
 			} catch (e) {
-				createNew(LaserCanvas.System.configuration.linear);
+				createNew(LaserCanvas.System.configuration.linear, mvariablesGetter);
 			}
 			calculateCartesianCoordinates();
 			fireEventListeners("change");
@@ -659,7 +659,7 @@ LaserCanvas.System = function () {
 		*/
 		createNew = function (configuration, elementsInfo, loc) {
 			var SystemUtil = LaserCanvas.SystemUtil;         // {object} System namespace.
-			SystemUtil.createNew(configuration, elementsInfo, loc, mprop, melements);
+			SystemUtil.createNew(configuration, elementsInfo, loc, mprop, melements, mvariablesGetter);
 
 			// Calculate Cartesian coordinates.
 			updateElementNames();
@@ -674,7 +674,7 @@ LaserCanvas.System = function () {
 		 */
 		fromTextFile = function (src) {
 			var json = LaserCanvas.SystemUtil.textFileToJson(src);
-			LaserCanvas.SystemUtil.fromJson(json, mprop, melements);
+			LaserCanvas.SystemUtil.fromJson(json, mprop, melements, mvariablesGetter);
 
 			// Calculate Cartesian coordinates.
 			updateElementNames();

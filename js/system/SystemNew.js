@@ -10,8 +10,9 @@
 	* @param {object=} loc Initial location values.
 	* @param {object} mprop Reference to properties to update.
 	* @param {Array<Element>} melements Reference to array of elements to update.
+	* @param {function} mvariablesGetter Delegate that exposes current variable values.
 	*/
-	var createNew = function (configuration, elementsInfo, loc, mprop, melements) {
+	var createNew = function (configuration, elementsInfo, loc, mprop, melements, mvariablesGetter) {
 		var LaserCanvas = window.LaserCanvas,            // {object} Namespace.
 			System = LaserCanvas.System,                 // {object} System namespace.
 
@@ -19,7 +20,7 @@
 			// @param {Array<object>} items Items to create.
 			addElements = function (items) {
 				var k, key, item, element,
-					type, distanceToNext, props, arg;
+					type, distanceToNext, props;
 				
 				// Add new elements.
 				for (k = 0; k < items.length; k += 1) {
@@ -27,8 +28,7 @@
 					type = item[0];              // {string} Type of element to create.
 					distanceToNext = item[1];    // {number} (mm) Distance to next element.
 					props = item[2];             // {object=} Properties to set.
-					arg = props.type;            // {object=} Additional argument to constructor function.
-					element = new LaserCanvas.Element[type](arg);
+					element = new LaserCanvas.Element[type](mvariablesGetter);
 					element.prop.distanceToNext = distanceToNext;
 					if (props) {
 						for (key in props) {
@@ -66,7 +66,9 @@
 			LaserCanvas.SystemUtil.fromJson(
 				systemDefaults()[configuration || System.configuration.linear],
 				mprop,
-				melements);
+				melements,
+				null, // TODO: Need system here
+				mvariablesGetter);
 		}
 
 		// Initial location.
