@@ -13,66 +13,23 @@
 	* @param {function} mvariablesGetter Delegate that exposes current variable values.
 	*/
 	var createNew = function (configuration, elementsInfo, loc, mprop, melements, mvariablesGetter) {
-		var LaserCanvas = window.LaserCanvas,            // {object} Namespace.
-			System = LaserCanvas.System,                 // {object} System namespace.
-
-			// Create elements from an array.
-			// @param {Array<object>} items Items to create.
-			addElements = function (items) {
-				var k, key, item, element,
-					type, distanceToNext, props;
-				
-				// Add new elements.
-				for (k = 0; k < items.length; k += 1) {
-					item = items[k];
-					type = item[0];              // {string} Type of element to create.
-					distanceToNext = item[1];    // {number} (mm) Distance to next element.
-					props = item[2];             // {object=} Properties to set.
-					element = new LaserCanvas.Element[type](mvariablesGetter);
-					element.prop.distanceToNext = distanceToNext;
-					if (props) {
-						for (key in props) {
-							if (props.hasOwnProperty(key)) {
-								element.prop[key] = props[key];
-							}
-						}
-					}
-					if (element.init) {
-						element.init(this);
-					}
-					melements.push(element);
-				}
-				
-				// Collect into groups.
-				window.LaserCanvas.Element.Dielectric.collectGroups(melements);
-			};
-
-		// Properties.
+		var System = LaserCanvas.System;
+		
 		mprop.configuration = configuration;
 		mprop.name = LaserCanvas.localize(
-			configuration === System.configuration.linear ? 'Linear resonator' :
-			configuration === System.configuration.endcap ? 'End coated resonator' :
-			configuration === System.configuration.ring ? 'Ring resonator' :
-			configuration === System.configuration.propagation ? 'Propagation' :
-			configuration === System.configuration.ultrafast ? 'Ultrafast resonator' :
-			'System');
+			configuration === System.configuration.linear ? "Linear resonator" :
+			configuration === System.configuration.endcap ? "End coated resonator" :
+			configuration === System.configuration.ring ? "Ring resonator" :
+			configuration === System.configuration.propagation ? "Propagation" :
+			configuration === System.configuration.ultrafast ? "Ultrafast resonator" :
+			"System");
 
-		// Prepare system.
-		resetElements(melements);
-
-		if (elementsInfo) {
-			addElements(elementsInfo);
-		} else {
-			LaserCanvas.SystemUtil.fromJson(
-				systemDefaults()[configuration || System.configuration.linear],
-				mprop,
-				melements,
-				null, // TODO: Need system here
-				mvariablesGetter);
-		}
-
-		// Initial location.
-		LaserCanvas.Utilities.extend(melements[0].loc, loc);
+		LaserCanvas.SystemUtil.fromJson(
+			systemDefaults()[configuration || System.configuration.linear],
+			mprop,
+			melements,
+			null, // TODO: Need system here (for screen?)
+			mvariablesGetter);
 	};
 
 	/**
@@ -196,6 +153,7 @@
 				}, {
 					type: "Screen",
 					name: "I2",
+					prop: {}
 				}]
 			};
 

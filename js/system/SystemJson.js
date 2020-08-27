@@ -73,9 +73,8 @@
 				element.fromJson(elementJson);
 if (element.init && !system) {
 	console.warn("SystemJson.fromJson has no reference to system for element", element);
-	debugger;
 }
-				// element.init && element.init(system);
+				element.init && element.init(system);
 				melements.push(element);
 			}
 			LaserCanvas.Element.Dielectric.collectGroups(melements);

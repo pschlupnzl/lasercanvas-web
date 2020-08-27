@@ -115,17 +115,19 @@ LaserCanvas.System = function () {
 		/**
 		 * Returns the property evaluated using the given variable values.
 		 * @param {string} propertyName Name of property to evaluate and return.
-		 * @param {object} variables Variable values, keyed by variable names.
 		 */
-		get = function (propertyName, variables) {
-			var value;
+		get = function (propertyName) {
+			var variables = mvariablesGetter(),
+				value = mprop[propertyName]
+					&& mprop[propertyName].value
+					&& mprop[propertyName].value(variables);
 			switch (propertyName) {
 				case "wavelength":
 				case "initialWaist":
 					value = mprop[propertyName].value(variables);
 					return Math.max(0, value);
 
-				case 'stability':
+				case "stability":
 					return [
 						(mabcd.sag.mx[0][0] + mabcd.sag.mx[1][1]) / 2,
 						(mabcd.tan.mx[0][0] + mabcd.tan.mx[1][1]) / 2
@@ -604,8 +606,10 @@ LaserCanvas.System = function () {
 		 */
 		fromJsonSource = function (jsonSource) {
 			try {
+				// Try to load e.g. from localStorage.
 				jsonSource(mprop, melements, this, mvariablesGetter);
 			} catch (e) {
+				// As a fallback, use a standard configuration.
 				createNew(LaserCanvas.System.configuration.linear, mvariablesGetter);
 			}
 			calculateCartesianCoordinates();
