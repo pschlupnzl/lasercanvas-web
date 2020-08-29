@@ -3,10 +3,10 @@
 * @param {string:Dielectric.eType} dispersionType Type of dispersion compensation pair to create.
 */
 (function (LaserCanvas) {
-	"use strict";
-LaserCanvas.Element.Dispersion = function (dispersionType) {
-	this.type = 'Dispersion'; // {string} Primitive element type.
-	this.name = 'DC';  // {string} Name of this element (updated by System).
+LaserCanvas.Element.Dispersion = function (variablesGetter) {
+	this.type = "Dispersion"; // {string} Primitive element type.
+	this.name = "DC";  // {string} Name of this element (updated by System).
+	this.variablesGetter = variablesGetter; // {function} Used to retrieve variable values.
 	this.loc = {       // Location on canvas.
 		x: 0,           // {number} (mm) Horizontal location of element.
 		y: 0,           // {number} (mm) Vertical location of element.
@@ -14,11 +14,8 @@ LaserCanvas.Element.Dispersion = function (dispersionType) {
 		q: 0            // {number} (rad) Rotation angle of outgoing axis.
 	};
 	this.group = [];   // {Array<Element>} Elements in this dispersion compensation pair.
-	this.prop = {      // Public properties, for first of pair only.
-		distanceToNext: 0 // {number} (mm) Distance to next element.
-	};
-	this.priv = {};    // Private properties, for first of pair only.
-	this.setDefaults(dispersionType); // Set default properties for first of pair.
+	this.prop = this.getDefaultProp(); // Public properties, for first of pair only.
+	this.priv = this.getDefaultPriv();    // Private properties, for first of pair only.
 	
 	// Updated externally.
 	this.abcdQ = {};   // {object<object>}} ABCD propagation coefficient after this optic.
@@ -29,20 +26,8 @@ LaserCanvas.Element.Dispersion.Type = "Dispersion";
 
 // Types of dispersion compensation elements (affects angle calculations).
 LaserCanvas.Element.Dispersion.eType = {
-	Prism: 'Prism'
-	////Grating: 'Grating'
-};
-
-// Default values to use when creating a new group.
-LaserCanvas.Element.Dispersion.propertyDefault = {
-	// Prism values:
-	prismInsertion: 0,             // {number} (mm) Prism insertion.
-	refractiveIndex: 1.5,          // {number} Refractive index (for prism).
-	indexDispersion: 0,            // {number} (um^-1) First derivative dn / d lam. (e.g. BK7@1um).
-	groupVelocityDispersion: 0     // {number} (um^-2) Second derivative d^2 n / d lam^2 (e.g. BK7@1um).
-	
-	////// Grating values:
-	////gratingDensity: 600   // {number} (1/mm) Groove density per mm (for gratings).
+	Prism: "Prism"
+	////Grating: "Grating"
 };
 
 // -------------------------------------------------------
@@ -118,43 +103,52 @@ LaserCanvas.Element.Dispersion.prototype = {
 			type: this.type,
 			name: this.name,
 			loc: LaserCanvas.Utilities.extend({}, this.loc),
-			prop: LaserCanvas.Utilities.extend({}, this.prop),
-			priv: LaserCanvas.Utilities.extend({}, this.priv)
+			priv: LaserCanvas.Utilities.extend({}, this.priv),
+			prop: LaserCanvas.Utilities.extend({}, this.prop)
 		};
 	},
 
 	/** Load a serialized representation of this object. */
 	fromJson: function (json) {
 		this.name = json.name;
-		this.setDefaults(json.prop.type);
+		this.prop = this.getDefaultProp(json.prop.type);
+		this.priv = this.getDefaultPriv(json.prop.type);
 		LaserCanvas.Utilities.extend(this.loc, json.loc);
-		LaserCanvas.Utilities.extend(this.prop, json.prop);
 		LaserCanvas.Utilities.extend(this.priv, json.priv);
+		for (var propertyName in this.prop) {
+			if (this.prop.hasOwnProperty(propertyName)) {
+				switch (propertyName) {
+					case "type":
+						this.prop[propertyName] = json.prop[propertyName];
+						break;
+					default:
+						this.prop[propertyName].set(json.prop[propertyName]);
+						break;
+				}
+			}
+		}
 	},
 
-	/**
-	* Set default values (for first of pair only).
-	* @param {string:Dielectric.eType} dispersionType Type of dispersion compensation pair to create.
-	*/
-	setDefaults: function (dispersionType) {
-		var Dispersion = LaserCanvas.Element.Dispersion,  // {object} Namespace.
-			eType = Dispersion.eType,                     // {object:Enum} Types of dispersion pairs.
-			propertyDefault = Dispersion.propertyDefault; // {object} Default properties to set.
-		
-		if (dispersionType) {
-			// Set for first element only.
-			this.prop = {
-				type: eType.Prism, // {string:Enum} Type of dispersion pair 'Prism'|'Grating'.
-				distanceToNext: 0  // {number} (mm) Distance to next element.
-			};
-			LaserCanvas.Utilities.extend(this.prop, Dispersion.propertyDefault);
-			
-			this.priv = { // Calculated at updateAngles, below.
-				apexAngle: 0.1,     // {number} (rad) Apex angle.
-				deflectionAngle: 0, // {number} (rad) Deflection angle.
-				internalLength: 0   // {number} (mm) Internal propagation length.
-			};
+	getDefaultProp: function (dispersionType) {
+		// Prism values:
+		return {
+			type: LaserCanvas.Element.Dispersion.eType.Prism,    // {eType} Type
+			distanceToNext: new LaserCanvas.Equation(0),         // {number} (mm) Distance to next element.
+			prismInsertion: new LaserCanvas.Equation(0),         // {number} (mm) Prism insertion.
+			refractiveIndex: new LaserCanvas.Equation(1.5),      // {number} Refractive index (for prism).
+			indexDispersion: new LaserCanvas.Equation(0),        // {number} (um^-1) First derivative dn / d lam. (e.g. BK7@1um).
+			groupVelocityDispersion: new LaserCanvas.Equation(0) // {number} (um^-2) Second derivative d^2 n / d lam^2 (e.g. BK7@1um).
 		}
+		////// Grating values:
+		////gratingDensity: 600   // {number} (1/mm) Groove density per mm (for gratings).
+	},
+
+	getDefaultPriv: function (disperisonType) {
+		return { // Calculated at updateAngles, below.
+			apexAngle: 0.1,     // {number} (rad) Apex angle.
+			deflectionAngle: 0, // {number} (rad) Deflection angle.
+			internalLength: 0   // {number} (mm) Internal propagation length.
+		};
 	},
 
 	/**
@@ -164,9 +158,12 @@ LaserCanvas.Element.Dispersion.prototype = {
 		var eType = LaserCanvas.Element.Dispersion.eType; // {object:Enum} Types of dispersion pairs.
 		// Update for first element.
 		if (this === this.group[0]) {
-			switch (this.prop.type) {
+			switch (this.get("type")) {
 				case eType.Prism:
-					LaserCanvas.Element.Dispersion.brewsterPrism(this.prop.refractiveIndex, this.prop.prismInsertion, this.priv);
+					LaserCanvas.Element.Dispersion.brewsterPrism(
+						this.get("refractiveIndex"),
+						this.get("prismInsertion"),
+						this.priv);
 					break;
 				////case eType.Grating:
 				////	// TODO: Grating calculation.
@@ -202,45 +199,45 @@ LaserCanvas.Element.Dispersion.prototype = {
 	userProperties: function () {
 		var eType = LaserCanvas.Element.Dispersion.eType,
 			props = [{
-				propertyName: 'type',
-				options: ['Prism'], // , 'Grating'], // TODO: Grating.
+				propertyName: "type",
+				options: ["Prism"], // , "Grating"], // TODO: Grating.
 				infoPanel: false
 			}, {
-				propertyName: 'distanceToNext',
+				propertyName: "distanceToNext",
 				increment: 5,
 				min: 0
 			}];
-		switch (this.group[0].prop.type) {
+		switch (this.get("type")) {
 			case eType.Prism:
 				props = props.concat([
 					{
-						propertyName: 'prismInsertion',
+						propertyName: "prismInsertion",
 						increment: 0.5,
 						min: 0,
 						infoPanel: this === this.group[0]
 					}, {
-						propertyName: 'refractiveIndex',
+						propertyName: "refractiveIndex",
 						increment: 0.1,
 						min: 1,
 						infoPanel: this === this.group[0]
 					}, {
-						propertyName: 'indexDispersion',
+						propertyName: "indexDispersion",
 						increment: 0.001,
 						infoPanel: this === this.group[0]
 					}, {
-						propertyName: 'groupVelocityDispersion',
+						propertyName: "groupVelocityDispersion",
 						increment: 0.001,
 						infoPanel: this === this.group[0]
 					}
 					// ?? { // d^2n / dl^2 Only used with insertion.
-					// ?? 	propertyName: 'indexSecondDerivative',
+					// ?? 	propertyName: "indexSecondDerivative",
 					// ?? 	increment: 0.001
 					// ?? },
 				]);
 				break;
 			////case eType.Grating:
 			////	props.push({
-			////		propertyName: 'gratingDensity',
+			////		propertyName: "gratingDensity",
 			////		increment: 10,
 			////		min: 10
 			////	});
@@ -252,71 +249,84 @@ LaserCanvas.Element.Dispersion.prototype = {
 	
 	/**
 	* Gets a value indicating whether this element can adjust transfer properties.
-	* @param {string} propertyName Name of property being probed 'distanceToNext'|'deflectionAngle'.
+	* @param {string} propertyName Name of property being probed "distanceToNext"|"deflectionAngle".
 	* @param {object} adjustingElement Element being dragged - to retain intra-pair spacing.
 	*/
 	canSetProperty: function (propertyName, adjustingElement) {
 		var eType = LaserCanvas.Element.Dispersion.eType, // {object:Enum} Dispersion pair types.
-			isPrism = this.group[0].prop.type === eType.Prism; // {boolean} Value indicating whether the dispersion pair is a prism.
+			isPrism = this.get("type") === eType.Prism; // {boolean} Value indicating whether the dispersion pair is a prism.
 		return {
+			type: true,
 			distanceToNext: true, // !(adjustingElement === this && this === this.group[0]), // Retain intra-pair spacing.
-			////gratingDensity: this.group[0].prop.type === eType.Grating, // Prisms have refractive index.
 			insertElement: this === this.group[this.group.length - 1], // Can insert elements after last of pair.
 			prismInsertion: isPrism,
 			refractiveIndex: isPrism,  // Prisms have refractive index.
 			indexDispersion: isPrism,
 			groupVelocityDispersion: isPrism,
-			type: true
 		}[propertyName] || false;
 	},
 	
 	/**
-	* Sets internal parameters to match new property value -OR- retrieve the current value.
+	* Sets internal parameters to match new property value.
 	* @param {string} propertyName Name of property to set 'distanceToNext' etc.
 	* @param {number=} newValue (mm|rad) New target value to set, if any.
-	* @param {...=} arg Additional argument, if needed.
-	* @returns {number=} The current value, if retrieving only.
 	*/
-	property: function (propertyName, newValue, arg) {
-
-		// Set value, if specified.
-		if (newValue !== undefined) {
-			switch (propertyName) {
-				case 'distanceToNext': // {number} (mm) New distance to next element.
-					this.prop[propertyName] = newValue;
-					break;
-					
-				////case 'gratingDensity':
-				case 'prismInsertion':
-				case 'refractiveIndex':
-				case 'indexDispersion':
-				case 'groupVelocityDispersion':
-				case 'type':
-					this.group[0].prop[propertyName] = newValue;
-					this.group[0].updateAngles();
-					break;
-			}
-		} else {
-			// Otherwise, return the current value.
-			switch (propertyName) {
-				case 'distanceToNext': // {number} (mm) Distance to next element.
-					return this.prop[propertyName];
-					
-				case 'deflectionAngle': // {number} (rad) Outgoing axis.
-					return this.group[0].priv.deflectionAngle *
-						(this === this.group[0] ? +1 : -1);
+	set: function (propertyName, newValue) {
+		switch (propertyName) {
+			case "type":
+				this.group[0].prop[propertyName] = newValue;
+				this.updateAngles();
+				break;
+			
+			case "distanceToNext": // {number} (mm) New distance to next element.
+				this.prop[propertyName].set(newValue);
+				break;
 				
-				////case 'gratingDensity':
-				case 'prismInsertion':
-				case 'refractiveIndex':
-				case 'indexDispersion':
-				case 'groupVelocityDispersion':
-				case 'type':
-					return this.group[0].prop[propertyName];
-			}
+			////case "gratingDensity":
+			case "prismInsertion":
+			case "refractiveIndex":
+			case "indexDispersion":
+			case "groupVelocityDispersion":
+			case "type":
+				this.group[0].prop[propertyName].set(newValue);
+				this.group[0].updateAngles();
+				break;
+		}
+	},
+
+	/**
+	 * Returns the property value for the current variables.
+	 */
+	get: function (propertyName) {
+		var variables = this.variablesGetter();
+		switch (propertyName) {
+			case "type":
+				return this.group[0].prop[propertyName];
+				
+			////case "gratingDensity":
+			case "distanceToNext": // {number} (mm) Distance to next element.
+				return Math.max(0, this.prop[propertyName].value(variables));
+
+			case "prismInsertion":
+			case "refractiveIndex":
+			case "indexDispersion":
+			case "groupVelocityDispersion":
+				return this.group[0].prop[propertyName].value(variables);
+
+			case "deflectionAngle": // {number} (rad) Outgoing axis.
+				return this.group[0].priv.deflectionAngle *
+					(this === this.group[0] ? +1 : -1);
+
+			case "apexAngle":
+				return this.group[0].priv.apexAngle;
 		}
 	},
 	
+	/** Returns the expression for a user-settable property. */
+	expression: function (propertyName) {
+		return this.prop[propertyName].expression();
+	},
+
 	/**
 	* Return the refractive index for the space following the 
 	* element. The method is exposed here because prisms have
@@ -345,8 +355,8 @@ LaserCanvas.Element.Dispersion.prototype = {
 		//                 2 pi c^2  ( d lam )
 		if (this === this.group[0]) {
 			// Properties.
-			dndl = this.prop.indexDispersion; // {number} (1/um) First derivative dn / dlam.
-			d2ndl2 = this.prop.groupVelocityDispersion; // {number} (1/um^2) Group velocity dispersion d^2n / dlam^2.
+			dndl = this.get("indexDispersion"); // {number} (1/um) First derivative dn / dlam.
+			d2ndl2 = this.get("groupVelocityDispersion"); // {number} (1/um^2) Group velocity dispersion d^2n / dlam^2.
 			
 			// Variables.
 			c = LaserCanvas.constant.c; // {number} (um/fs) Speed of light.
@@ -409,7 +419,7 @@ LaserCanvas.Element.Dispersion.prototype = {
 	draw: function (render, layer) {
 		var qf, tan, path,
 			i = this === this.group[0] ? 0    // {number} (mm) Prism insertion.
-				: this.group[0].prop.prismInsertion, // Assign to second prism only (although stored on first).
+				: this.get("prismInsertion"), // Assign to second prism only (although stored on first).
 			r = Math.max(40, 1.5 * i),        // {number} Prism length.
 			qc = -this.loc.p - this.get("deflectionAngle") / 2, // {number} (rad) Display angle on canvas.
 			renderLayer = LaserCanvas.Enum.renderLayer; // {Enum} Layer to draw.
@@ -421,13 +431,13 @@ LaserCanvas.Element.Dispersion.prototype = {
 		
 		switch (layer) {
 			case renderLayer.optics:
-				qf = this.group[0].priv.apexAngle / 2; // {number} (rad) Apex half angle.
+				qf = this.get("apexAngle") / 2; // {number} (rad) Apex half angle.
 				tan = r * Math.tan(qf);  // {number} Base half-width of prism.
-				path = LaserCanvas.Utilities.stringFormat('M 0 {0} L {1} {2} L {3} {4} ZFS',
+				path = LaserCanvas.Utilities.stringFormat("M 0 {0} L {1} {2} L {3} {4} ZFS",
 					i.toFixed(2), -tan.toFixed(2), (i - r).toFixed(2), +tan.toFixed(2), (i - r).toFixed(2));
 				render
 					.save()
-					.setStroke('#000', 1)
+					.setStroke("#000", 1)
 					.createPattern(LaserCanvas.theme.current.blockFill)
 					.drawPath(path, this.loc.x, this.loc.y, qc)
 					.restore();

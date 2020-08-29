@@ -104,6 +104,7 @@ window.LaserCanvas = {
 			"js/element/Element.js",
 			"js/element/ElementDielectric.js",
 			"js/element/ElementDispersion.js",
+			"js/element/ElementGroups.js",
 			"js/element/ElementLens.js",
 			"js/element/ElementMirror.js",
 			"js/element/ElementScreen.js",
