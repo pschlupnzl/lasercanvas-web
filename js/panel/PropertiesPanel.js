@@ -7,7 +7,7 @@
 LaserCanvas.PropertiesPanel = function (render, system) {
 	var
 		currentElement = null,                   // {Element} Current system element being edited.
-		panel = document.createElement('div'),   // {HTMLDivElement} Panel DOM element.
+		panel = document.createElement("div"),   // {HTMLDivElement} Panel DOM element.
 		sellmeier = null,                        // {Sellmeier} Sellmeier panel, if used.
 		
 		// -------------------------------------------------
@@ -30,31 +30,32 @@ LaserCanvas.PropertiesPanel = function (render, system) {
 				H = window.innerHeight;
 			
 			// Add listeners - ensure not already added.
-			if (panel.getAttribute('data-visible') !== 'true') {
-				document.addEventListener('mousedown', onDocumentDown, false);
-				document.addEventListener('touchstart', onDocumentTouch, false);
+			if (panel.getAttribute("data-visible") !== "true") {
+				document.addEventListener("mousedown", onDocumentDown, false);
+				document.addEventListener("touchstart", onDocumentTouch, false);
 			}
 			
 			// Show the panel.
-			panel.setAttribute('data-visible', 'true');
+			panel.setAttribute("data-visible", "true");
 			
 			// Position (must be visible to get metrics).
 			w = panel.offsetWidth;
 			h = panel.offsetHeight;
 			x = Math.max(0, Math.min(x - 0.5 * w, W - w));
 			y = Math.max(0, Math.min(y + 16, H - h));
-			panel.style.left = x + 'px';
-			panel.style.top = y + 'px';
+			panel.style.left = x + "px";
+			panel.style.top = y + "px";
 		},
 		
 		/**
 		* Remove panel and listeners.
 		*/
 		hidePanel = function () {
-			panel.removeAttribute('data-visible');
+			panel.removeAttribute("data-visible");
+			clearRows();
 			currentElement = null;
-			document.removeEventListener('mousedown', onDocumentDown, false);
-			document.removeEventListener('touchstart', onDocumentTouch, false);
+			document.removeEventListener("mousedown", onDocumentDown, false);
+			document.removeEventListener("touchstart", onDocumentTouch, false);
 			if (sellmeier) {
 				sellmeier.hide();
 			}
@@ -148,14 +149,14 @@ LaserCanvas.PropertiesPanel = function (render, system) {
 		
 		/**
 		* Callback from Sellmeier panel to apply current values.
-		* @param {object} prop Property values to set, 'refractiveIndex', 'indexDispersion', 'groupVelocityDispersion'.
+		* @param {object} prop Property values to set, "refractiveIndex", "indexDispersion", "groupVelocityDispersion".
 		*/
 		onApplySellmeier = function (prop) {
 			LaserCanvas.Utilities.foreach(prop, function (propertyName, value) {
 				var input = panel.querySelector('input[data-property-name="' + propertyName + '"]');
 				if (input
 					&& currentElement.canSetProperty(propertyName)) {
-					LaserCanvas.Element.propertyStep(input, 'set', value, currentElement, system);
+					LaserCanvas.Element.propertyStep(input, "set", value, currentElement, system);
 				}
 			});
 		},
@@ -300,5 +301,5 @@ LaserCanvas.PropertiesPanel.template = [
 			'<label data-localize="Delete"></label>',
 		'</button>',
 	'</div>'
-].join('');
+].join("");
 }(window.LaserCanvas));

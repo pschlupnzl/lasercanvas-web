@@ -28,6 +28,7 @@
 			el = document.createElement("div"),
 			inputFocus = function () {
 				this.setAttribute("data-last-value", this.value);
+				setTimeout(function () { this.select(); }.bind(this));
 			},
 			inputChange = function () {
 				self.inputChange(this.getAttribute("data-prop"), this.value);
