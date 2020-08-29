@@ -198,6 +198,7 @@ LaserCanvas.Element.Dispersion.prototype = {
 	*/
 	userProperties: function () {
 		var eType = LaserCanvas.Element.Dispersion.eType,
+			firstElement = this === this.group[0],
 			props = [{
 				propertyName: "type",
 				options: ["Prism"], // , "Grating"], // TODO: Grating.
@@ -214,20 +215,20 @@ LaserCanvas.Element.Dispersion.prototype = {
 						propertyName: "prismInsertion",
 						increment: 0.5,
 						min: 0,
-						infoPanel: this === this.group[0]
+						infoPanel: firstElement
 					}, {
 						propertyName: "refractiveIndex",
 						increment: 0.1,
 						min: 1,
-						infoPanel: this === this.group[0]
+						infoPanel: firstElement
 					}, {
 						propertyName: "indexDispersion",
 						increment: 0.001,
-						infoPanel: this === this.group[0]
+						infoPanel: firstElement
 					}, {
 						propertyName: "groupVelocityDispersion",
 						increment: 0.001,
-						infoPanel: this === this.group[0]
+						infoPanel: firstElement
 					}
 					// ?? { // d^2n / dl^2 Only used with insertion.
 					// ?? 	propertyName: "indexSecondDerivative",

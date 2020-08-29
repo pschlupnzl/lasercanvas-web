@@ -6,13 +6,11 @@
 	 * Initialize a new InputPropertyRow object, which is based on a TR element.
 	 * @param {string|object} prop Property name (for read-only) or object of property to manipulate.
 	 * @param {System|Element} source Data source.
-	 * @param {function} variablesGetter Callback to retrieve current variable values.
 	 * @param {function=} onChange Change event handler callback.
 	 */
-	var InputPropertyRow = function (prop, source, variablesGetter, onChange) {
+	var InputPropertyRow = function (prop, source, onChange) {
 		this.prop = prop;
 		this.source = source;
-		this.variablesGetter = variablesGetter;
 		this.onChange = onChange;
 		this.propertyName = typeof prop === "string" ? prop : prop.propertyName;
 		this.type = this.getType();
@@ -25,7 +23,8 @@
 		unary: "unary",
 		sagTan: "sagTan",
 		action: "action",
-		mx: "mx"
+		mx: "mx",
+		select: "select"
 	};
 
 	/** Table row template HTML. */
@@ -64,6 +63,13 @@
 			'<td data-cell="label"></td>',
 			'<td data-cell="action" colspan="2" class="nowrap"></td>',
 			'<td data-cell="unit"></td>'
+		].join(""),
+
+		/** Template HTML for a select action data row. */
+		select: [
+			'<td data-cell="label"></td>',
+			'<td data-cell="select" colspan="2"></td>',
+			'<td data-cell="unit"></td>'
 		].join("")
 	};
 
@@ -73,6 +79,9 @@
 	InputPropertyRow.prototype.getType = function () {
 		var value;
 		if (typeof this.prop === "object") {
+			if (this.prop.hasOwnProperty("options")) {
+				return InputPropertyRow.eType.select;
+			}
 			return InputPropertyRow.eType.action;
 		}
 		value = this.get();
@@ -111,9 +120,14 @@
 			return new LaserCanvas.PropertyInput(
 				this.prop,
 				this.source,
-				this.variablesGetter,
 				this.onInputChange.bind(this)
 			).appendTo(this.el.querySelector('[data-cell="action"]'));
+		} else if (this.type === InputPropertyRow.eType.select) {
+			return new LaserCanvas.SelectInput(
+				this.prop,
+				this.source,
+				this.onInputChange.bind(this)
+			).appendTo(this.el.querySelector('[data-cell="select"]'));
 		} else {
 			this.update();
 			return null;

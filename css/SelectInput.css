@@ -1,0 +1,8 @@
+.selectInput select {
+	padding: 0.1em 0.5em;
+	min-width: 6em;
+	background: white;
+	border-radius: 0.5em;
+	font-family: inherit;
+	font-size: inherit;
+}

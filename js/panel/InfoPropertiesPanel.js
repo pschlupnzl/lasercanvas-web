@@ -35,12 +35,14 @@
 	 */
 	InfoPropertiesPanel.prototype.initRows = function () {
 		var source = this.source,
-			variablesGetter = this.variablesGetter,
 			tbody = this.el.querySelector("tbody"),
 			onPropertyChange = this.onPropertyChange.bind(this);
 		return this.source.userProperties()
+			.filter(function (prop) {
+				return prop.infoPanel !== false;
+			})
 			.map(function (prop) {
-				return new LaserCanvas.InputPropertyRow(prop, source, variablesGetter, onPropertyChange)
+				return new LaserCanvas.InputPropertyRow(prop, source, onPropertyChange)
 					.appendTo(tbody);
 			});
 	};
