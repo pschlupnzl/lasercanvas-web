@@ -118,26 +118,32 @@
 	 * Create a new input control.
 	 * @param {string} prop Name and configuration of property to manipulate.
 	 * @param {Element|System} source Data source, element or system, with property.
-	 * @param {function} variablesGetter Callback to retrieve current variable values.
 	 * @param {function} onChange Change event handler callback.
 	 */
-	var PropertyInput = function (prop, source, variablesGetter, onChange) {
+	var PropertyInput = function (prop, source, onChange) {
 		this.prop = prop;
 		this.source = source;
-		this.variablesGetter = variablesGetter;
 		this.onChange = onChange;
 		this.isFocused = false;
 		this.lastValue = "";
-		this.el = this.init(prop);
+		this.el = this.init();
 		this.input = this.el.querySelector("input");
 		this.update();
 	};
 	
+	/** Template for control. */
+	PropertyInput.template = [
+		'<button data-step="-1" disabled>&minus;</button>',
+		'<span>',
+		'<input type="text" />',
+		'</span>',
+		'<button data-step="+1" disabled>+</button>'
+	].join("");
+
 	/**
 	 * Initialize a new control and return the container DOM element.
-	 * @param {string} prop Name and configuration of property to manipulate.
 	 */
-	PropertyInput.prototype.init = function (prop) {
+	PropertyInput.prototype.init = function () {
 		var self = this,
 			el = document.createElement("div"),
 			/** Attach listeners to the input field. */
@@ -150,13 +156,7 @@
 			};
 
 		el.className = "propertyInput";
-		el.innerHTML = [
-			'<button data-step="-1" disabled>&minus;</button>',
-			'<span>',
-			'<input type="text" />',
-			'</span>',
-			'<button data-step="+1" disabled>+</button>'
-		].join("");
+		el.innerHTML = PropertyInput.template;
 		LaserCanvas.Utilities.foreach(el.querySelectorAll("button"), function () {
 			this.onclick = self.onButtonClick.bind(self);
 		});

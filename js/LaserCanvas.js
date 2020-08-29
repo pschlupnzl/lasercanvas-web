@@ -67,13 +67,13 @@ window.LaserCanvas.Application = function (canvas, info) {
 		*/
 		onResize = function () {
 			var id, el, key,
-				info = document.body.getAttribute('data-info-visible') === 'true',
+				info = document.body.getAttribute("data-info-visible") === "true",
+				variables = document.body.getAttribute("data-variables-visible") === "true",
 				sliver = 0, // {number} (px) Slice off to prevent scroll bars.
 				w = window.innerWidth - sliver,  // {number} (px) Width of window.
 				h = window.innerHeight - sliver, // {number} (px) Height of window.
 				ht = 80,                         // {number} (px) Height of toolbar.
-ht=220,
-				
+
 				pos = {
 					// '#LaserCanvasFrame': {
 					// 	left: 0,
