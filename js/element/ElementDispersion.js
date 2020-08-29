@@ -60,9 +60,10 @@ LaserCanvas.Element.Dispersion.createGroup = function (prevElement, segZ) {
  * and internalLength properties.
  * @param {number} refractiveIndex Refractive index of prism.
  * @param {number} prismInsertion (mm) Amount by which prism is inserted into beam.
+ * @param {boolean} flip Value indicating whether to flip the deflection angle.
  * @param {object} priv Reference to object whose properties are updated.
  */
-LaserCanvas.Element.Dispersion.brewsterPrism = function (refractiveIndex, prismInsertion, priv) {
+LaserCanvas.Element.Dispersion.brewsterPrism = function (refractiveIndex, prismInsertion, flip, priv) {
 	// Brewster cut prism pair at minimum deviation angle.
 	// See e.g. https://arxiv.org/pdf/1411.0232.pdf
 	//                        .
@@ -85,14 +86,14 @@ LaserCanvas.Element.Dispersion.brewsterPrism = function (refractiveIndex, prismI
 	// Deflection angle would seem to be
 	//    qD = 2 ( pi/2 - q1 - q2 ) ??
 	// or qD = 2 (q1 - q2) ??
-	var
+	var sign = flip ? -1 : +1,
 		n = refractiveIndex,              // {number} Refractive index.
 		qB = Math.atan(n),                // {number} (rad) Brewster's angle.
 		a = Math.PI - 2 * qB,             // {number} (rad) Apex angle.
 		q2 = Math.asin(Math.sin(qB) / n), // {number} (rad) Internal refraction angle.
 		d = 2 * (qB - q2);                // {number} (rad) Deflection angle.
 	priv.apexAngle = a;                  // {number} (rad) Apex angle.
-	priv.deflectionAngle = -d;           // {number} (rad) Deflection angle.
+	priv.deflectionAngle = -d * sign;    // {number} (rad) Deflection angle.
 	priv.internalLength = 2 * prismInsertion * Math.tan(a);
 };
 
@@ -119,6 +120,7 @@ LaserCanvas.Element.Dispersion.prototype = {
 			if (this.prop.hasOwnProperty(propertyName)) {
 				switch (propertyName) {
 					case "type":
+					case "flip":
 						this.prop[propertyName] = json.prop[propertyName];
 						break;
 					default:
@@ -133,6 +135,7 @@ LaserCanvas.Element.Dispersion.prototype = {
 		// Prism values:
 		return {
 			type: LaserCanvas.Element.Dispersion.eType.Prism,    // {eType} Type
+			flip: false,                                         // {boolean} Value indicating whether the deflection should be flipped.
 			distanceToNext: new LaserCanvas.Equation(0),         // {number} (mm) Distance to next element.
 			prismInsertion: new LaserCanvas.Equation(0),         // {number} (mm) Prism insertion.
 			refractiveIndex: new LaserCanvas.Equation(1.5),      // {number} Refractive index (for prism).
@@ -163,6 +166,7 @@ LaserCanvas.Element.Dispersion.prototype = {
 					LaserCanvas.Element.Dispersion.brewsterPrism(
 						this.get("refractiveIndex"),
 						this.get("prismInsertion"),
+						this.get("flip"),
 						this.priv);
 					break;
 				////case eType.Grating:
@@ -203,6 +207,10 @@ LaserCanvas.Element.Dispersion.prototype = {
 				propertyName: "type",
 				options: ["Prism"], // , "Grating"], // TODO: Grating.
 				infoPanel: false
+			}, {
+				propertyName: "flip",
+				dataType: "boolean",
+				infoPanel: firstElement
 			}, {
 				propertyName: "distanceToNext",
 				increment: 5,
@@ -255,11 +263,13 @@ LaserCanvas.Element.Dispersion.prototype = {
 	*/
 	canSetProperty: function (propertyName, adjustingElement) {
 		var eType = LaserCanvas.Element.Dispersion.eType, // {object:Enum} Dispersion pair types.
-			isPrism = this.get("type") === eType.Prism; // {boolean} Value indicating whether the dispersion pair is a prism.
+			isPrism = this.get("type") === eType.Prism, // {boolean} Value indicating whether the dispersion pair is a prism.
+			lastElement = this === this.group[this.group.length - 1];
 		return {
 			type: true,
+			flip: true,
 			distanceToNext: true, // !(adjustingElement === this && this === this.group[0]), // Retain intra-pair spacing.
-			insertElement: this === this.group[this.group.length - 1], // Can insert elements after last of pair.
+			insertElement: lastElement, // Can insert elements after last of pair.
 			prismInsertion: isPrism,
 			refractiveIndex: isPrism,  // Prisms have refractive index.
 			indexDispersion: isPrism,
@@ -275,8 +285,9 @@ LaserCanvas.Element.Dispersion.prototype = {
 	set: function (propertyName, newValue) {
 		switch (propertyName) {
 			case "type":
+			case "flip":
 				this.group[0].prop[propertyName] = newValue;
-				this.updateAngles();
+				this.group[0].updateAngles();
 				break;
 			
 			case "distanceToNext": // {number} (mm) New distance to next element.
@@ -302,6 +313,7 @@ LaserCanvas.Element.Dispersion.prototype = {
 		var variables = this.variablesGetter();
 		switch (propertyName) {
 			case "type":
+			case "flip":
 				return this.group[0].prop[propertyName];
 				
 			////case "gratingDensity":
@@ -424,12 +436,16 @@ LaserCanvas.Element.Dispersion.prototype = {
 			r = Math.max(40, 1.5 * i),        // {number} Prism length.
 			qc = -this.loc.p - this.get("deflectionAngle") / 2, // {number} (rad) Display angle on canvas.
 			renderLayer = LaserCanvas.Enum.renderLayer; // {Enum} Layer to draw.
-		
+
 		// Second of pair opposite sense.
 		if (this !== this.group[0]) {
 			qc += Math.PI;
 		}
 		
+		if (this.get("flip")) {
+			qc += Math.PI;
+		}
+
 		switch (layer) {
 			case renderLayer.optics:
 				qf = this.get("apexAngle") / 2; // {number} (rad) Apex half angle.

@@ -1,10 +1,10 @@
+(function (LaserCanvas) {
 /**
 * Properties panel for optical elements.
 * @param {Render} render Rendering engine to map locations to elements.
 * @param {System} system System to interact with, e.g. to delete an element.
 */
-window.LaserCanvas.PropertiesPanel = function (render, system) {
-	"use strict";
+LaserCanvas.PropertiesPanel = function (render, system) {
 	var
 		currentElement = null,                   // {Element} Current system element being edited.
 		panel = document.createElement('div'),   // {HTMLDivElement} Panel DOM element.
@@ -33,7 +33,6 @@ window.LaserCanvas.PropertiesPanel = function (render, system) {
 			if (panel.getAttribute('data-visible') !== 'true') {
 				document.addEventListener('mousedown', onDocumentDown, false);
 				document.addEventListener('touchstart', onDocumentTouch, false);
-				document.addEventListener('keyup', onDocumentKeyUp, false);
 			}
 			
 			// Show the panel.
@@ -56,7 +55,6 @@ window.LaserCanvas.PropertiesPanel = function (render, system) {
 			currentElement = null;
 			document.removeEventListener('mousedown', onDocumentDown, false);
 			document.removeEventListener('touchstart', onDocumentTouch, false);
-			document.removeEventListener('keyup', onDocumentKeyUp, false);
 			if (sellmeier) {
 				sellmeier.hide();
 			}
@@ -93,64 +91,19 @@ window.LaserCanvas.PropertiesPanel = function (render, system) {
 			}
 		},
 		
-		/**
-		* Document key - remove panel on escape.
-		* @param {KeyboardEvent} e Triggering event.
-		*/
-		onDocumentKeyUp = function (e) {
-			if ((e.which || e.keyCode) === 27) {
-				if (e.target.tagName === 'INPUT') {
-					e.target.blur();
-				} else {
-					hidePanel();
-				}
-			}
-		},
-		
-		/**
-		* Retrieve the property name from the given row element.
-		* The property is stored on the table row, rather than
-		* the individual input and button elements.
-		* @param {HTMLElement} el Triggering element, which can also be the row itself.
-		* @returns {string?} Property corresponding to element.
-		*/
-		getProperty = function (el) {
-			return window.LaserCanvas.Utilities.closest(el, '[data-property-name]').getAttribute('data-property-name');
-		},
-		
-		/**
-		* A property dropdown has changed. This causes the
-		* window to be re-drawn.
-		* @this {HTMLSelectElement} Element that triggered the handler.
-		*/
-		onPropertySelectChange = function () {
-			var propertyName = getProperty(this),
-				val = this.value; // {string} Current value.
-			propertyChange(propertyName, val, true); // Update system, including 'change' event.
-			prepareProperties(currentElement);
-		},
-		
-		/**
-		* A property checkbox has changed.
-		* @this {HTMLInputElement} Checkbox element that triggered the handler.
-		*/
-		onPropertyCheckChange = function () {
-			var propertyName = getProperty(this),
-				val = this.checked; // {boolean} Current value.
-			propertyChange(propertyName, val);
-		},
-		
-		// -------------------------------------------------
-		//  Manipulate element.
-		// -------------------------------------------------
+		// ---------
+		//  Events.
+		// ---------
 		
 		/**
 		* A property is changing.
 		* @param {string} propertyName Name of property to change.
 		* @param {number} newValue New value to set.
-		* @param {boolean=} systemChanged Value indicating whether the system has changed, e.g. Dielectric plate / Brewster / crystal.
 		*/
-		propertyChange = function (propertyName, newValue, systemChanged) {
+		onPropertyChange = function (propertyName, newValue) {
+			var
+				// Value indicating whether the system has changed, e.g. Dielectric plate / Brewster / crystal.
+				systemChanged = propertyName === "type";
 			currentElement.set(propertyName, newValue);
 			system.update(true, systemChanged);
 		},
@@ -188,7 +141,7 @@ window.LaserCanvas.PropertiesPanel = function (render, system) {
 				sellmeier.show();
 				ready();
 			} else {
-				sellmeier = new window.LaserCanvas.Sellmeier();
+				sellmeier = new LaserCanvas.Sellmeier();
 				ready();
 			}
 		},
@@ -198,11 +151,11 @@ window.LaserCanvas.PropertiesPanel = function (render, system) {
 		* @param {object} prop Property values to set, 'refractiveIndex', 'indexDispersion', 'groupVelocityDispersion'.
 		*/
 		onApplySellmeier = function (prop) {
-			window.LaserCanvas.Utilities.foreach(prop, function (propertyName, value) {
+			LaserCanvas.Utilities.foreach(prop, function (propertyName, value) {
 				var input = panel.querySelector('input[data-property-name="' + propertyName + '"]');
 				if (input
 					&& currentElement.canSetProperty(propertyName)) {
-					window.LaserCanvas.Element.propertyStep(input, 'set', value, currentElement, system);
+					LaserCanvas.Element.propertyStep(input, 'set', value, currentElement, system);
 				}
 			});
 		},
@@ -214,105 +167,11 @@ window.LaserCanvas.PropertiesPanel = function (render, system) {
 		/**
 		* Clear the existing control rows from the panel.
 		*/
-		clearControls = function () {
+		clearRows = function () {
 			var tr;
-			while ((tr = panel.querySelector('tbody tr'))) {
+			while ((tr = panel.querySelector("tbody tr"))) {
 				tr.parentNode.removeChild(tr);
 			}
-		},
-		
-		/**
-		* Swap out the input field for a drop-down menu.
-		* @param {HTMLInputElement} input Input field to replace.
-		* @param {Array<string>} options Options to append to input menu.
-		* @returns {HTMLSelectElement} Newly created select menu.
-		*/
-		inputAsMenu = function (input, options) {
-			var k, opt,
-				select = document.createElement('select'), // {HTMLSelectMenu} The new menu.
-				parent = input.parentNode, // {HTMLElement} Parent of element to substitute.
-				sibling = parent.nextElementSibling; // {HTMLTDElement} Next cell for merging.
-				
-			// Assemble options.
-			for (k = 0; k < options.length; k += 1) {
-				opt = document.createElement('option');
-				opt.value = options[k];
-				opt.text = window.LaserCanvas.localize(options[k]);
-				select.appendChild(opt);
-			}
-			
-			// Swap out for input box.
-			parent.insertBefore(select, input);
-			parent.removeChild(input);
-			
-			// Merge this and units cell.
-			if (parent.nodeName === 'TD'
-				&& sibling.getAttribute('data-content') === 'unit') {
-				parent.colSpan = 2;
-				sibling.parentNode.removeChild(sibling);
-			}
-			
-			return select;
-		},
-		
-		/**
-		* Create a single row of controls for the given element.
-		* The property elements can have these properties:
-		*    propertyName {string}        Property name as used by element.
-		*    label        {string=}       Optional label to use in place of pretty print propertyName.
-		*    unit         {string=}       Optional unit to display.
-		*    options      {Array<string>} For drop-down menu, array of option strings.
-		*    dataType     {string}        Set to 'boolean' to create a checkbox.
-		*    increment    {number}        Step size with buttons or arrow keys (x10 for Shift+arrow).
-		*    min          {number}        Minimum permitted value.
-		*    max          {number}        Maximum permitted value.
-		*    standard     {Array<number>} Values to step through with prev/next buttons or Ctrl+arrow keys.
-		* @param {Element} element Optical element whose properties to set.
-		* @param {object} prop Property to set.
-		*/
-		createSingleControl = function (element, prop) {
-			var val,
-				LaserCanvas = window.LaserCanvas,          // {object} LaserCanvas namespace.
-				prettify = LaserCanvas.Utilities.prettify, // {function} Pretty print name.
-				localize = LaserCanvas.localize,           // {function} Localize text.
-				numberFormat = LaserCanvas.Utilities.numberFormat, // {function} Formatted number.
-				unit = LaserCanvas.unit,                   // {object} Units for each property.
-				propertyName = prop.propertyName,          // {string} Name of this property.
-				tbody = panel.querySelector('tbody'),      // {HTMLTBodyElement} Table body where to append row.
-				tmpl = panel.querySelector('thead tr[data-property-name]'), // {HTMLTRElement} Template row.
-				tr = tmpl.cloneNode(true),                 // {HTMLTRElement} Table row to fill.
-				input = tr.querySelector('input');         // {HTMLInputElement} Main input text field.
-
-			// Set row labels.
-			tr.querySelector('label').innerHTML = localize(prop.label || prettify(propertyName));
-			tr.querySelector('[data-content="unit"]').innerHTML = unit[propertyName] || '';
-			
-			// Property field.
-			input.setAttribute('data-property-name', propertyName);
-			if (element.canSetProperty(propertyName)) {
-				// Prepare the row.
-				tr.setAttribute('data-property-name', propertyName);
-				
-				// Other input types.
-				if (prop.hasOwnProperty('options')) {
-					input = inputAsMenu(input, prop.options);
-				} else if (prop.dataType === 'boolean') {
-					input.type = 'checkbox';
-				}
-				
-				// Set the value.
-				val = element.get(propertyName);
-				if (typeof val === 'boolean') {
-					input.checked = val;
-				} else if (typeof val === 'number') {
-					input.value = numberFormat(val);
-				} else {
-					input.value = val.toString();
-				}
-			} else {
-				input.disabled = true;
-			}
-			tbody.appendChild(tr);
 		},
 		
 		/**
@@ -323,49 +182,35 @@ window.LaserCanvas.PropertiesPanel = function (render, system) {
 		*    increment     (optional) Increment value for +/- buttons and up/down keys.
 		*    standard      (optional) Array of standard values for &lt; / &gt; buttons.
 		*/
-		createControls = function () {
-			var k,
-				el = currentElement, // {Element} el Optical element whose properties to adjust.
-				props = el.userProperties(), // {Array<object>} Properties.
-				hasRefractiveIndex = false;  // {boolean} Value indicating whether the element has refractive index.
-				
-			// Panel properties.
-			panel.querySelector('h1 input').value = currentElement.name;
-			panel.setAttribute('data-can-delete', props.canDelete === false ? 'false' : 'true');
-			
-			// Table rows.
-			for (k = 0; k < props.length; k += 1) {
-				if (props[k].propertyPanel !== false
-					&& system.showElementProperty(props[k].propertyName)) {
-					createSingleControl(el, props[k]);
-					hasRefractiveIndex = hasRefractiveIndex || (props[k].propertyName === 'refractiveIndex');
-				}
-			}
-			
-			// Refractive index button.
-			panel.setAttribute('data-has-refractive-index', hasRefractiveIndex);
-		},
-		
-		/**
-		* Activate the input and buttons for the given element.
-		*/
-		activateControls = function () {
-			var Utilities = window.LaserCanvas.Utilities;
+		initRows = function () {
+			var element = currentElement,
+				props = element.userProperties(),
+				tbody = panel.querySelector("tbody"),
+				hasRefractiveIndex = props.some(function (prop) {  // {boolean} Value indicating whether the element has refractive index.
+					return prop.propertyName === "refractiveIndex";
+				});
 
-			// Fancy input fields.
-			window.LaserCanvas.Element.inputProperties(panel, currentElement, system);
-			
-			// Select menus.
-			Utilities.foreach(panel.querySelectorAll('tbody select'), function (k, select) {
-				select.onchange = onPropertySelectChange;
-			});
-			
-			// Check boxes.
-			Utilities.foreach(panel.querySelectorAll('tbody input[type="checkbox"]'), function (k, chk) {
-				chk.onchange = onPropertyCheckChange;
-			});
+			// Panel properties.
+			panel.querySelector("h1 input").value = element.name;
+			panel.setAttribute("data-can-delete", props.canDelete === false ? "false" : "true");
+
+			// Refractive index button.
+			panel.setAttribute("data-has-refractive-index", hasRefractiveIndex);
+
+			// Table rows.
+			return props
+				.filter(function (prop) {
+					return system.showElementProperty(prop.propertyName);
+				})
+				.map(function (prop) {
+if (!element.canSetProperty(prop.propertyName)) {
+	console.warn(`Element can't set property ${prop.propertyName}`);
+}
+					return new LaserCanvas.InputPropertyRow(prop, element, onPropertyChange)
+						.appendTo(tbody);
+				});
 		},
-	
+
 		/**
 		* Read properties of the given element and fill
 		* the ones that can be set.
@@ -373,10 +218,8 @@ window.LaserCanvas.PropertiesPanel = function (render, system) {
 		*/
 		prepareProperties = function (el) {
 			currentElement = el;
-			clearControls();
-			createControls();
-			activateControls();
-			window.LaserCanvas.localize(panel);
+			clearRows();
+			initRows();
 		},
 		
 		/**
@@ -395,47 +238,40 @@ window.LaserCanvas.PropertiesPanel = function (render, system) {
 		* Activate the listeners on the static panel elements.
 		*/
 		activatePanel = function () {
-			var el;
-			
-			// Draggable.
-			window.LaserCanvas.Utilities.draggable(panel, {
-				handle: panel.querySelector('.dragbar')
-			});
-			
-			// Close button.
-			el = panel.querySelector('button[data-action="close"]');
-			el.onclick = function () {
-				hidePanel();
+			var onClick = function (sel, handler) {
+				panel.querySelector(sel).onclick = handler;
 			};
 			
+			// Draggable.
+			LaserCanvas.localize(panel);
+			LaserCanvas.Utilities.draggable(panel, {
+				handle: panel.querySelector(".dragbar")
+			});
+			
 			// Rename field.
-			el = panel.querySelector('h1 input');
-			el.onchange = onNameChange;
+			panel.querySelector("h1 input").onchange = onNameChange;
 			
-			// Sellmeier button.
-			el = panel.querySelector('button[data-action="sellmeier"]');
-			el.onclick = onSellmeier;
-			
-			// Delete button.
-			el = panel.querySelector('button[data-action="delete"]');
-			el.onclick = onDelete;
+			// Buttons.
+			onClick('button[data-action="close"]', hidePanel);
+			onClick('button[data-action="sellmeier"]', onSellmeier);
+			onClick('button[data-action="delete"]', onDelete);
 		};
 		
 	// Construct panel.
-	panel.innerHTML = window.LaserCanvas.PropertiesPanel.html;
-	panel.className = 'propertiesPanel';
+	panel.innerHTML = LaserCanvas.PropertiesPanel.template;
+	panel.className = "propertiesPanel";
 	activatePanel();
 	document.body.appendChild(panel);
 	
 	
 	// Attach listener.
-	render.addEventListener('elementClick', onElementClick);
+	render.addEventListener("elementClick", onElementClick);
 };
 
 /**
 * Panel contents.
 */
-window.LaserCanvas.PropertiesPanel.html = [
+LaserCanvas.PropertiesPanel.template = [
 	'<div class="dragbar"></div>',
 	'<h1>',
 		'<input type="text" data-action="name" disabled="disabled" />',
@@ -465,3 +301,4 @@ window.LaserCanvas.PropertiesPanel.html = [
 		'</button>',
 	'</div>'
 ].join('');
+}(window.LaserCanvas));

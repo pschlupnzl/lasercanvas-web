@@ -1,5 +1,15 @@
 /**
  * Control to manipulate a single element or system property.
+ * The property elements can have these properties:
+ *    propertyName {string}        Property name as used by element.
+ *    label        {string=}       Optional label to use in place of pretty print propertyName.
+ *    unit         {string=}       Optional unit to display.
+ *    options      {Array<string>} For drop-down menu, array of option strings.
+ *    dataType     {string}        Set to 'boolean' to create a checkbox.
+ *    increment    {number}        Step size with buttons or arrow keys (x10 for Shift+arrow).
+ *    min          {number}        Minimum permitted value.
+ *    max          {number}        Maximum permitted value.
+ *    standard     {Array<number>} Values to step through with prev/next buttons or Ctrl+arrow keys.
  */
 (function (LaserCanvas) {
 	/**
@@ -24,7 +34,8 @@
 		sagTan: "sagTan",
 		action: "action",
 		mx: "mx",
-		select: "select"
+		select: "select",
+		boolean: "boolean"
 	};
 
 	/** Table row template HTML. */
@@ -70,6 +81,13 @@
 			'<td data-cell="label"></td>',
 			'<td data-cell="select" colspan="2"></td>',
 			'<td data-cell="unit"></td>'
+		].join(""),
+
+		/** Template HTML for checkbox. */
+		boolean: [
+			'<td data-cell="label"></td>',
+			'<td data-cell="checkbox" colspan="2"></td>',
+			'<td data-cell="unit"></td>'
 		].join("")
 	};
 
@@ -81,6 +99,8 @@
 		if (typeof this.prop === "object") {
 			if (this.prop.hasOwnProperty("options")) {
 				return InputPropertyRow.eType.select;
+			} else if (this.prop.dataType === "boolean") {
+				return InputPropertyRow.eType.boolean;
 			}
 			return InputPropertyRow.eType.action;
 		}
@@ -116,18 +136,19 @@
 	 * Create an input control for action type rows.
 	 */
 	InputPropertyRow.prototype.initControl = function () {
+		var onInputChange = this.onInputChange.bind(this);
 		if (this.type === InputPropertyRow.eType.action) {
-			return new LaserCanvas.PropertyInput(
-				this.prop,
-				this.source,
-				this.onInputChange.bind(this)
-			).appendTo(this.el.querySelector('[data-cell="action"]'));
+			return new LaserCanvas.PropertyInput(this.prop, this.source, onInputChange)
+				.appendTo(this.el.querySelector('[data-cell="action"]'));
+
 		} else if (this.type === InputPropertyRow.eType.select) {
-			return new LaserCanvas.SelectInput(
-				this.prop,
-				this.source,
-				this.onInputChange.bind(this)
-			).appendTo(this.el.querySelector('[data-cell="select"]'));
+			return new LaserCanvas.SelectInput(this.prop, this.source, onInputChange)
+			.appendTo(this.el.querySelector('[data-cell="select"]'));
+
+		} else if (this.type === InputPropertyRow.eType.boolean) {
+			return new LaserCanvas.CheckboxInput(this.prop, this.source, onInputChange)
+				.appendTo(this.el.querySelector('[data-cell="checkbox"]'));
+
 		} else {
 			this.update();
 			return null;

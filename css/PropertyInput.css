@@ -63,3 +63,9 @@
 			margin-left: -1.5em;
 			margin-right: -1.5em;
 		}
+
+		.propertyInput[disabled] {
+			color: #626262;
+			background-color: #e7e7e7;
+			box-shadow: none;
+		}
