@@ -15,7 +15,7 @@ LaserCanvas.Element.Lens = function (variablesGetter) {
 	};
 	this.prop = {
 		distanceToNext: new LaserCanvas.Equation(0),  // {number} (mm) Distance to next element.
-		focalLength: 250    // {number} (mm) Focal length, 0 for infinite.
+		focalLength: new LaserCanvas.Equation(0)      // {number} (mm) Focal length, 0 for infinite.
 	};
 	this.priv = {
 		refractiveIndex: 0  // {number} Refractive index, when used as a thermal lens.
@@ -48,7 +48,7 @@ LaserCanvas.Element.Lens.prototype = {
 		LaserCanvas.Utilities.extend(this.loc, json.loc || {});
 		for (var propertyName in this.prop) {
 			if (this.prop.hasOwnProperty(propertyName)) {
-				this.prop[propertyName] = new LaserCanvas.Equation(json.prop[propertyName]);
+				this.prop[propertyName].set(json.prop[propertyName]);
 			}
 		}
 	},
@@ -127,7 +127,7 @@ LaserCanvas.Element.Lens.prototype = {
 	 * @param {string} propertyName Name of property to set, "distanceToNext"|...
 	 * @param {string|number} newValue New value to set. It is passed to the equation.
 	 */
-	set: function (propertyName, newValue, arg) {
+	set: function (propertyName, newValue) {
 		switch (propertyName) {
 			case "distanceToNext":
 			case "focalLength":

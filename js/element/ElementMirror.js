@@ -51,7 +51,7 @@ LaserCanvas.Element.Mirror.prototype = {
 		LaserCanvas.Utilities.extend(this.loc, json.loc);
 		for (var propertyName in this.prop) {
 			if (this.prop.hasOwnProperty(propertyName)) {
-				this.prop[propertyName] = new LaserCanvas.Equation(json.prop[propertyName]);
+				this.prop[propertyName].set(json.prop[propertyName]);
 			}
 		}
 	},

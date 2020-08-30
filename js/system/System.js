@@ -508,6 +508,16 @@ LaserCanvas.System = function () {
 			fireEventListeners('update');
 		},
 		
+		/**
+		 * Respond to a change in variables. This notifies internal
+		 * event listeners. The caller must still call update().
+		 */
+		onVariablesChange = function () {
+			melements.forEach(function (element) {
+				element.onVariablesChange && element.onVariablesChange();
+			});
+		},
+
 		// -------------------------------------------------
 		//  Add and remove elements.
 		// -------------------------------------------------
@@ -548,7 +558,7 @@ LaserCanvas.System = function () {
 				// Element.createGroup returns {Array<object>}, so
 				// we use apply to distribute the returned objects
 				// into the splice command.
-				Array.prototype.splice.apply(melements, [seg.indx + 1, 0].concat(Element.createGroup(prevElement, seg.z)));
+				Array.prototype.splice.apply(melements, [seg.indx + 1, 0].concat(Element.createGroup(prevElement, seg.z, mvariablesGetter)));
 				element = melements[seg.indx + 1];
 			} else {
 				element = new Element(mvariablesGetter); // {Element} Newly created element.
@@ -681,6 +691,7 @@ LaserCanvas.System = function () {
 		insertElement: insertElement,             // Insert a new element near the given point.
 		inspectSegment: inspectSegment,           // Inspect beam on a segment (from segmentNearLocation).
 		iterateElements: iterateElements,         // Iterate all elements in the system.
+		onVariablesChange: onVariablesChange,     // Respond to a change in variables.
 		removeElement: removeElement,             // Remove the given element.
 		removeEventListener: removeEventListener, // Remove an event handler.
 		segmentNearLocation: segmentNearLocation, // Segment point closest to point.

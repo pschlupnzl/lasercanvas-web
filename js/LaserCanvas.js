@@ -167,6 +167,7 @@ window.LaserCanvas.Application = function (canvas, info) {
 			
 			mvariables = new LaserCanvas.Variables();
 			mvariables.addEventListener("change", function () {
+				msystem.onVariablesChange();
 				msystem.update(true);
 			});
 			var variablesGetter = mvariables.value.bind(mvariables);

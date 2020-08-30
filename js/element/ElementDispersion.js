@@ -118,14 +118,10 @@ LaserCanvas.Element.Dispersion.prototype = {
 		LaserCanvas.Utilities.extend(this.priv, json.priv);
 		for (var propertyName in this.prop) {
 			if (this.prop.hasOwnProperty(propertyName)) {
-				switch (propertyName) {
-					case "type":
-					case "flip":
-						this.prop[propertyName] = json.prop[propertyName];
-						break;
-					default:
-						this.prop[propertyName].set(json.prop[propertyName]);
-						break;
+				if (typeof this.prop[propertyName] === "object") {
+					this.prop[propertyName].set(json.prop[propertyName]);
+				} else {
+					this.prop[propertyName] = json.prop[propertyName];
 				}
 			}
 		}

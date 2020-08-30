@@ -202,7 +202,7 @@ LaserCanvas.PropertiesPanel = function (render, system) {
 				})
 				.map(function (prop) {
 if (!element.canSetProperty(prop.propertyName)) {
-	console.warn(`Element can't set property ${prop.propertyName}`);
+	console.warn(`Element ${element.name} has canSetProperty(${prop.propertyName})=${element.canSetProperty(prop.propertyName)}`);
 }
 					return new LaserCanvas.InputPropertyRow(prop, element, onPropertyChange)
 						.appendTo(tbody);
