@@ -143,7 +143,7 @@
 
 		} else if (this.type === InputPropertyRow.eType.select) {
 			return new LaserCanvas.SelectInput(this.prop, this.source, onInputChange)
-			.appendTo(this.el.querySelector('[data-cell="select"]'));
+				.appendTo(this.el.querySelector('[data-cell="select"]'));
 
 		} else if (this.type === InputPropertyRow.eType.boolean) {
 			return new LaserCanvas.CheckboxInput(this.prop, this.source, onInputChange)
@@ -172,6 +172,8 @@
 			Utilities = LaserCanvas.Utilities;
 		switch (this.type) {
 			case InputPropertyRow.eType.action:
+			case InputPropertyRow.eType.select:
+			case InputPropertyRow.eType.boolean:
 				this.control.update();
 				break;
 			case InputPropertyRow.eType.unary:

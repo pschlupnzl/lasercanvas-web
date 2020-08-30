@@ -14,6 +14,7 @@
 		this.onChange = onChange;
 		this.el = this.init(prop);
 		this.input = this.el.querySelector("input");
+		this.update();
 	};
 
 	/** Table row template HTML. */
@@ -53,7 +54,7 @@
 
 	/** Update the displayed value of the select menu. */
 	CheckboxInput.prototype.update = function () {
-		this.input.value = this.get();
+		this.input.checked = this.get();
 	};
 
 	// ---------

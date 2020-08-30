@@ -9,10 +9,7 @@ LaserCanvas.PropertiesPanel = function (render, system) {
 		currentElement = null,                   // {Element} Current system element being edited.
 		panel = document.createElement("div"),   // {HTMLDivElement} Panel DOM element.
 		sellmeier = null,                        // {Sellmeier} Sellmeier panel, if used.
-		
-		// -------------------------------------------------
-		//  Utility methods.
-		// -------------------------------------------------
+		rows = [],                               // {Array<InputPropertyRow>} Controls in the panel.
 		
 		// -------------------------------------------------
 		//  Panel visibility.
@@ -212,6 +209,13 @@ if (!element.canSetProperty(prop.propertyName)) {
 				});
 		},
 
+		/** Update the rows. */
+		update = function () {
+			for (var row of rows) {
+				row.update();
+			}
+		},
+
 		/**
 		* Read properties of the given element and fill
 		* the ones that can be set.
@@ -220,7 +224,7 @@ if (!element.canSetProperty(prop.propertyName)) {
 		prepareProperties = function (el) {
 			currentElement = el;
 			clearRows();
-			initRows();
+			rows = initRows();
 		},
 		
 		/**
@@ -267,6 +271,10 @@ if (!element.canSetProperty(prop.propertyName)) {
 	
 	// Attach listener.
 	render.addEventListener("elementClick", onElementClick);
+
+	return {
+		update: update
+	};
 };
 
 /**

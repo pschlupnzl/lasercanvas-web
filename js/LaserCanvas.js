@@ -151,6 +151,7 @@ window.LaserCanvas.Application = function (canvas, info) {
 			msystem.addEventListener('update', function () {
 				msystem.calculateAbcd();
 				mrender.update();
+				mprop.update();
 				minfo.update(msystem, mrender);
 			});
 			
@@ -158,6 +159,7 @@ window.LaserCanvas.Application = function (canvas, info) {
 			msystem.addEventListener('change', function () {
 				msystem.calculateAbcd();
 				mrender.update();
+				mprop.update();
 				minfo
 					.change()
 					.update();
