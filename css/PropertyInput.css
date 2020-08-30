@@ -5,6 +5,7 @@
 	justify-content: flex-end;
 }
 
+	.propertyInput .selector::after,
 	.propertyInput button {
 		margin: 0 0.1em;
 		padding: 0.1em 0.5em;
@@ -31,13 +32,13 @@
 			border-top-right-radius: 0;
 			border-bottom-right-radius: 0;
 		}
-
+		.propertyInput .selector::after,
 		.propertyInput button[data-step="+1"] {
 			border-top-left-radius: 0;
 			border-bottom-left-radius: 0;
 		}
 
-	.propertyInput span {
+	.propertyInput span.input {
 		position: relative;
 		width: 4em;
 	}
@@ -69,3 +70,32 @@
 			background-color: #e7e7e7;
 			box-shadow: none;
 		}
+
+	.propertyInput .selector::after {
+		content: "▼";
+		padding: 0.6em 0.8em;
+		pointer-events: none;
+		border-top-right-radius: 2em;
+		border-bottom-right-radius: 2em;
+		font-size: 0.5em;
+	}
+	
+	.propertyInput select {
+		position: absolute;
+		width: 2.4em;
+		opacity: 0.01;
+	}
+
+	.propertyInput[data-has-standard="true"] button[data-step="+1"],
+	.propertyInput .selector {
+		display: none;
+	}
+
+	.propertyInput[data-has-standard="true"] button[data-step="-1"] {
+		visibility: hidden;
+	}
+
+	.propertyInput[data-has-standard="true"] .selector {
+		display: unset;
+	}
+

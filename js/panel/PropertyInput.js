@@ -128,16 +128,20 @@
 		this.lastValue = "";
 		this.el = this.init();
 		this.input = this.el.querySelector("input");
+		this.select = this.el.querySelector("select");
 		this.update();
 	};
 	
 	/** Template for control. */
 	PropertyInput.template = [
 		'<button data-step="-1" disabled>&minus;</button>',
-		'<span>',
+		'<span class="input">',
 		'<input type="text" />',
 		'</span>',
-		'<button data-step="+1" disabled>+</button>'
+		'<button data-step="+1" disabled>+</button>',
+		'<span class="selector">',
+		'<select></select>',
+		'</span>'
 	].join("");
 
 	/**
@@ -145,7 +149,10 @@
 	 */
 	PropertyInput.prototype.init = function () {
 		var self = this,
+
 			el = document.createElement("div"),
+			hasStandard = this.prop.hasOwnProperty("standard"), // {boolean} Value indicating whether should show the standard value selector.
+			hasIncrement = !hasStandard && this.prop.hasOwnProperty("increment"), // {boolean} Value indicating whether increment / decrement buttons are available.
 			/** Attach listeners to the input field. */
 			attachInputHandlers = function (input) {
 				input.onkeydown = self.onInputKeydown.bind(self);
@@ -153,14 +160,36 @@
 				input.onchange = self.onInputChange.bind(self);
 				input.onfocus = self.onInputFocus.bind(self);
 				input.onblur = self.onInputBlur.bind(self);
-			};
+			},
+			/** Attach handlers to Select menu. */
+			attachSelectHandlers = function (select) {
+				el.setAttribute("data-has-standard", hasStandard.toString());
+				self.prop.standard.forEach(function (value) {
+					var option = document.createElement("option");
+					option.value = value;
+					option.innerText = value;
+					select.insertBefore(option, select.firstChild);
+				});
+				select.onchange = self.onSelectChange.bind(self);
+				setTimeout(function () { select.value = self.get(); }, 0);
+			}
 
 		el.className = "propertyInput";
 		el.innerHTML = PropertyInput.template;
-		LaserCanvas.Utilities.foreach(el.querySelectorAll("button"), function () {
-			this.onclick = self.onButtonClick.bind(self);
-		});
+
 		attachInputHandlers(el.querySelector("input"));
+		if (this.prop.hasOwnProperty("standard")) {
+			attachSelectHandlers(el.querySelector("select"));
+		} else if (this.prop.hasOwnProperty("increment")) {
+			LaserCanvas.Utilities.foreach(el.querySelectorAll("button"), function () {
+				this.onclick = self.onButtonClick.bind(self);
+			});
+		} else {
+			LaserCanvas.Utilities.foreach(el.querySelectorAll("button"), function () {
+				this.disabled = true;
+			});
+		}
+
 		return el;
 	};
 
@@ -199,6 +228,7 @@
 		if (this.input.value !== displayValue) {
 			this.input.value = displayValue;
 		}
+		this.select.value = value;
 	};
 	
 	// ---------
@@ -242,9 +272,15 @@
 		this.fireChangeEvent(this.input.value);
 	};
 
-	/** The decrement button is clicked. */
+	/** The increment or decrement button is clicked. */
 	PropertyInput.prototype.onButtonClick = function () {
 console.log(`onButtonClick ${this.prop.propertyName}`);
+	};
+
+	/** The value in the select chooser is changed. */
+	PropertyInput.prototype.onSelectChange = function () {
+		this.fireChangeEvent(+this.select.value);
+		this.select.value = "";
 	};
 
 	/** Increment or decrement the value by the given step. */
