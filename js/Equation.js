@@ -48,7 +48,10 @@
 				}
 			}
 			return true;
-		};
+		},
+
+		/** Regular expression matching a trailing number such as ...) + 3, ...x - 3, etc. */
+		reTrailingNumber = /(^|[a-df-z0-9]|\))(\s*)([+-])\s*(\d+)$/i;
 
 	/**
 	 * Initialize a new Equation, optionally setting the initial value.
@@ -114,6 +117,51 @@
 			return value;
 		}
 	};
+
+
+
+	/**
+	 * Increment or decrement by a given amount. For numerical values,
+	 * this simply changes the values; expressions are modified to result
+	 * the adjusted value.
+	 * @param {number} amount Amount by which to increment the value.
+	 */
+	Equation.prototype.increment = function (amount) {
+		var match;
+
+		// Ignore if not changing value.
+		if (!amount) {
+			return;
+		}
+
+		// Numerical value: Add increment amount.
+		if (this._number !== null) {
+			return this.set(this._number + amount);
+		}
+
+		// Simple numerical expression (unlikely): Add amount as numerical value.
+		match = +this._expression;
+		if (!isNaN(match)) {
+			return this.set(match + amount);
+		}
+
+		// Trailing number: Adjust trailing value.
+		match = reTrailingNumber.exec(this._expression);
+		if (match) {
+			return this.set(this._expression.replace(reTrailingNumber, function (m, pre, space, sign, value) {
+				var newValue = +value + amount;
+				if (sign === "+" && newValue < 0) {
+					return pre + " - " + Math.abs(newValue).toString();
+				} else if (sign === "-" && newValue < 0) {
+					return pre + " + " + Math.abs(newValue).toString();
+				}
+				return pre + " " + sign + " " + newValue.toString();
+			}));
+		}
+
+		// Otherwise, add as trailing offset.
+		return this.set(this._expression + " " + (amount >= 0 ? "+" : "-") + " " + Math.abs(amount).toString());
+	}
 
 	/** Returns the string expression. */
 	Equation.prototype.expression = function () {

@@ -3,6 +3,11 @@
 <head>
 <title>LaserCanvas Tests</title>
 <style type="text/css">
+	body[theme="dark"] {
+		background: #272727;
+		color: #e7e7e7;
+	}
+
 	#test-runner-results {
 		/* border-collapse: collapse; */
 	}
@@ -13,6 +18,14 @@
 		
 		#test-runner-results tr.fail td {
 			background-color: #f99;
+		}
+
+		[theme="dark"] #test-runner-results tr.pass td {
+			background-color: #363;
+		}
+		
+		[theme="dark"] #test-runner-results tr.fail td {
+			background-color: #633;
 		}
 
 		#test-runner-results .template-row {
@@ -55,11 +68,12 @@
 <!-- <script src="css/HelpPanel.css"></script> -->
 
 <script src="TestRunner.js"></script>
-<script src="testElementDielectric.js"></script>
-<script src="testSystemLoad.js"></script>
+<!-- <script src="testElementDielectric.js"></script>
+<script src="testSystemLoad.js"></script> -->
 <script src="testEquation.js"></script>
+<script src="testEquationIncrement.js"></script>
 </head>
-<body>
+<body theme="dark">
 	<table id="test-runner-results">
 		<thead>
 			<tr>
