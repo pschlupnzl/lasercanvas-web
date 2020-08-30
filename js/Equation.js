@@ -64,11 +64,15 @@
 
 	/**
 	 * Set the equation value, e.g. in response to user input. Only
-	 * number and strings are accepted.
+	 * number and strings are accepted. If `value` is undefined, the
+	 * Equation is set to 0.
 	 * @param {string|number|object} value Value or expression to set.
 	 */
 	Equation.prototype.set = function (value) {
-		if (typeof value === "number" && !isNaN(value)) {
+		if (value === undefined) {
+			this._number = 0;
+			this._expression = null;
+		} else if (typeof value === "number" && !isNaN(value)) {
 			this._number = value;
 			this._expression = null;
 		} else if (typeof value === "string" && !isNaN(+value)) {
