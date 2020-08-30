@@ -14,6 +14,7 @@
 		this.onChange = onChange;
 		this.el = this.init(prop);
 		this.select = this.el.querySelector("select");
+		this.update();
 	};
 
 	/** Table row template HTML. */
@@ -70,6 +71,7 @@
 
 	/** Handle a change in the select menu. */
 	SelectInput.prototype.onSelectChange = function () {
+console.log(`SelectInput change ${this.prop.propertyName} => ${this.select.value}`)
 		this.fireChangeEvent(this.select.value);
 	};
 
