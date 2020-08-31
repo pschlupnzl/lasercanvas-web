@@ -118,8 +118,6 @@
 		}
 	};
 
-
-
 	/**
 	 * Increment or decrement by a given amount. For numerical values,
 	 * this simply changes the values; expressions are modified to result

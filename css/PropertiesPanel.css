@@ -52,6 +52,12 @@
 		border-bottom: 1px solid #666;
 	}
 
+	.propertiesPanel table th,
+	.propertiesPanel table td {
+		padding-top: 0.15em;
+		padding-bottom: 0.15em;
+	}
+
 	input.laserCanvasInput[type="number"],
 	input.laserCanvasInput[type="text"] {
 	/* .propertiesPanel table select,

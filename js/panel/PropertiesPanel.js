@@ -104,6 +104,9 @@ LaserCanvas.PropertiesPanel = function (render, system) {
 				systemChanged = propertyName === "type";
 			currentElement.set(propertyName, newValue);
 			system.update(true, systemChanged);
+			if (systemChanged) {
+				prepareProperties(currentElement);
+			}
 		},
 
 		/**
@@ -112,6 +115,18 @@ LaserCanvas.PropertiesPanel = function (render, system) {
 		*/
 		onNameChange = function () {
 			currentElement.name = this.value;
+			system.update(); // No need for coordinate changes.
+		},
+
+		/** Manipulate the name field on key down events. */
+		onNameKeydown = function (e) {
+			switch (e.which || e.keyCode) {
+				case 10:
+				case 13:
+				case 27:
+					this.blur();
+					return false;
+			}
 		},
 		
 		/**
@@ -167,6 +182,7 @@ LaserCanvas.PropertiesPanel = function (render, system) {
 		*/
 		clearRows = function () {
 			var tr;
+			panel.querySelector("h1 input").blur();
 			while ((tr = panel.querySelector("tbody tr"))) {
 				tr.parentNode.removeChild(tr);
 			}
@@ -198,12 +214,10 @@ LaserCanvas.PropertiesPanel = function (render, system) {
 			// Table rows.
 			return props
 				.filter(function (prop) {
-					return system.showElementProperty(prop.propertyName);
+					return system.showElementProperty(prop.propertyName)
+						&& element.canSetProperty(prop.propertyName);
 				})
 				.map(function (prop) {
-if (!element.canSetProperty(prop.propertyName)) {
-	console.warn(`Element ${element.name} has canSetProperty(${prop.propertyName})=${element.canSetProperty(prop.propertyName)}`);
-}
 					return new LaserCanvas.InputPropertyRow(prop, element, onPropertyChange)
 						.appendTo(tbody);
 				});
@@ -243,9 +257,10 @@ if (!element.canSetProperty(prop.propertyName)) {
 		* Activate the listeners on the static panel elements.
 		*/
 		activatePanel = function () {
-			var onClick = function (sel, handler) {
-				panel.querySelector(sel).onclick = handler;
-			};
+			var input,
+				onClick = function (sel, handler) {
+					panel.querySelector(sel).onclick = handler;
+				};
 			
 			// Draggable.
 			LaserCanvas.localize(panel);
@@ -254,7 +269,9 @@ if (!element.canSetProperty(prop.propertyName)) {
 			});
 			
 			// Rename field.
-			panel.querySelector("h1 input").onchange = onNameChange;
+			input = panel.querySelector("h1 input");
+			input.onkeyup = input.onchange = onNameChange;
+			input.onkeydown = onNameKeydown;
 			
 			// Buttons.
 			onClick('button[data-action="close"]', hidePanel);
@@ -283,7 +300,7 @@ if (!element.canSetProperty(prop.propertyName)) {
 LaserCanvas.PropertiesPanel.template = [
 	'<div class="dragbar"></div>',
 	'<h1>',
-		'<input type="text" data-action="name" disabled="disabled" />',
+		'<input type="text" data-action="name" />',
 		'<button data-action="close">X</button>',
 	'</h1>',
 	'<table class="banded">',

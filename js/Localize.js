@@ -21,6 +21,7 @@ window.LaserCanvas.localize = (function () {
 			"symbolscreen": "I",
 
 			// Property names.
+			"elementdistancetonext": "Distance To Next",
 			"abcdsag": "Sagittal ABCD",
 			"abcdtan": "Tangential ABCD",
 		},

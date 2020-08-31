@@ -29,7 +29,8 @@ button[data-action="toggleVariables"] {
 	}
 
 		button[data-action="toggleVariables"]:after {
-			content: "\2303";
+			/* content: "\2303"; */
+			content: "\3a3";
 			font-size: 0.8em;
 		}
 
