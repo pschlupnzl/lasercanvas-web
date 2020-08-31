@@ -134,11 +134,11 @@
 	
 	/** Template for control. */
 	PropertyInput.template = [
-		'<button data-step="-1" disabled>&minus;</button>',
+		'<button data-step="-1">&minus;</button>',
 		'<span class="input">',
 		'<input type="text" />',
 		'</span>',
-		'<button data-step="+1" disabled>+</button>',
+		'<button data-step="+1">+</button>',
 		'<span class="selector">',
 		'<select></select>',
 		'</span>'
@@ -149,10 +149,8 @@
 	 */
 	PropertyInput.prototype.init = function () {
 		var self = this,
-
 			el = document.createElement("div"),
-			hasStandard = this.prop.hasOwnProperty("standard"), // {boolean} Value indicating whether should show the standard value selector.
-			hasIncrement = !hasStandard && this.prop.hasOwnProperty("increment"), // {boolean} Value indicating whether increment / decrement buttons are available.
+
 			/** Attach listeners to the input field. */
 			attachInputHandlers = function (input) {
 				input.onkeydown = self.onInputKeydown.bind(self);
@@ -161,9 +159,21 @@
 				input.onfocus = self.onInputFocus.bind(self);
 				input.onblur = self.onInputBlur.bind(self);
 			},
+
+			/** Attach handlers to the step buttons. */
+			attachButtonHandlers = function (buttons) {
+				var onClick = function () {
+					var step = +this.getAttribute("data-step");
+					self.increment(step * self.prop.increment);
+				}
+				LaserCanvas.Utilities.foreach(buttons, function () {
+					this.onclick = onClick;
+				});
+			},
+
 			/** Attach handlers to Select menu. */
 			attachSelectHandlers = function (select) {
-				el.setAttribute("data-has-standard", hasStandard.toString());
+				el.setAttribute("data-has-standard", "true");
 				self.prop.standard.forEach(function (value) {
 					var option = document.createElement("option");
 					option.value = value;
@@ -172,7 +182,7 @@
 				});
 				select.onchange = self.onSelectChange.bind(self);
 				setTimeout(function () { select.value = self.get(); }, 0);
-			}
+			};
 
 		el.className = "propertyInput";
 		el.innerHTML = PropertyInput.template;
@@ -181,9 +191,7 @@
 		if (this.prop.hasOwnProperty("standard")) {
 			attachSelectHandlers(el.querySelector("select"));
 		} else if (this.prop.hasOwnProperty("increment")) {
-			LaserCanvas.Utilities.foreach(el.querySelectorAll("button"), function () {
-				this.onclick = self.onButtonClick.bind(self);
-			});
+			attachButtonHandlers(el.querySelectorAll("button"));
 		} else {
 			LaserCanvas.Utilities.foreach(el.querySelectorAll("button"), function () {
 				this.disabled = true;
@@ -248,23 +256,38 @@
 		this.update(); // Update now with value.
 	};
 
+	var ENTER = 13,
+		NEWLINE = 10,
+		ESCAPE = 27
+		UP_ARROW = 38,
+		DOWN_ARROW = 40;
+
 	/** Blur the field on enter or escape. */
 	PropertyInput.prototype.onInputKeydown = function (keyboardEvent) {
 		switch (keyboardEvent.which || keyboardEvent.keyCode) {
-			case 10:
-			case 13:
+			case ENTER:
+			case NEWLINE:
 				this.input.blur();
 				break;
-			case 27:
+			case ESCAPE:
 				this.input.value = this.lastValue;
 				this.input.blur();
 				break;
+			case UP_ARROW: // Up arrow
+				this.increment(+1 * this.prop.increment);
+				return false;
+			case DOWN_ARROW:
+				this.increment(-1 * this.prop.increment);
+				return false;
 		}
 	};
 
 	/** Handle a keyup event. */
 	PropertyInput.prototype.onInputKeyup = function () {
-		this.fireChangeEvent(this.input.value);
+		var value = this.input.value;
+		if (value !== "") {
+			this.fireChangeEvent(this.input.value);
+		}
 	};
 
 	/** Handle a change event. */
@@ -272,20 +295,29 @@
 		this.fireChangeEvent(this.input.value);
 	};
 
-	/** The increment or decrement button is clicked. */
-	PropertyInput.prototype.onButtonClick = function () {
-console.log(`onButtonClick ${this.prop.propertyName}`);
+	/** Increment or decrement the value by the given step. */
+	PropertyInput.prototype.increment = function (step) {
+		var newValue = this.get() + step;
+		if (!step) {
+			return;
+		}
+		if ((this.prop.hasOwnProperty("min") && newValue < this.prop.min)
+			|| (this.prop.hasOwnProperty("max") && newValue > this.prop.max)) {
+			return;
+		}
+		if (this.prop.hasOwnProperty("wrap") && newValue > this.prop.wrap) {
+			newValue -= 2 * this.prop.wrap;
+		}
+		if (this.prop.hasOwnProperty("wrap") && newValue < -this.prop.wrap) {
+			newValue += 2 * this.prop.wrap;
+		}
+		this.fireChangeEvent(newValue);
 	};
 
 	/** The value in the select chooser is changed. */
 	PropertyInput.prototype.onSelectChange = function () {
 		this.fireChangeEvent(+this.select.value);
 		this.select.value = "";
-	};
-
-	/** Increment or decrement the value by the given step. */
-	PropertyInput.prototype.increment = function (step) {
-console.log(`Increment by ${step}`);
 	};
 
 	/** Notify the parent controller that the value has changed. */

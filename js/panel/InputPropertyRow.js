@@ -7,6 +7,7 @@
  *    options      {Array<string>} For drop-down menu, array of option strings.
  *    dataType     {string}        Set to 'boolean' to create a checkbox.
  *    increment    {number}        Step size with buttons or arrow keys (x10 for Shift+arrow).
+ *    wrap         {number}        Number at which to wrap (to negative of wrap)
  *    min          {number}        Minimum permitted value.
  *    max          {number}        Maximum permitted value.
  *    standard     {Array<number>} Values to step through with prev/next buttons or Ctrl+arrow keys.
