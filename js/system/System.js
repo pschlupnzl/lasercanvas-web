@@ -659,7 +659,7 @@ LaserCanvas.System = function () {
 		 */
 		fromTextFile = function (src) {
 			var json = LaserCanvas.SystemUtil.textFileToJson(src);
-			LaserCanvas.SystemUtil.fromJson(json, mprop, melements, mvariablesGetter);
+			LaserCanvas.SystemUtil.fromJson(json, mprop, melements, this, mvariablesGetter);
 
 			// Calculate Cartesian coordinates.
 			updateElementNames();

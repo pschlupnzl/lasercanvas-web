@@ -402,6 +402,7 @@ Renderer 2d {
 }
 `},
 
+/*
 { label: "test_linear_lens_astigmatic", expectAbcd: [[0.125, 328, -0.003, 0.125], [-0.875, -46.9, 0.005, -0.875]], src: 
 `[Sys_02247ec8]
 Resonator
@@ -453,7 +454,7 @@ Renderer 2d {
    Flags = 10
 }
 ` },
-
+*/
 { label: "test_linear_block_angled", expectAbcd: [[-1.48, -120, 0.00483, -0.283], [-1.45, -109, 0.00445, -0.356]], src: 
 `[Sys_02248264]
 Resonator
@@ -1877,6 +1878,7 @@ let filter = null;
 // filter = "test_linear_crystal";
 // filter = "test_plate";
 // filter = "test_plate_input_curved";
+// filter = "test_linear_angled_curved";
 // filter = "test_plate_face_angle_input_curved";
 // filter = /thermal_lens/;
 // filter = "test_screen_in_plate";
@@ -1894,6 +1896,7 @@ collection.systemload = {
 	 */
 	test: function (testCase) {
 		const s = new LaserCanvas.System();
+		s.setVariablesGetter(function () { return {}; });
 		try {
 			s.fromTextFile(testCase.src);
 		} catch (e) {

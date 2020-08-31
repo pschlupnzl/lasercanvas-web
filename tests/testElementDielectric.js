@@ -170,23 +170,26 @@ window.testCollection = window.testCollection || {};
 		label: "Dielectric Elements",
 		cases: testCases,
 		test: function (testCase) {
-			const Matrix2x2 = LaserCanvas.Math.Matrix2x2;
-
-			const face1 = {
+			const variablesGetter = function () { return {}; };
+			const first = new LaserCanvas.Element.Dielectric(variablesGetter);
+			const last = new LaserCanvas.Element.Dielectric(variablesGetter);
+			first.fromJson({
 				prop: {
-					type: LaserCanvas.Element.Dielectric.eType[testCase.type],
-					refractiveIndex: testCase.n,
-					angleOfIncidence: testCase.angleOfIncidence,
-					qext: 0,
-					curvatureFace1: testCase.curvatureFace1 || 0,
-					curvatureFace2: testCase.curvatureFace2 || 0,
+					type: testCase.type,
+					angleOfIncidence: testCase.angleOfIncidence * 180 / Math.PI,
+					curvatureFace1: testCase.curvatureFace1,
+					curvatureFace2: testCase.curvatureFace2,
+					refractiveIndex: testCase.n
 				}
-			};
-			const face2 = {};
-			face1.group = face2.group = [face1, face2];
-			const element = testCase.isFace1 ? face1 : face2;
+			});
+			first.group = last.group = [
+				first,
+				new LaserCanvas.Element.Lens(variablesGetter),
+				last];
+			first.updateAngles();
+
 			const modePlane = LaserCanvas.Enum.modePlane[testCase.plane];
-			const abcd = LaserCanvas.Element.Dielectric.prototype.elementAbcd.call(element, testCase.dir, modePlane);
+			const abcd = (testCase.isFace1 ? first : last).elementAbcd(testCase.dir, modePlane);
 			const success = abcd.isEqual(testCase.expectAbcd, 1e-5);
 
 			if (!success) {

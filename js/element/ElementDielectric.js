@@ -119,8 +119,8 @@ LaserCanvas.Element.Dielectric.prototype = {
 			distanceToNext: new LaserCanvas.Equation(0),         // {number} (mm) Distance to next element.
 			refractiveIndex: new LaserCanvas.Equation(1),        // {number} Refractive index.
 			groupVelocityDispersion: new LaserCanvas.Equation(0),// {number} (um^-2) Group velocity dispersion for ultrafast calculations.
-			angleOfIncidence: new LaserCanvas.Equation(0),       // {number} (rad) Angle of incidence. Auto-calculated for Brewster and Crystal.
-			faceAngle: new LaserCanvas.Equation(0),              // {number} (rad) Face angle relative to internal propagation for Crystal (also used for painting).
+			angleOfIncidence: new LaserCanvas.Equation(0),       // {number} (deg) Angle of incidence. Auto-calculated for Brewster and Crystal.
+			faceAngle: new LaserCanvas.Equation(0),              // {number} (deg) Face angle relative to internal propagation for Crystal (also used for painting).
 			curvatureFace1: new LaserCanvas.Equation(0),         // {number} (mm) Radius of curvature for input interface, or 0 for flat.
 			curvatureFace2: new LaserCanvas.Equation(0),         // {number} (mm) Radius of curvature for output interface, or 0 for flat.
 			thermalLens: new LaserCanvas.Equation(0),            // {number} (mm) Focal length of thermal lens, or 0 for none.
@@ -156,10 +156,10 @@ LaserCanvas.Element.Dielectric.prototype = {
 			isBrewster = type === eType.Brewster, // {boolean} Value indicating whether the dielectric is a Brewster crystal.
 			isPrism = type === eType.Prism,       // {boolean} Value indicating whether the dielectric is a Prism.
 			sign = this.get("flip") ? -1 : 1,     // {number} Reverse angles on flip.
-			angleOfIncidence = this.get("angleOfIncidence"), // {number} (rad) External incidence angle (n = 1 side?).
-			faceAngle = this.get("faceAngle"),    // {number} (rad) Face angle, used for Crystal.
-			n = Math.max(1, this.get("refractiveIndex")); // {number} Refractive index (must be n >= 1).
-		
+			angleOfIncidence = this.get("angleOfIncidence") * Math.PI / 180, // {number} (deg) External incidence angle (n = 1 side?).
+			faceAngle = this.get("faceAngle") * Math.PI / 180, // {number} (deg) Face angle, used for Crystal.
+			n = Math.max(1, this.get("refractiveIndex"));      // {number} Refractive index (must be n >= 1).
+
 		// Brewster plate: Fix external angle of incidence.
 		if (isBrewster || isPrism) {
 			angleOfIncidence = sign * Math.atan(n);
@@ -491,11 +491,10 @@ default:
 		switch (propertyName) {
 			case "type":            // {string} Dielectric block type.
 			case "flip":            // {boolean} Value indicating whether to flip a Brewster plate.
-				return this.prop[propertyName];
+				return this.group[0].prop[propertyName];
 
 			case "angleOfIncidence":
 			case "faceAngle":
-				// return this.prop[propertyName] * 180.00/ Math.PI;
 				return value;
 				
 			case "thickness":       // {number} (mm) Thickness of element.

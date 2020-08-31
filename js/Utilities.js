@@ -227,7 +227,7 @@ window.LaserCanvas.Utilities = {
 		} else if (Math.abs(val) > 1e4) {
 			str = val.toPrecision(2);
 		} else if (Math.abs(val) >= 100) {
-			str = Math.round(val);
+			str = Math.round(val).toString();
 		} else {
 			str = useFixed  // First pass at string.
 				? val.toFixed(3)       // Fixed decimal point (123.123).

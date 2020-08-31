@@ -28,7 +28,7 @@
 			systemDefaults()[configuration || System.configuration.linear],
 			mprop,
 			melements,
-			null, // TODO: Need system here (for screen?)
+			this,
 			mvariablesGetter);
 	};
 
@@ -103,11 +103,11 @@
 							refractiveIndex: 1.5,
 							curvatureFace1: -200,
 							curvatureFace2: 0,
-							thermalLens: 0
+							thermalLens: 0,
+							thickness: 50,
+							angleOfIncidence: 0
 						},
-						priv: {
-							thickness: 50
-						}
+						priv: {}
 					},
 					{
 						type: "Lens",
@@ -122,7 +122,8 @@
 						loc: {},
 						prop: {
 							distanceToNext: 200
-						}
+						},
+						priv: {}
 					},
 					{
 						type: "Mirror",
@@ -184,7 +185,7 @@
 						prop: {
 							distanceToNext: 250,
 							radiusOfCurvature: 0,
-							angleOfIncidence: -0.5235987755982988
+							angleOfIncidence: -30
 						}
 					},
 					{
@@ -193,7 +194,7 @@
 						loc: {},
 						prop: {
 							radiusOfCurvature: 500,
-							angleOfIncidence: -0.5235987755982989
+							angleOfIncidence: -30
 						}
 					}
 				]
@@ -228,7 +229,7 @@
 						prop: {
 							distanceToNext: 105,
 							radiusOfCurvature: 200,
-							angleOfIncidence: 0.15
+							angleOfIncidence: 9
 						}
 					},
 					{
@@ -239,15 +240,14 @@
 							type: "Crystal",
 							refractiveIndex: 1.76,
 							groupVelocityDispersion: 0.064,
-							angleOfIncidence: 1.0550462304736345,
-							faceAngle: 0.517,
+							angleOfIncidence: 60,
+							faceAngle: 29.62,
+							thickness: 2,
 							curvatureFace1: 0,
 							curvatureFace2: 0,
 							thermalLens: 0
 						},
-						priv: {
-							thickness: 2
-						}
+						priv: {}
 					},
 					{
 						type: "Lens",
@@ -273,7 +273,7 @@
 						prop: {
 							distanceToNext: 170,
 							radiusOfCurvature: 200,
-							angleOfIncidence: 0.15
+							angleOfIncidence: 9
 						}
 					},
 					{
@@ -281,8 +281,8 @@
 						name: "DC1",
 						loc: {},
 						prop: {
-							distanceToNext: 217,
 							type: "Prism",
+							distanceToNext: 217,
 							prismInsertion: 0,
 							refractiveIndex: 1.5,
 							indexDispersion: 0,
