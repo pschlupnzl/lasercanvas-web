@@ -269,16 +269,16 @@ console.log(axisParams);
 	LaserCanvas.Graph2d = Graph2d;
 }(window.LaserCanvas));
 
-setTimeout(function () {
-	var el = document.createElement("div");
-	document.body.appendChild(el);
-	el.style.position = "absolute";
-	el.style.top = "0";
-	el.style.left = "0";
-	el.style.width = "300px";
-	el.style.height = "200px";
-	// el.style.background = "white";
-	// el.style.border = "1px solid";
-	var g = new window.LaserCanvas.Graph2d(el);
-	g.plot([0, 0.5, 2], [-1, 1, 0]);
-}, 100);
+// setTimeout(function () {
+// 	var el = document.createElement("div");
+// 	document.body.appendChild(el);
+// 	el.style.position = "absolute";
+// 	el.style.top = "0";
+// 	el.style.left = "0";
+// 	el.style.width = "300px";
+// 	el.style.height = "200px";
+// 	// el.style.background = "white";
+// 	// el.style.border = "1px solid";
+// 	var g = new window.LaserCanvas.Graph2d(el);
+// 	g.plot([0, 0.5, 2], [-1, 1, 0]);
+// }, 100);
