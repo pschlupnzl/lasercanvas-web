@@ -60,9 +60,6 @@
 
 	input.laserCanvasInput[type="number"],
 	input.laserCanvasInput[type="text"] {
-	/* .propertiesPanel table select,
-	.propertiesPanel table input[type="number"],
-	.propertiesPanel table input[type="text"] { */
 		padding: 0.1em 0.5em;
 		background: white;
 		border-radius: 0.5em;
@@ -70,31 +67,23 @@
 		font-size: inherit;
 	}
 	
-	/* .propertiesPanel table select {
-		min-width: 6em;
-	} */
-	
 	input.laserCanvasInput[type="number"],
 	input.laserCanvasInput[type="text"] {
-	/* .propertiesPanel table input[type="number"],
-	.propertiesPanel table input[type="text"] { */
 		width: 3.0em;
 		border: none;
 		box-shadow: 0.1em 0.1em 0.2em rgba(0, 0, 0, 0.3) inset;
 		text-align: right;
 	}
 
+	/*
 	.checkboxInput input[type="checkbox"],
 	input.laserCanvasInput[type="checkbox"] {
-	/* .propertiesPanel table input[type="checkbox"] { */
 		position: relative;
-		/* top: +0.4em; */
 		left: +0.4em;
 	}
 	
 		.checkboxInput input[type="checkbox"]:after,
 		input.laserCanvasInput[type="checkbox"]:after {
-		/* .propertiesPanel table input[type="checkbox"]:after { */
 			content: " ";
 			display: inline-block;
 			position: relative;
@@ -112,22 +101,54 @@
 		
 			.checkboxInput input[type="checkbox"]:checked:after,
 			input.laserCanvasInput[type="checkbox"]:checked:after {
-			/* .propertiesPanel table input[type="checkbox"]:checked:after { */
 				content: "\2714";
 				box-shadow: 0.1em 0.1em 0.2em rgba(0, 0, 0, 0.3) inset;
 				background-color: #c7c7c8;
 			}
-			
-	/* .propertiesPanel table input[type="text"][disabled] {
-		color: #626262;
-		background-color: #e7e7e7;
-		box-shadow: none;
-	} */
+	*/
 
-	/* .propertiesPanel table td[data-content="unit"] {
-		text-align: left;
-	} */
+	.checkboxInput input[type="checkbox"],
+	input.laserCanvasInput[type="checkbox"] {
+		position: relative;
+		width: 3em;
+		margin-left: 1em;
+		font-size: inherit;
+	}
 	
+		.checkboxInput input[type="checkbox"]::before,
+		input.laserCanvasInput[type="checkbox"]::before {
+			content: "";
+			display: inline-block;
+			position: absolute;
+			left: -0.9em;
+			top: -0.2em;
+			width: 3em;
+			height: 1.4em;
+			border-radius: 0.7em;
+			background: #a8a8a8;
+			box-shadow: 0 0 0.5em rgba(0, 0, 0, 0.2) inset;
+		}
+
+		.checkboxInput input[type="checkbox"]::after,
+		input.laserCanvasInput[type="checkbox"]::after {
+			content: "\d7";
+			position: absolute;
+			width: 1.2em;
+			height: 1.2em;
+			left: -0.7em;
+			top: -0.1em;
+			border-radius: 0.5em;
+			background: #f4f4f4;
+			text-align: center;
+			transition: left 150ms;
+		}
+
+			.checkboxInput input[type="checkbox"]:checked::after,
+			input.laserCanvasInput[type="checkbox"]:checked::after {
+				content: "\2713";
+				left: 0.7em;
+			}
+
 .dragbar {
 	background-image: linear-gradient(
 		to bottom,
