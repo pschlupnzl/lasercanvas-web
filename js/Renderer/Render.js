@@ -51,6 +51,7 @@ LaserCanvas.Render = function (system, info, canvas) {
 		/** Sets the callback function used to retrieve variable values. */
 		setVariablesGetter = function (getter) {
 			mvariablesGetter = getter;
+			return this;
 		},
 
 		/** Retrieves current variables, or returns empty object as callback. */

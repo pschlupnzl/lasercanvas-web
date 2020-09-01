@@ -12,7 +12,19 @@ window.LaserCanvas.RenderSvg = function (system) {
 		mstrokeStyle = '#000', // {string} Current stroke color.
 		mlineWidth = 1,        // {number} Current stroke width.
 		mgroups = [],          // {Array<Group>} Group within group (with save / restore).
+		mvariablesGetter = null, // {function|null} Function to retrieve current variable values.
 		
+		/** Sets the callback function used to retrieve variable values. */
+		setVariablesGetter = function (getter) {
+			mvariablesGetter = getter;
+			return this;
+		},
+
+		/** Returns the current variable values. */
+		getVariables = function () {
+			return mvariablesGetter ? mvariablesGetter() : {};
+		},
+
 		// -------------------------------------------------
 		//  Drawing methods.
 		// -------------------------------------------------
@@ -318,6 +330,8 @@ window.LaserCanvas.RenderSvg = function (system) {
 	* Public methods.
 	*/
 	this.download = download;    // Trigger the SVG to download.
+	this.getVariables = getVariables; // Retrieve the current variable values.
+	this.setVariablesGetter = setVariablesGetter; // Set the callback to retrieve variable values.
 	this.update = update;        // Update the drawing.
 	
 	////// Used by Elements for drawing.

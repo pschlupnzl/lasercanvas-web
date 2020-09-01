@@ -23,7 +23,7 @@
 	/**
 	 * Initialize the toolbar controls, such as theme and inspect mode.
 	 */
-	Toolbar.prototype.init = function () {
+	Toolbar.prototype.init = function (variablesGetter) {
 		var msystem = this.msystem,
 			mrender = this.mrender,
 			fireEventListeners = this.fireEventListeners,
@@ -94,6 +94,7 @@
 		document.querySelector('button[data-action="download-svg"]').onclick = function () {
 			// LaserCanvas.getScript('js/RenderSvg.js', function () {
 				window.globalRenderSvg = new window.LaserCanvas.RenderSvg(msystem)
+					.setVariablesGetter(variablesGetter)
 					.update()
 					.download();
 			// }, this);
@@ -106,7 +107,8 @@
 		});
 
 		// Initialize from local storage, if possible.
-		msystem.fromJsonSource(LaserCanvas.SystemUtil.fromLocalStorage);
+		// msystem.fromJsonSource(LaserCanvas.SystemUtil.fromLocalStorage);
+		msystem.fromJsonSource();
 		return this;
 	};
 

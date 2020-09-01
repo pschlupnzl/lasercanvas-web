@@ -181,7 +181,7 @@ window.LaserCanvas.Application = function (canvas, info) {
 			* Toolbar handler.
 			*/
 			new LaserCanvas.Toolbar(msystem, mrender, fireEventListeners)
-				.init()
+				.init(variablesGetter)
 				.initDrag()
 				.initSystemNew(launch);
 		},
