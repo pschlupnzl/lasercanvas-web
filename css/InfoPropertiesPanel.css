@@ -31,19 +31,24 @@
 		text-align: left;
 	}
 
-[data-show-advanced="false"] .infoPropertiesPanel [data-property-name="physicalLength"],
-[data-show-advanced="false"] .infoPropertiesPanel [data-property-name="opticalLength"],
-[data-show-advanced="false"] .infoPropertiesPanel [data-property-name="modeSpacing"],
-[data-show-advanced="false"] .infoPropertiesPanel [data-property-name="groupDelayDispersion"],
-[data-show-advanced="false"] .infoPropertiesPanel .systems [data-property-name="groupVelocityDispersion"],
 [data-show-advanced="false"] .infoPropertiesPanel [data-property-name="abcdSag"],
 [data-show-advanced="false"] .infoPropertiesPanel [data-property-name="abcdTan"],
-[data-show-advanced="false"] .infoPropertiesPanel [data-property-name="distanceToNext"],
 [data-show-advanced="false"] .infoPropertiesPanel [data-property-name="angleOfIncidence"],
-[data-show-advanced="false"] .infoPropertiesPanel [data-property-name="radiusOfCurvature"],
+[data-show-advanced="false"] .infoPropertiesPanel [data-property-name="curvatureFace1"],
+[data-show-advanced="false"] .infoPropertiesPanel [data-property-name="curvatureFace2"],
+[data-show-advanced="false"] .infoPropertiesPanel [data-property-name="distanceToNext"],
+[data-show-advanced="false"] .infoPropertiesPanel [data-property-name="elementDistanceToNext"],
 [data-show-advanced="false"] .infoPropertiesPanel [data-property-name="focalLength"],
-[data-show-advanced="false"] .infoPropertiesPanel [data-property-name="wavefrontROC"],
+[data-show-advanced="false"] .infoPropertiesPanel [data-property-name="groupDelayDispersion"],
+[data-show-advanced="false"] .infoPropertiesPanel [data-property-name="groupVelocityDispersion"],
+[data-show-advanced="false"] .infoPropertiesPanel [data-property-name="modeSpacing"],
+[data-show-advanced="false"] .infoPropertiesPanel [data-property-name="opticalLength"],
+[data-show-advanced="false"] .infoPropertiesPanel [data-property-name="physicalLength"],
+[data-show-advanced="false"] .infoPropertiesPanel [data-property-name="radiusOfCurvature"],
+[data-show-advanced="false"] .infoPropertiesPanel [data-property-name="rayleighLength"],
+[data-show-advanced="false"] .infoPropertiesPanel [data-property-name="refractiveIndex"],
+[data-show-advanced="false"] .infoPropertiesPanel [data-property-name="thickness"],
 [data-show-advanced="false"] .infoPropertiesPanel [data-property-name="waistSize"],
-[data-show-advanced="false"] .infoPropertiesPanel [data-property-name="rayleighLength"] {
+[data-show-advanced="false"] .infoPropertiesPanel [data-property-name="wavefrontROC"] {
 	display: none;
 }

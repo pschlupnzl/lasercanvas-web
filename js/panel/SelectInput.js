@@ -71,7 +71,6 @@
 
 	/** Handle a change in the select menu. */
 	SelectInput.prototype.onSelectChange = function () {
-console.log(`SelectInput change ${this.prop.propertyName} => ${this.select.value}`)
 		this.fireChangeEvent(this.select.value);
 	};
 
