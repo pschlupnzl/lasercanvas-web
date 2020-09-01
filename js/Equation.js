@@ -24,8 +24,8 @@
 		/** Anticipated variable strings. */
 		variableStrings = ["x", "y"],
 
-		/** Regular expression matching an isolated string corresponding to a variable. */
-		reVariables = new RegExp(`(^|\\W)(${variableStrings.join("|")})(\\W|$)`, "g"),
+		/** Regular expression matching an isolated string corresponding to a variable (case insensitive). */
+		reVariables = new RegExp(`(^|\\W)(${variableStrings.join("|")})(\\W|$)`, "gi"),
 
 		/** Allowed strings of more than one character. */
 		allowedStrings = (function (strings) {
@@ -83,7 +83,10 @@
 			this._expression = null;
 		} else if (typeof value === "string" && validate(value)) {
 			this._number = null;
-			this._expression = value;
+			this._expression = value
+				.replace(reVariables, function (m, pre, name, post) {
+					return `${pre}${name.toLowerCase()}${post}`;
+				});
 		} else if (typeof value === "object" 
 				&& value.hasOwnProperty("_number") 
 				&& value.hasOwnProperty("_expression")) {

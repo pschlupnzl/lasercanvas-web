@@ -497,11 +497,15 @@ default:
 			case "faceAngle":
 				return value;
 				
-			case "thickness":       // {number} (mm) Thickness of element.
 			case "distanceToNext": // {number} (mm) Distance to next element.
+			case "thickness":       // {number} (mm) Thickness of element.
+				return Math.max(0, value);
+
+			case "refractiveIndex": // {number} Refractive index.
+				return Math.max(1, value);
+
 			case "curvatureFace1":
 			case "curvatureFace2":
-			case "refractiveIndex": // {number} Refractive index.
 			case "groupVelocityDispersion": // {number} (um^-2) Group velocity dispersion.
 			case "thermalLens":     // {number} (mm) Focal length of thermal lens, or 0 for none.
 				return value;
@@ -518,6 +522,10 @@ default:
 	
 	/** Returns the source expression for the property. */
 	expression: function (propertyName) {
+		switch (propertyName) {
+			case "elementDistanceToNext":
+				return this.group[this.group.length - 1].expression("distanceToNext");
+		}
 		return this.prop[propertyName].expression();
 	},
 

@@ -122,9 +122,13 @@
 
 	/**
 	 * Update the displayed value of the input field.
+	 * @param {string=} value Optional value to set, defaults to get().
 	 */
-	PropertyInput.prototype.update = function () {
-		var value = this.get(),
+	PropertyInput.prototype.update = function (value) {
+		if (this.isFocused && value === undefined) {
+			return;
+		}
+		var value = value || this.get(),
 			displayValue = typeof value === "number" ? LaserCanvas.Utilities.numberFormat(value) : value;
 		if (this.input.value !== displayValue) {
 			this.input.value = displayValue;
@@ -139,8 +143,8 @@
 	/** A focused input field shows the expression. */
 	PropertyInput.prototype.onInputFocus = function () {
 		this.isFocused = true;
-		this.update(); // Update now with expression.
 		this.lastValue = this.input.value;
+		this.update(this.source.expression(this.prop.propertyName)); // Update now with expression.
 	};
 
 	/** A blurred input field shows the expression. */
@@ -151,7 +155,7 @@
 
 	var ENTER = 13,
 		NEWLINE = 10,
-		ESCAPE = 27
+		ESCAPE = 27,
 		UP_ARROW = 38,
 		DOWN_ARROW = 40;
 
@@ -190,10 +194,22 @@
 
 	/** Increment or decrement the value by the given step. */
 	PropertyInput.prototype.increment = function (step) {
-		var newValue = this.getValue() + step;
+		var newValue,
+			value = this.getValue();
 		if (!step) {
 			return;
 		}
+
+		if (!Number.isInteger(step)) {
+			// Small steps: Add on, avoid roundoff errors.
+			newValue = value + step;
+		} else if (step > 0) {
+			// Big steps: Round to nearest step and then advance.
+			newValue = step * (Math.floor(value / step) + 1);
+		} else {
+			newValue = -step * (Math.ceil(value / -step) - 1);
+		}
+
 		if ((this.prop.hasOwnProperty("min") && newValue < this.prop.min)
 			|| (this.prop.hasOwnProperty("max") && newValue > this.prop.max)) {
 			return;
@@ -204,6 +220,7 @@
 		if (this.prop.hasOwnProperty("wrap") && newValue < -this.prop.wrap) {
 			newValue += 2 * this.prop.wrap;
 		}
+		this.update(newValue);
 		this.fireChangeEvent(newValue);
 	};
 
