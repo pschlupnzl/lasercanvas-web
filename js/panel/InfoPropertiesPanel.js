@@ -7,10 +7,12 @@
 	 * @param {string} label Display label for panel heading.
 	 * @param {System} source Reference to data source (system, element) to manipulate.
 	 * @param {function} variablesGetter Callback to retrieve current variable values.
+	 * @param {function} toggleGraph Callback to show or remove a property graph.
 	 */
-	var InfoPropertiesPanel = function (label, source, variablesGetter) {
+	var InfoPropertiesPanel = function (label, source, variablesGetter, toggleGraph) {
 		this.source = source;
 		this.variablesGetter = variablesGetter;
+		this.toggleGraph = toggleGraph;
 		this.eventListeners = { change: [] };
 		this.el = this.init(label);
 		this.rows = this.initRows();
@@ -35,6 +37,7 @@
 	 */
 	InfoPropertiesPanel.prototype.initRows = function () {
 		var source = this.source,
+			toggleGraph = this.toggleGraph,
 			tbody = this.el.querySelector("tbody"),
 			onPropertyChange = this.onPropertyChange.bind(this);
 		return this.source.userProperties()
@@ -42,7 +45,7 @@
 				return prop.infoPanel !== false;
 			})
 			.map(function (prop) {
-				return new LaserCanvas.InputPropertyRow(prop, source, onPropertyChange)
+				return new LaserCanvas.InputPropertyRow(prop, source, onPropertyChange, toggleGraph)
 					.appendTo(tbody);
 			});
 	};
@@ -103,13 +106,13 @@
 	 * @param {modePlane|string} plane Mode plane or key for auto-updating sources.
 	 */
 	InfoPropertiesPanel.prototype.addAbcdPropertyRow = function (propertyName, plane) {
-		this.rows.push(new LaserCanvas.AbcdPropertyRow(propertyName, plane, this.source)
+		this.rows.push(new LaserCanvas.AbcdPropertyRow(propertyName, plane, this.source, this.toggleGraph)
 			.appendTo(this.el.querySelector("tbody")));
 	};
 
 	/** Add a sag/tan custom row, perhaps mode size. */
 	InfoPropertiesPanel.prototype.addAbcdQPropertyRow = function (propertyName, fieldName) {
-		this.rows.push(new LaserCanvas.AbcdQPropertyRow(propertyName, fieldName, this.source)
+		this.rows.push(new LaserCanvas.AbcdQPropertyRow(propertyName, fieldName, this.source, this.toggleGraph)
 			.appendTo(this.el.querySelector("tbody")));
 	};
 

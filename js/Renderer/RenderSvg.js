@@ -285,7 +285,6 @@ window.LaserCanvas.RenderSvg = function (system) {
 		*/
 		updateBoundingBox = function () {
 			var bbox = svg.getBBox();
-			console.log(bbox);
 			if (bbox.width > 0 && bbox.height > 0) {
 				svg.setAttributeNS(null, 'viewBox', window.LaserCanvas.Utilities.stringFormatPrecision(2, 
 					'{0} {1} {2} {3}',

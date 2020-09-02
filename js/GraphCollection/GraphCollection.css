@@ -1,0 +1,8 @@
+.graphCollection {
+    white-space: nowrap;
+    overflow-x: auto;
+}
+
+    .graphCollection > div {
+        display: inline-block;
+    }

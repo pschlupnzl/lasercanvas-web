@@ -18,11 +18,13 @@
 	 * @param {string|object} prop Property name (for read-only) or object of property to manipulate.
 	 * @param {System|Element} source Data source.
 	 * @param {function=} onChange Change event handler callback.
+	 * @param {function} toggleGraph Callback to show or hide a property graph for this row.
 	 */
-	var InputPropertyRow = function (prop, source, onChange) {
+	var InputPropertyRow = function (prop, source, onChange, toggleGraph) {
 		this.prop = prop;
 		this.source = source;
 		this.onChange = onChange;
+		this.toggleGraph = toggleGraph;
 		this.propertyName = typeof prop === "string" ? prop : prop.propertyName;
 		this.type = this.getType();
 		this.el = this.init();
@@ -43,6 +45,7 @@
 	InputPropertyRow.template = {
 		/** Template HTML for an ABCD matrix value row. */
 		mx: [
+			'<td data-cell="graph-placeholder"></td>',
 			'<td data-cell="label"></td>',
 			'<td data-cell="mx-col-1">',
 				'<span data-cell="mx-1-1"></span><br><span data-cell="mx-2-1"></span>',
@@ -55,15 +58,15 @@
 
 		/** Template HTML for a unary value row. */
 		unary: [
-			'<tr class="template" data-type="unary">',
-				'<td data-cell="label"></td>',
-				'<td data-cell="value" colspan="2"></td>',
-				'<td data-cell="unit"></td>',
-			'</tr>',
+			'<td data-cell="graph"><input type="checkbox" /></td>',
+			'<td data-cell="label"></td>',
+			'<td data-cell="value" colspan="2"></td>',
+			'<td data-cell="unit"></td>',
 		].join(""),
 
 		/** Template HTML for a sagittal / tangential value row. */
 		sagTan: [
+			'<td data-cell="graph"><input type="checkbox" /></td>',
 			'<td data-cell="label"></td>',
 			'<td data-cell="sag" color-theme-plane="sag"></td>',
 			'<td data-cell="tan" color-theme-plane="tan"></td>',
@@ -72,6 +75,7 @@
 
 		/** Template HTML for an input data row. */
 		action: [
+			'<td data-cell="graph-placeholder"></td>',
 			'<td data-cell="label"></td>',
 			'<td data-cell="action" colspan="2" class="nowrap"></td>',
 			'<td data-cell="unit"></td>'
@@ -79,6 +83,7 @@
 
 		/** Template HTML for a select action data row. */
 		select: [
+			'<td data-cell="graph-placeholder"></td>',
 			'<td data-cell="label"></td>',
 			'<td data-cell="select" colspan="2"></td>',
 			'<td data-cell="unit"></td>'
@@ -86,6 +91,7 @@
 
 		/** Template HTML for checkbox. */
 		boolean: [
+			'<td data-cell="graph-placeholder"></td>',
 			'<td data-cell="label"></td>',
 			'<td data-cell="checkbox" colspan="2"></td>',
 			'<td data-cell="unit"></td>'
@@ -151,6 +157,7 @@
 				.appendTo(this.el.querySelector('[data-cell="checkbox"]'));
 
 		} else {
+			this.el.querySelector('[data-cell="graph"] input').onchange = this.onGraphChange.bind(this);
 			this.update();
 			return null;
 		}
@@ -192,6 +199,10 @@
 		this.onChange && this.onChange(this.prop.propertyName, value);
 	};
 
+	/** Respond to a click on the graph click. */
+	InputPropertyRow.prototype.onGraphChange = function () {
+		this.toggleGraph(this.source, this.propertyName, null);
+	};
 
 	// -----------
 	//  Abcd row.
@@ -203,11 +214,13 @@
 	 * @param {string} propertyName Name or key of property displayed by this control.
 	 * @param {modePlane|string} plane Optional plane for auto-setting rows.
 	 * @param {Element} source Optional data source for auto-setting rows. 
+	 * @param {function} toggleGraph Callback to create or remove property graphs.
 	 */
-	var AbcdPropertyRow = function (propertyName, plane, source) {
+	var AbcdPropertyRow = function (propertyName, plane, source, toggleGraph) {
 		this.propertyName = propertyName;
 		this.plane = plane;
 		this.source = source;
+		this.toggleGraph = toggleGraph;
 		this.el = this.init();
 	};
 
@@ -261,11 +274,13 @@
 	 * @param {string} propertyName Name of property.
 	 * @param {string} fieldName Name of field within abcdQ property.
 	 * @param {Element} source Data source, used to retrieve current values in update().
+	 * @param {function} toggleGraph Callback to create or remove property graphs.
 	 */
-	var AbcdQPropertyRow = function (propertyName, fieldName, source) {
+	var AbcdQPropertyRow = function (propertyName, fieldName, source, toggleGraph) {
 		this.propertyName = propertyName;
 		this.fieldName = fieldName;
 		this.source = source;
+		this.toggleGraph = toggleGraph;
 		this.el = this.init();
 	};
 
@@ -276,6 +291,7 @@
 		tr.setAttribute("data-property-name", this.propertyName);
 		tr.querySelector('[data-cell="label"]').innerText = LaserCanvas.Utilities.prettify(this.propertyName);
 		tr.querySelector('[data-cell="unit"]').innerText = window.LaserCanvas.unit[this.propertyName] || "";
+		tr.querySelector('[data-cell="graph"] input[type="checkbox"]').onchange = this.onGraphChange.bind(this);
 		return tr;
 	};
 
@@ -296,6 +312,11 @@
 		var value = this.get();
 		this.el.querySelector('[data-cell="sag"]').innerText = LaserCanvas.Utilities.numberFormat(value[0], true);
 		this.el.querySelector('[data-cell="tan"]').innerText = LaserCanvas.Utilities.numberFormat(value[1], true);
+	};
+
+	/** Hnadle a change on the graph panel button. */
+	AbcdQPropertyRow.prototype.onGraphChange = function () {
+		this.toggleGraph(this.source, this.propertyName, this.fieldName);
 	};
 
 	LaserCanvas.AbcdPropertyRow = AbcdPropertyRow;

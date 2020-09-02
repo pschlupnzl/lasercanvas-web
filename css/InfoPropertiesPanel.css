@@ -52,3 +52,25 @@
 [data-show-advanced="false"] .infoPropertiesPanel [data-property-name="wavefrontROC"] {
 	display: none;
 }
+
+/* Property graph checkboxes */
+
+[data-cell="graph"] input[type="checkbox"] {
+	position: relative;
+	visibility: hidden;
+	cursor: pointer;
+}
+
+	[data-cell="graph"] input[type="checkbox"]::after {
+		content: "\1f441";
+		position: absolute;
+		left: 0;
+		top: -0.1em;
+		visibility: visible;
+		opacity: 0.2;
+		transition: opacity 150ms;
+	}
+
+		[data-cell="graph"] input[type="checkbox"]:checked::after {
+			opacity: 1;
+		}

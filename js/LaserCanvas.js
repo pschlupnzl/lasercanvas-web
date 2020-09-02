@@ -28,7 +28,8 @@ window.LaserCanvas.Application = function (canvas, info) {
 	*    Explanation and exposition of equations used.
 	*/	
 	var msystem, mrender, minfo, mvariables,
-		mprop,                     // {PropertiesPanel} Properties panel handler.
+		mpropertiesPanel,                     // {PropertiesPanel} Properties panel handler.
+		mgraphCollection,                     // {GraphCollection} Currently active graphs.
 		mlisteners = {
 			interactionchange: [],           // {Array<function>} Handlers when render interaction changes.
 			insertelement: []                // {Array<function>} Handlers when an element is added.
@@ -67,8 +68,8 @@ window.LaserCanvas.Application = function (canvas, info) {
 		*/
 		onResize = function () {
 			var id, el, key,
-				info = document.body.getAttribute("data-info-visible") === "true",
-				variables = document.body.getAttribute("data-variables-visible") === "true",
+				// info = document.body.getAttribute("data-info-visible") === "true",
+				// variables = document.body.getAttribute("data-variables-visible") === "true",
 				sliver = 0, // {number} (px) Slice off to prevent scroll bars.
 				w = window.innerWidth - sliver,  // {number} (px) Width of window.
 				h = window.innerHeight - sliver, // {number} (px) Height of window.
@@ -131,7 +132,8 @@ window.LaserCanvas.Application = function (canvas, info) {
 			msystem = new LaserCanvas.System();                 // {System} Optical system.
 			minfo = new LaserCanvas.InfoPanel(info); // {InfoPanel} System information.
 			mrender = new LaserCanvas.Render(msystem, minfo, canvas);  // {Render} Rendering engine.
-			mprop = new LaserCanvas.PropertiesPanel(mrender, msystem);  // {PropertiesPanel} Properties panel.
+			mpropertiesPanel = new LaserCanvas.PropertiesPanel(mrender, msystem);  // {PropertiesPanel} Properties panel.
+			mgraphCollection = new LaserCanvas.GraphCollection(); // {GraphCollection} Graphing collection on Variables panel.
 
 			onResize();
 			window.addEventListener('resize', onResize, false);
@@ -151,7 +153,8 @@ window.LaserCanvas.Application = function (canvas, info) {
 			msystem.addEventListener('update', function () {
 				msystem.calculateAbcd();
 				mrender.update();
-				mprop.update();
+				mpropertiesPanel.update();
+				mgraphCollection.update();
 				minfo.update(msystem, mrender);
 			});
 			
@@ -159,10 +162,9 @@ window.LaserCanvas.Application = function (canvas, info) {
 			msystem.addEventListener('change', function () {
 				msystem.calculateAbcd();
 				mrender.update();
-				mprop.update();
-				minfo
-					.change()
-					.update();
+				mpropertiesPanel.update();
+				mgraphCollection.change(msystem.elements()).update();
+				minfo.change().update();
 			});
 			
 			mvariables = new LaserCanvas.Variables();
@@ -173,10 +175,10 @@ window.LaserCanvas.Application = function (canvas, info) {
 			var variablesGetter = mvariables.value.bind(mvariables);
 			msystem.setVariablesGetter(variablesGetter);
 			mrender.setVariablesGetter(variablesGetter);
-			minfo.init(msystem, mrender, variablesGetter);
+			minfo.init(msystem, mrender, variablesGetter, mgraphCollection.toggleGraph.bind(mgraphCollection));
 			new LaserCanvas.VariablePanel(mvariables)
 				.appendTo(document.querySelector("#LaserCanvasVariablesPanel .variables"));
-
+			mgraphCollection.appendTo(document.querySelector("#LaserCanvasVariablesPanel .graphs"));
 			/*
 			* Toolbar handler.
 			*/

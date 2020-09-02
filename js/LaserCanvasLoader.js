@@ -100,6 +100,7 @@ window.LaserCanvas = {
 			"css/SellmeierPanel.css",
 			"css/Themes.css",
 			"js/Graph2d/Graph2d.css",
+			"js/GraphCollection/GraphCollection.css",
 			"js/NumberSlider/NumberSlider.css",
 			"js/VariablePanel/VariablePanel.css",
 
@@ -112,6 +113,7 @@ window.LaserCanvas = {
 			"js/element/ElementScreen.js",
 			"js/Graph2d/Graph2d.js",
 			"js/Graph2d/Graph2dAxis.js",
+			"js/GraphCollection/GraphCollection.js",
 			"js/NumberSlider/NumberSlider.js",
 			"js/panel/CheckboxInput.js",
 			"js/panel/GraphPanel.js",
