@@ -27,7 +27,7 @@ window.LaserCanvas.Application = function (canvas, info) {
 	*  - Help / documentation
 	*    Explanation and exposition of equations used.
 	*/	
-	var msystem, mrender, minfo, mvariables,
+	var msystem, mrender, minfo, mvariables, mvariablePanel,
 		mpropertiesPanel,                     // {PropertiesPanel} Properties panel handler.
 		mgraphCollection,                     // {GraphCollection} Currently active graphs.
 		mlisteners = {
@@ -120,13 +120,7 @@ window.LaserCanvas.Application = function (canvas, info) {
 		* Initialize the application, once all items have finished loading.
 		*/
 		init = function () {
-			var LaserCanvas = window.LaserCanvas,
-				controller = {
-					highlightElement: function (element) {
-						mrender.highlightElement(element);
-						minfo.highligtElement(system, element);
-					}
-				};
+			var LaserCanvas = window.LaserCanvas;
 			
 			// Child members.
 			msystem = new LaserCanvas.System();                 // {System} Optical system.
@@ -134,6 +128,8 @@ window.LaserCanvas.Application = function (canvas, info) {
 			mrender = new LaserCanvas.Render(msystem, minfo, canvas);  // {Render} Rendering engine.
 			mpropertiesPanel = new LaserCanvas.PropertiesPanel(mrender, msystem);  // {PropertiesPanel} Properties panel.
 			mgraphCollection = new LaserCanvas.GraphCollection(); // {GraphCollection} Graphing collection on Variables panel.
+			mvariables = new LaserCanvas.Variables();
+			mvariablePanel = new LaserCanvas.VariablePanel(mvariables);
 
 			onResize();
 			window.addEventListener('resize', onResize, false);
@@ -149,35 +145,56 @@ window.LaserCanvas.Application = function (canvas, info) {
 			document.querySelector('#LaserCanvasToggleInfo').onclick = makeToggle("data-info-visible");
 			document.querySelector('#LaserCanvasToggleVariables').onclick = makeToggle("data-variables-visible");
 			
-			// Properties have updated.
-			msystem.addEventListener('update', function () {
-				msystem.calculateAbcd();
+			var scanVariables = function () {
+				for (var variableName of ["x", "y"]) {
+					if (mgraphCollection.hasRange(variableName)) {
+						mgraphCollection.scanStart(variableName);
+						mvariablePanel.scan(variableName, function (variableValue) {
+							msystem.calculateAbcd();
+							mgraphCollection.scanValue(variableName, variableValue);
+						});
+						mgraphCollection.scanEnd(variableName);
+					}
+				}
+			};
+
+			var updateAll = function () {
 				mrender.update();
 				mpropertiesPanel.update();
-				mgraphCollection.update();
 				minfo.update(msystem, mrender);
+			};
+
+			// Properties have updated.
+			msystem.addEventListener('update', function () {
+				scanVariables();
+				msystem.calculateAbcd();
+				updateAll();
 			});
 			
 			// Structure has changed.
 			msystem.addEventListener('change', function () {
+				scanVariables();
 				msystem.calculateAbcd();
-				mrender.update();
-				mpropertiesPanel.update();
-				mgraphCollection.change(msystem.elements()).update();
-				minfo.change().update();
+				mgraphCollection.change(msystem.elements());
+				minfo.change()
+				updateAll()
 			});
 			
-			mvariables = new LaserCanvas.Variables();
+			// Variables have changed.
 			mvariables.addEventListener("change", function () {
 				msystem.onVariablesChange();
 				msystem.update(true);
+			});
+
+			// Graphs have changed.
+			mgraphCollection.addEventListener("change", function () {
+				scanVariables()
 			});
 			var variablesGetter = mvariables.value.bind(mvariables);
 			msystem.setVariablesGetter(variablesGetter);
 			mrender.setVariablesGetter(variablesGetter);
 			minfo.init(msystem, mrender, variablesGetter, mgraphCollection.toggleGraph.bind(mgraphCollection));
-			new LaserCanvas.VariablePanel(mvariables)
-				.appendTo(document.querySelector("#LaserCanvasVariablesPanel .variables"));
+			mvariablePanel.appendTo(document.querySelector("#LaserCanvasVariablesPanel .variables"));
 			mgraphCollection.appendTo(document.querySelector("#LaserCanvasVariablesPanel .graphs"));
 			/*
 			* Toolbar handler.

@@ -108,15 +108,18 @@
 	*/
 
 	.checkboxInput input[type="checkbox"],
-	input.laserCanvasInput[type="checkbox"] {
+	input.laserCanvasInput[type="checkbox"],
+	input.laserCanvasCheckbox[type="checkbox"] {
 		position: relative;
-		width: 3em;
+		width: 2.5em;
 		margin-left: 1em;
 		font-size: inherit;
 	}
 	
+		/* Trough */
 		.checkboxInput input[type="checkbox"]::before,
-		input.laserCanvasInput[type="checkbox"]::before {
+		input.laserCanvasInput[type="checkbox"]::before,
+		input.laserCanvasCheckbox[type="checkbox"]::before {
 			content: "";
 			display: inline-block;
 			position: absolute;
@@ -129,9 +132,11 @@
 			box-shadow: 0 0 0.5em rgba(0, 0, 0, 0.2) inset;
 		}
 
+		/* Thumb */
 		.checkboxInput input[type="checkbox"]::after,
-		input.laserCanvasInput[type="checkbox"]::after {
-			content: "\d7";
+		input.laserCanvasInput[type="checkbox"]::after,
+		input.laserCanvasCheckbox[type="checkbox"]::after {
+			content: "";
 			position: absolute;
 			width: 1.2em;
 			height: 1.2em;
@@ -144,9 +149,20 @@
 		}
 
 			.checkboxInput input[type="checkbox"]:checked::after,
+			input.laserCanvasInput[type="checkbox"]:checked::after,
+			input.laserCanvasCheckbox[type="checkbox"]:checked::after {
+				content: "";
+				left: 0.7em;
+			}
+
+		.checkboxInput input[type="checkbox"]::after,
+		input.laserCanvasInput[type="checkbox"]::after {
+			content: "\d7";
+		}
+
+			.checkboxInput input[type="checkbox"]:checked::after,
 			input.laserCanvasInput[type="checkbox"]:checked::after {
 				content: "\2713";
-				left: 0.7em;
 			}
 
 .dragbar {

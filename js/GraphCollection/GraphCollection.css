@@ -1,8 +1,13 @@
 .graphCollection {
-    white-space: nowrap;
-    overflow-x: auto;
+	white-space: nowrap;
+	overflow-x: auto;
 }
 
-    .graphCollection > div {
-        display: inline-block;
-    }
+	.graphCollection .graphCollectionPanel {
+		display: inline-block;
+	}
+
+	.graphCollectionPanel .title,
+	.graphCollectionPanel .variable {
+		text-align: center;
+	}

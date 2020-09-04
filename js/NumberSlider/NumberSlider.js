@@ -20,6 +20,14 @@
 		this.update();
 	};
 
+	/** Returns the current range. */
+	NumberSlider.prototype.getRange = function () {
+		return {
+			min: this.min,
+			max: this.max
+		};
+	};
+
 	/**
 	 * Initialize and create the component DOM element.
 	 */
@@ -118,9 +126,7 @@
 			value = +value;
 			if (!isNaN(value)) {
 				this[prop] = +value;
-				if (prop === "value") {
-					this.fireChangeEvent();
-				}
+				this.fireChangeEvent();
 				this.updateThumb();
 			}
 		}

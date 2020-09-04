@@ -5,6 +5,9 @@
 		this.el = this.init();
 	};
 
+	/** Number of scanning steps (not including starting point). */
+	VariablePanel.scanSteps = 32;
+
 	/** Initializes the component, filling its DOM element. */
 	VariablePanel.prototype.init = function () {
 		var el = document.createElement("div");
@@ -37,5 +40,11 @@
 		thumbLabel.innerText = thumbInput.value = str;
 	};
 
+	/** Trigger a variable to be scanned over its range. */
+	VariablePanel.prototype.scan = function (variableName, iterator) {
+		var range = this.numberSliders[variableName].getRange();
+		this.mvariables.scan(variableName, range, VariablePanel.scanSteps, iterator);
+	};
+		
 	LaserCanvas.VariablePanel = VariablePanel;
 }(window.LaserCanvas));

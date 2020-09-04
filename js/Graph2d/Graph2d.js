@@ -1,37 +1,47 @@
 (function (LaserCanvas) {
 	/**
 	 * Creates a 2d graph of data.
-	 * @param {HTMLElement} el Element where to render the graph.
 	 */
-	var Graph2d = function (el) {
+	var Graph2d = function () {
 		/** Array of lines to plot. */
 		this.lines = [];
 		this.axes = this.initAxes();
 		/** Element where to render the component. */
-		this.el = this.init(el);
-
-		// /** Axes limits and tick spacings. */
-		// this.axisParams = {
-		// 	x: { min: 0, max: 1, major: 0.5, scale: 1 },
-		// 	y: { min: 0, max: 1, major: 0.5, scale: 1 }
-		// };
+		this.el = this.init();
+		this.events = {
+			variableChange: []
+		};
 	};
 
 	/**
 	 * Initialize the plot and create additional elements.
 	 */
-	Graph2d.prototype.init = function (el) {
-		var plot;
+	Graph2d.prototype.init = function () {
+		var plot,
+			el = document.createElement("div")
 		el.className = "LaserCanvasGraph2d";
 		el.innerHTML = [
 			'<div class="plot">',
 			'<canvas/>',
+			'</div>',
 			'</div>'
 		].join("");
 		plot = el.querySelector(".plot");
-		plot.appendChild(this.axes.x.element());
-		plot.appendChild(this.axes.y.element());
+		this.axes.x.appendTo(plot);
+		this.axes.y.appendTo(plot);
 		return el;
+	};
+
+	/** Attach the graph to the parent element. */
+	Graph2d.prototype.appendTo = function (container) {
+		container.appendChild(this.el);
+		return this;
+	};
+
+	/** Destroy myself and remove DOM element. */
+	Graph2d.prototype.destroy = function () {
+		this.el.parentElement && this.el.parentElement.removeChild(this.el);
+		return this;
 	};
 
 	Graph2d.prototype.initAxes = function () {
@@ -42,15 +52,43 @@
 		};
 	};
 
+	// ---------
+	//  Events.
+	// ---------
+
+	Graph2d.prototype.addEventListener = function (eventName, handler) {
+		this.events[eventName].push(handler);
+	};
+
+	Graph2d.prototype.fireEvent = function (eventName) {
+		this.events[eventName].forEach(function (handler) {
+			handler();
+		});
+	};
+
+	// -------------
+	//  Data lines.
+	// -------------
+
+	/** Reset the plotting data lines. */
+	Graph2d.prototype.clearDataPoints = function () {
+		this.lines = [];
+	};
+
 	/**
-	 * Plot the given data and update the rendering.
+	 * Add a data point to each of the plotting lines. The data point is
+	 * formatted as an array of {x, y} objects, which are added to the
+	 * corresponding plotting lines.
+	 * @param {Array<object>} dataPoints Points to add to each line.
 	 */
-	Graph2d.prototype.plot = function (x, y) {
-		this.lines = [{
-			x: x,
-			y: y,
-		}];
-		this.render();
+	Graph2d.prototype.addDataPoints = function (dataPoints) {
+		dataPoints.forEach(function (dataPoint, index) {
+			if (!this.lines[index]) {
+				this.lines[index] = { x: [], y: [] };
+			}
+			this.lines[index].x.push(dataPoint.x);
+			this.lines[index].y.push(dataPoint.y);
+		}.bind(this));
 	};
 
 	// ----------
@@ -58,71 +96,64 @@
 	// ----------
 
 	/**
-	 * Returns the extent of the data.
+	 * Returns the extents (ranges) of data across all plotting lines.
 	 */
-	Graph2d.prototype.getRange = function () {
-		var line,
-			range = {
-				x: { min: 0, max: 1 },
-				y: { min: 0, max: 1 },
-			},
-			/** Get single range over coordinates. */
-			getRange = function (coords, prev) {
-				var r = {
-					min: Math.min.apply(Math, coords),
-					max: Math.max.apply(Math, coords)
-				};
-				if (prev) {
-					r.min = Math.min(r.min, prev.min);
-					r.max = Math.max(r.max, prev.max);
+	Graph2d.prototype.getDataExtents = function () {
+		var firstPoint = true,
+			extents = {
+				x: { min: 0, max: 1, firstPoint: true },
+				y: { min: 0, max: 1, firstPoint: true }
+			};
+		this.lines.forEach(function (line) {
+			var p;
+			for (var ax of ["x", "y"]) {
+				for (var k = 0; k < line[ax].length; k += 1) {
+					p = line[ax][k];
+					if (isNaN(p)) {
+						// NOP - skip NaNs.
+					} else if (extents[ax].firstPoint) {
+						extents[ax].min = extents[ax].max = p;
+						delete extents[ax].firstPoint;
+					} else {
+						extents[ax].min = Math.min(extents[ax].min, p);
+						extents[ax].max = Math.max(extents[ax].max, p);
+					}
 				}
-				return r;
 			}
-
-		for (var k = 0; k < this.lines.length; k += 1) {
-			line = this.lines[k];
-			range.x = getRange(line.x, k === 0 ? null : range.x);
-			range.y = getRange(line.y, k === 0 ? null : range.y);
-		}
-
-		return range;
+		});
+		return extents;
 	};
 
 	/**
-	 * Update the axis plotting parameters.
+	 * Calculate the ticks and scaling.
 	 */
-	Graph2d.prototype.updateAxisParams = function (width, height) {
-		var range = this.getRange();
-		this.axisParams = {
-			x: this.calcAxisTicks(range.x, width),
-			y: this.calcAxisTicks(range.y, height)
-		};
-	};
-
-	/**
-	 * Calculate tick spacings for a single axis to optimally satisfy the given dimensions.
-	 * @param {object<number>} range Minimum and maximum values of data to fit.
-	 * @param {number} extent Width or height in pixels to calculate scale factor.
-	 */
-	Graph2d.prototype.calcAxisTicks = function (range, extent) {
-		var min = range.min,
-			max = range.max,
-			scale;
-
-		if (min === max) {
-			max = min + 1;
-		}
-		scale = extent / (max - min);
-		return {
-			min: min,
-			max: max,
-			scale: scale
-		};
+	Graph2d.prototype.calcTicks = function () {
+		var size = this.canvasSize(),
+			extents = this.getDataExtents(),
+			fontSize = this.getFontSize;
+		this.axes.x.calcTicks(extents.x, size.width, 5 * fontSize);
+		this.axes.y.calcTicks(extents.y, size.height, 2 * fontSize);
 	};
 
 	// ------------
 	//  Rendering.
 	// ------------
+
+	/**
+	 * Update the size of canvas, returning the dimensions.
+	 */
+	Graph2d.prototype.canvasSize = function () {
+		var canvas = this.el.querySelector("canvas"),
+			container = canvas.parentElement,
+			width = container.offsetWidth,
+			height = container.offsetHeight;
+		canvas.width = parseInt(width);
+		canvas.height = parseInt(height);
+		return {
+			width: width,
+			height: height
+		};
+	};
 
 	/** Returns the current font size, in px, or a default value. */
 	Graph2d.prototype.getFontSize = function () {
@@ -137,148 +168,47 @@
 	};
 
 	/**
-	 * Resize the component.
-	 */
-	Graph2d.prototype.resize = function () {
-		var el = this.el,
-			plot = el.querySelector(".plot"),
-			canvas = plot.querySelector("canvas"),
-			fontSize = this.getFontSize(),
-			left = 5 * fontSize,
-			right = 2 * fontSize,
-			bottom = 3 * fontSize,
-			top = 1 * fontSize,
-			width = el.offsetWidth - left - right,
-			height = el.offsetHeight - top - bottom,
-			styles = {
-				left: `${left}px`,
-				bottom: `${bottom}px`,
-				width: `${width}px`,
-				height: `${height}px`,
-			};
-		for (var key in styles) {
-			if (styles.hasOwnProperty(key)) {
-				plot.style[key] = styles[key];
-			}
-		}
-		canvas.width = width;
-		canvas.height = height;
-	};
-
-	/**
 	 * Update the graph rendering.
 	 */
 	Graph2d.prototype.render = function () {
-		this.resize();
 		this.axes.x.render();
 		this.axes.y.render();
-// 		var el = this.el,
-// 			fontSize = this.getFontSize(),
-// 			left = 5 * fontSize,
-// 			right = 2 * fontSize,
-// 			bottom = 3 * fontSize,
-// 			top = 1 * fontSize,
-// 			width = el.offsetWidth - left - right,
-// 			height = el.offsetHeight - top - bottom
-
-// 		this.updateAxisParams(width, height);
-// console.log(this.axisParams)
-
-// 		// Clear the element.
-// 		el.innerHTML = "";
-// 		this.el.innerText = JSON.stringify({x: this.x, y: this.y, w: width, h: height});
-// 		// Add the main canvas.
-// 		this.renderAxes();
-// 		this.renderPlotArea(left, bottom, width, height);
-// 		// Plot the lines.
-// 		this.renderPlotLines();
+		this.renderPlotLines();
 	};
 
-	/**
-	 * Render the main graph canvas plotting area.
-	 * The dimensions are in px.
-	 */
-	Graph2d.prototype.renderPlotArea = function (left, bottom, width, height) {
-		var el = this.el,
-			canvas = document.createElement("canvas"),
-			styles = {
-				position: `absolute`,
-				left: `${left}px`,
-				bottom: `${bottom}px`,
-				width: `${width}px`,
-				height: `${height}px`,
-				border: `1px solid`
-			};
-		for (var key in styles) {
-			if (styles.hasOwnProperty(key)) {
-				canvas.style[key] = styles[key];
-			}
-		}
-		canvas.width = width;
-		canvas.height = height;
-		el.appendChild(canvas);
-	};
-
-	/** Create the elements for the axes. */
-	Graph2d.prototype.renderAxes = function () {
-		var
-			/** Create single text label. */
-			createLabel = function (text, value, axisParams, direction) {
-
-			},
-
-			/** Render elements for one axis. */
-			renderAxis = function (axisParams, direction) {
-				createLabel(axisParams.min, axisParams.min, axisParams, direction);
-				createLabel(axisParams.max, axisParams.max, axisParams, direction);
-console.log(axisParams);
-
-			};
-		renderAxis(this.axisParams.x, "horizontal");
-		renderAxis(this.axisParams.y, "vertical");
-	};
-
-	/**
-	 * Plot the lines on the prepared canvas.
-	 */
+	/** Update the plotting area and lines. */
 	Graph2d.prototype.renderPlotLines = function () {
-		var vx, vy,
-			el = this.el,
-			params = this.axisParams,
-			px = params.x,
-			py = params.y,
-			ctx = el.querySelector("canvas").getContext("2d"),
-			width = ctx.canvas.width,
-			height = ctx.canvas.height;
-		ctx.clearRect(0, 0, width, height);
-		for (var line of this.lines) {
-			for (var k = 0; k < line.x.length; k += 1) {
-				vx = (line.x[k] - px.min) * px.scale;
-				vy = (line.y[k] - py.min) * py.scale;
-				vy = height - vy;
-				if (k === 0) {
-					ctx.moveTo(vx, vy);
+		var canvas = this.el.querySelector("canvas"),
+			ctx = canvas.getContext("2d"),
+			axisX = this.axes.x,
+			axisY = this.axes.y;
+
+		ctx.clearRect(0, 0, canvas.width, canvas.height);
+		this.lines.forEach(function (line, lineIndex) {
+			var k, ptx, pty, x, y,
+				moveTo = true;
+			ctx.save();
+			ctx.beginPath();
+			for (k = 0; k < line.x.length && k < line.y.length; k += 1) {
+				ptx = line.x[k];
+				pty = line.y[k];
+				if (isNaN(ptx) || isNaN(pty)) {
+					moveTo = true;
 				} else {
-					ctx.lineTo(vx, vy);
+					x = axisX.transform(ptx);
+					y = axisY.transform(pty, true);
+					if (moveTo) {
+						ctx.moveTo(x, y);
+						moveTo = false;
+					} else {
+						ctx.lineTo(x, y);
+					}
 				}
 			}
+			ctx.strokeStyle = LaserCanvas.theme.current.mode[lineIndex];
 			ctx.stroke();
-		}
+			ctx.restore();
+		});
 	};
-
 	LaserCanvas.Graph2d = Graph2d;
 }(window.LaserCanvas));
-
-// setTimeout(function () {
-// 	var el = document.createElement("div");
-// 	document.body.appendChild(el);
-// 	el.style.position = "absolute";
-// 	el.style.top = "0";
-// 	el.style.left = "0";
-// 	el.style.width = "300px";
-// 	el.style.height = "200px";
-// 	// el.style.background = "white";
-// 	// el.style.border = "1px solid";
-// 	var g = new window.LaserCanvas.Graph2d(el);
-// 	g.plot([0, 0.5, 2], [-1, 1, 0]);
-// }, 100);

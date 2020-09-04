@@ -58,3 +58,8 @@ button[data-action="toggleVariables"] {
 		border-bottom: 1px solid;
 		text-align: center;
 	}
+
+#LaserCanvasVariablesPanel .LaserCanvasGraph2d {
+	width: 260px;
+	height: 160px;
+}

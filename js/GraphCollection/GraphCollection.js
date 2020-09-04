@@ -8,6 +8,10 @@
 	var GraphCollection = function () {
 		this.graphs = [];
 		this.el = this.init(); // {HTMLElement} DOM element where to attach graphs.
+		this.events = {
+			/** A graph is added or a variable dependency is changed. */
+			change: []
+		};
 	};
 
 	/** Prepare the collection. */
@@ -23,6 +27,66 @@
 		return this;
 	};
 
+	/** Add the handler to the change event. */
+	GraphCollection.prototype.addEventListener = function (eventName, handler) {
+		this.events[eventName].push(handler);
+	};
+
+	/** Trigger event listeners to fire. */
+	GraphCollection.prototype.fireEvent = function (eventName) {
+		this.events[eventName].forEach(function (handler) {
+			handler();
+		});
+	};
+
+	// ---------------------
+	//  Scanning variables.
+	// ---------------------
+
+	/** Returns a value indicating whether any graphs depend on the variable. */
+	GraphCollection.prototype.hasRange = function (variableName) {
+		return this.graphs.some(function (graph) { 
+			return graph.variableName === variableName;
+		});
+	};
+
+	/** Iterate over graphs corresponding to the variable name. */
+	GraphCollection.prototype.graphsForVariable = function (variableName, callback) {
+		this.graphs.forEach(function (graph) {
+			if (graph.variableName === variableName) {
+				callback.call(this, graph);
+			}
+		}.bind(this));
+	};
+
+	/** Prepare for a new variable scan by clearing any data lines. */
+	GraphCollection.prototype.scanStart = function (variableName) {
+		this.graphsForVariable(variableName, function (graph) {
+			graph.graph2d.clearDataPoints();
+		});
+	};
+
+	/** Add a scanning variable data point. */
+	GraphCollection.prototype.scanValue = function (variableName, variableValue) {
+		this.graphsForVariable(variableName, function (graph) {
+			graph.graph2d.addDataPoints(this.getGraphValue(variableValue, graph))
+		});
+	};
+
+	/** Complete a variable scan and update the graphs. */
+	GraphCollection.prototype.scanEnd = function (variableName) {
+		this.graphsForVariable(variableName, function (graph) {
+			graph.graph2d.calcTicks();
+			graph.graph2d.render();
+		});
+	};
+
+	/** One of the graph's variable dependencies has changed. */
+	GraphCollection.prototype.onVariableChange = function () {
+console.log('variablechange')
+		this.fireEvent("change");
+	};
+
 	// -------------------
 	//  Graph management.
 	// -------------------
@@ -35,18 +99,46 @@
 	 */
 	GraphCollection.prototype.toggleGraph = function (source, propertyName, fieldName) {
 		if (!this.removeGraph(source, propertyName, fieldName)) {
-			this.graphs.push({
-				source: source,
-				propertyName: propertyName,
-				fieldName: fieldName,
-				el: (function (parent) {
-					var el = document.createElement("div");
-					el.innerText = `Graph ${source.name} ${propertyName} ${fieldName}`;
-					parent.appendChild(el);
-					return el;
-				}(this.el))
-			});
+			var el = this.createGraphContainer(),
+				graph = {
+					el: el,
+					variableInput: el.querySelector('.variable input[type="checkbox"]'),
+					source: source,
+					propertyName: propertyName,
+					fieldName: fieldName,
+					variableName: "x",
+					graph2d: new LaserCanvas.Graph2d()
+						.appendTo(el.querySelector(".graph2dContainer"))
+				};
+			el.querySelector(".title").innerText = this.getTitle(graph);
+			// TODO: Refactor to make GraphItem.
+			graph.variableInput.onchange = (function (self) {
+				return function () {
+					graph.variableName = this.checked ? "y" : "x";
+					self.onVariableChange();
+				};
+			}(this));
+			this.graphs.push(graph);
+			this.fireEvent("change");
 		}
+	};
+
+	/**
+	 * Create a container for the graph to sit in.
+	 */
+	GraphCollection.prototype.createGraphContainer = function () {
+		var el = document.createElement("div");
+		el.className = "graphCollectionPanel";
+		el.innerHTML = [
+			'<div class="title"></div>',
+			'<div class="graph2dContainer"></div>',
+			'<div class="variable">',
+			'<span>x</span>',
+			'<input type="checkbox" class="laserCanvasCheckbox" />',
+			'<span>y</span>',
+		].join("");
+		this.el.appendChild(el);
+		return el;
 	};
 
 	/** Remove a graph, if found, returning a value indicating whether a graph was deleted. */
@@ -68,6 +160,7 @@
 	/** Remove the graph at the given collection index. */
 	GraphCollection.prototype.removeGraphAt = function (index) {
 		var graph = this.graphs[index];
+		graph.graph2d.destroy();
 		graph.el.parentElement.removeChild(graph.el);
 		this.graphs.splice(index, 1);
 	};
@@ -93,20 +186,43 @@
 		return this;
 	};
 
-	/** The system has been updated (e.g. drag, prop change): Update the graphs. */
-	GraphCollection.prototype.update = function () {
-		this.graphs.forEach(function (graph) {
-			var value;
-			if (graph.fieldName) {
-				value = [
-					graph.source.abcdQ[0][graph.fieldName],
-					graph.source.abcdQ[1][graph.fieldName]
-				];
+	/** Returns a title for the graphed property. */
+	GraphCollection.prototype.getTitle = function (graph) {
+		var source = graph.source.name,
+			property = LaserCanvas.Utilities.prettify(graph.propertyName);
+		return source
+			? `${source}: ${property}`
+			: property;
+	};
+
+	/** Returns the property value for the graph. */
+	GraphCollection.prototype.getGraphValue = function (variableValue, graph) {
+		var value;
+		if (graph.fieldName) {
+			return [{
+				x: variableValue,
+				y: graph.source.abcdQ[0][graph.fieldName]
+			}, {
+				x: variableValue,
+				y: graph.source.abcdQ[1][graph.fieldName]
+			}];
+		} else {
+			value = graph.source.get(graph.propertyName);
+			if (Array.isArray(value)) {
+				return value.map(function (val) {
+					return {
+						x: variableValue,
+						y: val
+					};
+				});
 			} else {
-				value = graph.source.get(graph.propertyName);
+console.warn(`getGraphValue is NOT an array ${graph.variableName}`)
+				return [{
+					x: variableValue,
+					y: value
+				}];
 			}
-			graph.el.innerText = value.map(function (val) { return LaserCanvas.Utilities.numberFormat(val)});
-		});
+		}
 	};
 
 	LaserCanvas.GraphCollection = GraphCollection;
