@@ -19,6 +19,11 @@
 	background-color: #404040;
 }
 
+[data-theme="line"] .laserCanvasToolbar,
+[data-theme="line"] .laserCanvasVariablesPanel {
+	background-color: #fff;
+}
+
 [data-theme="light"] .laserCanvasToolbar,
 [data-theme="light"] .laserCanvasVariablesPanel {
 	border-top-color: #676767;

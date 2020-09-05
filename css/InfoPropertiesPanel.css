@@ -55,6 +55,10 @@
 
 /* Property graph checkboxes */
 
+[data-variables-visible="false"] [data-cell="graph"] > span {
+	display: none;
+}
+
 [data-cell="graph"] input[type="checkbox"] {
 	position: relative;
 	visibility: hidden;
