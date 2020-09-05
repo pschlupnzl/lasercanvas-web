@@ -14,10 +14,22 @@
 		};
 	};
 
+	GraphCollection.template = [
+		'<div class="about">',
+			'<ul>',
+				'<li>You can use variables <em>x</em> and <em>y</em> in properties, for example <input disabled value="200 * cos(x)" /></li>',
+				'<li>Drag the sliders to see the effects of changing variables</li>',
+				'<li>Toggle the <span>👁</span> icon in the Info panel to plot a property\'s behaviour with varying values</li>',
+			'</ul>',
+		'</div>',
+		'<vid class="graphItems"></div>'
+	].join("");
+
 	/** Prepare the collection. */
 	GraphCollection.prototype.init = function () {
 		var el = document.createElement("div");
 		el.className = "graphCollection";
+		el.innerHTML = GraphCollection.template;
 		return el;
 	};
 
@@ -100,10 +112,11 @@
 		} else {
 			this.graphs.push(
 				new LaserCanvas.GraphItem(source, propertyName, fieldName)
-				.appendTo(this.el)
+				.appendTo(this.el.querySelector(".graphItems"))
 				.addEventListener("variableChange", this.onVariableChange.bind(this)));
 			this.fireEvent("change");
 		}
+		this.el.setAttribute("data-has-graphs", this.graphs.length ? "true" : "false");
 	};
 
 	/** Remove the graph at the given collection index. */

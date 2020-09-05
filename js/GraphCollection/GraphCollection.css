@@ -1,13 +1,21 @@
-.graphCollection {
+.graphCollection .graphItems {
 	white-space: nowrap;
 	overflow-x: auto;
 }
 
-	.graphCollection .graphCollectionPanel {
+	.graphCollection .graphItems .graphCollectionPanel {
 		display: inline-block;
 	}
 
 	.graphCollectionPanel .title,
 	.graphCollectionPanel .variable {
 		text-align: center;
+	}
+
+	.graphCollection .about {
+		max-width: 360px;
+	}
+
+	.graphCollection[data-has-graphs="true"] .about {
+		display: none;
 	}
