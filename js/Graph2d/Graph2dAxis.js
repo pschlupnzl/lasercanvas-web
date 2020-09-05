@@ -56,6 +56,8 @@
 
 	/** Standard tick spacings. */
 	Graph2dAxis.standardTicks = [0.1, 0.2, 0.5, 1, 5, 10];
+	/** Default maximum number of ticks, if not using metrics. */
+	Graph2dAxis.defaultMaxTicks = 5;
 
 	/**
 	 * Calculate limits, scale, and ticks (as appropriate) for the given metrics.
@@ -67,15 +69,20 @@
 	 */
 	Graph2dAxis.prototype.calcTicks = function (extent, length, options) {
 		var pow, scl, mn, mx,
+			maxTicks = Math.max(3, options.minTickSpacing
+				? Math.floor(length / options.minTickSpacing)
+				: Graph2dAxis.defaultMaxTicks),
 			min = extent.min,
-			max = extent.max,
-			tick = max - min, // Default no intermediate ticks.
-			maxTicks = 5;
+			max = extent.max;
 
-		// TODO: Calculate ticks in addition to scale.
+		// Roundoff error backstop.
+		if (max - min < 1e-7) {
+			max = min + 1;
+		}
 
-		// Power-of-ten scale factor, e.g. 185..319 -> delta=134 -> pow=100.
+		// Power-of-ten scale factor.
 		pow = Math.pow(10, Math.floor(Math.log10(max - min)));
+
 		// Find the largest spacing to limit the number of ticks.
 		max /= pow;
 		min /= pow;
@@ -86,6 +93,7 @@
 				break;
 			}
 		}
+
 		// Expand limits to nice values.
 		if (!options.tightLimits) {
 			this._max = mx * scl * pow;
@@ -97,6 +105,7 @@
 		this._tickMin = mn * scl * pow;
 		this._tickSpacing = scl * pow;
 
+		// Metrics and scale.
 		this._length = length;
 		this._scale = length / (this._max - this._min);
 	};

@@ -58,7 +58,7 @@
 
 		/** Template HTML for a unary value row. */
 		unary: [
-			'<td data-cell="graph"><input type="checkbox" /></td>',
+			'<td data-cell="graph"><span><input type="checkbox" /></span></td>',
 			'<td data-cell="label"></td>',
 			'<td data-cell="value" colspan="2"></td>',
 			'<td data-cell="unit"></td>',
@@ -66,7 +66,7 @@
 
 		/** Template HTML for a sagittal / tangential value row. */
 		sagTan: [
-			'<td data-cell="graph"><input type="checkbox" /></td>',
+			'<td data-cell="graph"><span><input type="checkbox" /></span></td>',
 			'<td data-cell="label"></td>',
 			'<td data-cell="sag" color-theme-plane="sag"></td>',
 			'<td data-cell="tan" color-theme-plane="tan"></td>',

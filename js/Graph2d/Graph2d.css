@@ -63,3 +63,22 @@
 			margin-bottom: -0.45em;
 			text-align: right;
 		}
+
+		.LaserCanvasGraph2d .Graph2dAxis .ticks label::before {
+			content: "";
+			position: absolute;
+		}
+
+			.LaserCanvasGraph2d .Graph2dAxis[data-direction="vertical"] .ticks label::before {
+				bottom: calc(50% - 2px);
+				right: -0.6em;
+				width: 0.5em;
+				border-bottom: 1px solid;
+			}
+
+			.LaserCanvasGraph2d .Graph2dAxis[data-direction="horizontal"] .ticks label::before {
+				top: -0.5em;
+				left: 50%;;
+				height: 0.5em;
+				border-left: 1px solid;
+			}

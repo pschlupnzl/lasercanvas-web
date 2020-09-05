@@ -109,7 +109,7 @@
 	/** Remove the graph at the given collection index. */
 	GraphCollection.prototype.removeGraphAt = function (index) {
 		this.graphs[index].destroy();
-		this.graphs.splice(index);
+		this.graphs.splice(index, 1);
 	};
 
 	// ---------

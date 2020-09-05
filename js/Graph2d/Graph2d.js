@@ -139,9 +139,9 @@
 	Graph2d.prototype.calcTicks = function () {
 		var size = this.canvasSize(),
 			extents = this.getDataExtents(),
-			fontSize = this.getFontSize;
-		this.axes.x.calcTicks(extents.x, size.width, { minTickSpacing: 5 * fontSize, tightLimits: true });
-		this.axes.y.calcTicks(extents.y, size.height, { minTickSpacing: 2 * fontSize });
+			fontSize = this.getFontSize();
+		this.axes.x.calcTicks(extents.x, size.width, { minTickSpacing: 2.5 * fontSize, tightLimits: true });
+		this.axes.y.calcTicks(extents.y, size.height, { minTickSpacing: 1.5 * fontSize });
 	};
 
 	// ------------

@@ -105,7 +105,6 @@
 					};
 				});
 			} else {
-console.warn(`getGraphValue is NOT an array ${this._variableName}`)
 				return [{
 					x: variableValue,
 					y: value
