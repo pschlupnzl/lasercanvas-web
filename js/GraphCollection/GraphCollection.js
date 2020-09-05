@@ -138,6 +138,7 @@
 	GraphCollection.prototype.change = function (elements) {
 		var graph;
 		for (var index = this.graphs.length - 1; index >= 0; index -= 1) {
+			graph =  this.graphs[index];
 			if (!elements.find(function (element) { return element === graph.source(); })) {
 				this.removeGraphAt(index);
 			}
