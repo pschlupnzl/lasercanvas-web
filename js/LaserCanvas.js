@@ -153,7 +153,7 @@ window.LaserCanvas.Application = function (canvas, info) {
 							msystem.calculateAbcd();
 							mgraphCollection.scanValue(variableName, variableValue);
 						});
-						mgraphCollection.scanEnd(variableName);
+						mgraphCollection.scanEnd(variableName, mvariables.value()[variableName]);
 					}
 				}
 			};

@@ -91,6 +91,14 @@
 		}.bind(this));
 	};
 
+	/** Create a new line corresponding to a vertical marker line. */
+	Graph2d.prototype.createVerticalMarker = function (x) {
+		this.lines.push({
+			x: [x, x],
+			y: [this.axes.y.min(), this.axes.y.max()]
+		});
+	};
+
 	// ----------
 	//  Scaling.
 	// ----------
@@ -205,7 +213,7 @@
 					}
 				}
 			}
-			ctx.strokeStyle = LaserCanvas.theme.current.mode[lineIndex];
+			ctx.strokeStyle = LaserCanvas.theme.current.mode[lineIndex] || "#333";
 			ctx.stroke();
 			ctx.restore();
 		});

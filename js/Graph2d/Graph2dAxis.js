@@ -19,6 +19,14 @@
 		VERTICAL: "vertical"
 	};
 
+	Graph2dAxis.prototype.min = function () {
+		return this._min;
+	};
+	
+	Graph2dAxis.prototype.max = function () {
+		return this._max;
+	};
+
 	/** Transform a data point to a screen point. */
 	Graph2dAxis.prototype.transform = function (val, flip) {
 		var p = this._scale * (val - this._min);
