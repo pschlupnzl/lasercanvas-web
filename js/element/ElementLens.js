@@ -223,7 +223,7 @@ LaserCanvas.Element.Lens.prototype = {
 	wireframe: function (render, layer) {
 		var k, dx,
 			renderLayer = LaserCanvas.Enum.renderLayer,    // {Enum} Layer to draw.
-			stringFormatPrecision = LaserCanvas.Utilities.stringFormatPrecision,
+			Utilities = LaserCanvas.Utilities,
 			d = [], // {Array<string>} Path drawing instructions.
 			r = 8,  // {number} "Thickness" of mirror.
 			qc = -this.loc.p, // {number} (rad) Display angle on canvas.
@@ -241,12 +241,12 @@ LaserCanvas.Element.Lens.prototype = {
 			switch (layer) {
 				case renderLayer.optics:
 					k = -4;
-					d.push(stringFormatPrecision(2, 'M {0} {1}', dx(k), r * k));
+					d.push(Utilities.stringFormatPrecision(2, 'M {0} {1}', dx(k), r * k));
 					for (k += 1; k <= +4; k += 1) {
-						d.push(stringFormatPrecision(2, 'L {0} {1}', dx(k), r * k));
+						d.push(Utilities.stringFormatPrecision(2, 'L {0} {1}', dx(k), r * k));
 					}
 					for (k = +4; k >= -4; k -= 1) {
-						d.push(stringFormatPrecision(2, 'L {0} {1}', -dx(k), r * k));
+						d.push(Utilities.stringFormatPrecision(2, 'L {0} {1}', -dx(k), r * k));
 					}
 					d.push('Z');
 					render
