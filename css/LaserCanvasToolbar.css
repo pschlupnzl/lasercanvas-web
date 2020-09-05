@@ -99,3 +99,31 @@
 [data-theme="line"] .generalSelector .slider {
 	background-color: #d7d7d7;
 }
+
+.laserCanvasToolbar .feedbackLink {
+	position: absolute;
+	top: -1.35em;
+	right: 0.5em;
+	text-decoration: none;
+	font-size: 16px;
+}
+
+	.laserCanvasToolbar .feedbackLink > span {
+		animation: gloss 7s linear infinite;
+	}
+
+	.laserCanvasToolbar .feedbackLink > span:nth-child(1) { animation-delay: 0; }
+	.laserCanvasToolbar .feedbackLink > span:nth-child(2) { animation-delay: 50ms; }
+	.laserCanvasToolbar .feedbackLink > span:nth-child(3) { animation-delay: 100ms; }
+	.laserCanvasToolbar .feedbackLink > span:nth-child(4) { animation-delay: 150ms; }
+	.laserCanvasToolbar .feedbackLink > span:nth-child(5) { animation-delay: 200ms; }
+	.laserCanvasToolbar .feedbackLink > span:nth-child(6) { animation-delay: 250ms; }
+	.laserCanvasToolbar .feedbackLink > span:nth-child(7) { animation-delay: 300ms; }
+	.laserCanvasToolbar .feedbackLink > span:nth-child(8) { animation-delay: 350ms; }
+
+	@keyframes gloss {
+		0% { color: #339; }
+		96% { color: #339; }
+		98% { color: #99c; }
+		100% { color: #339; }
+	}
