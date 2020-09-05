@@ -6,8 +6,16 @@
 	var Graph2dAxis = function (dir) {
 		this.dir = dir;
 		this.el = this.init();
+
+		// Data limits.
 		this._min = 0;
 		this._max = 1;
+
+		// Ticks.
+		this._tickMin = 0;
+		this._tickSpacing = 1;
+
+		// Scaling.
 		this._scale = 1;
 		this._length = 1; // Length in display units (pixels).
 		this.render();
@@ -46,18 +54,51 @@
 		return el;
 	};
 
+	/** Standard tick spacings. */
+	Graph2dAxis.standardTicks = [0.1, 0.2, 0.5, 1, 5, 10];
+
 	/**
 	 * Calculate limits, scale, and ticks (as appropriate) for the given metrics.
 	 * @param {object} extent The { min, max } extent to include on this axis.
 	 * @param {number} length Length (width or height) of axis in screen units (pixels).
-	 * @param {number} minTickSpacing Minimum space, in screen units, allowed between ticks.
+	 * @param {object} options Optional parameters:
+	 *     minTickSpacing {number}  Minimum space, in screen units, allowed between ticks.
+	 *     tightLimits    {boolean} Value indicating that axes limits should not be extended.
 	 */
-	Graph2dAxis.prototype.calcTicks = function (extent, length, minTickSpacing) {
+	Graph2dAxis.prototype.calcTicks = function (extent, length, options) {
+		var pow, scl, mn, mx,
+			min = extent.min,
+			max = extent.max,
+			tick = max - min, // Default no intermediate ticks.
+			maxTicks = 5;
+
 		// TODO: Calculate ticks in addition to scale.
+
+		// Power-of-ten scale factor, e.g. 185..319 -> delta=134 -> pow=100.
+		pow = Math.pow(10, Math.floor(Math.log10(max - min)));
+		// Find the largest spacing to limit the number of ticks.
+		max /= pow;
+		min /= pow;
+		for (scl of Graph2dAxis.standardTicks) {
+			mx = Math.ceil(max / scl);
+			mn = Math.floor(min / scl);
+			if ((mx - mn) / scl < maxTicks) {
+				break;
+			}
+		}
+		// Expand limits to nice values.
+		if (!options.tightLimits) {
+			this._max = mx * scl * pow;
+			this._min = mn * scl * pow;
+		} else {
+			this._max = extent.max;
+			this._min = extent.min;
+		}
+		this._tickMin = mn * scl * pow;
+		this._tickSpacing = scl * pow;
+
 		this._length = length;
-		this._min = extent.min;
-		this._max = extent.max;
-		this._scale = length / (extent.max - extent.min);
+		this._scale = length / (this._max - this._min);
 	};
 
 	/** Attach myself to the DOM. */
@@ -70,24 +111,23 @@
 	 * Update the axis ticks.
 	 */
 	Graph2dAxis.prototype.render = function () {
-		var dir = this.dir,
-			el = this.el.querySelector(".ticks"),
+		var el = this.el.querySelector(".ticks"),
+			styleRule = this.dir === Graph2dAxis.Direction.HORIZONTAL ? "left" : "bottom",
 			min = this._min,
 			max = this._max,
-			tick = function (value, text) {
-				var el = document.createElement("label"),
-					pos = 100 * (value - min) / (max - min);
-				el.innerHTML = text;
-				if (dir === Graph2dAxis.Direction.HORIZONTAL) {
-					el.style.left = `${pos}%`;
-				} else {
-					el.style.bottom = `${pos}%`;
-				}
+			createTick = function (value, text) {
+				var label = document.createElement("label");
+				label.innerHTML = text || LaserCanvas.Utilities.numberFormat(value, true);
+				label.style[styleRule] = `${100 * (value - min) / (max - min)}%`;
+				el.appendChild(label);
 				return el;
 			};
 		el.innerHTML = "";
-		el.appendChild(tick(min, LaserCanvas.Utilities.numberFormat(min, true)));
-		el.appendChild(tick(max, LaserCanvas.Utilities.numberFormat(max, true)));
+		for (var tickValue = this._tickMin; tickValue <= this._max; tickValue += this._tickSpacing) {
+			if (tickValue >= this._min) {
+				createTick(tickValue);
+			}
+		}
 	};
 
 	LaserCanvas.Graph2dAxis = Graph2dAxis;

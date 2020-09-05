@@ -13,6 +13,12 @@
 		};
 	};
 
+	Graph2d.template = [
+		'<div class="plot">',
+		'<canvas/>',
+		'</div>'
+	].join("");
+
 	/**
 	 * Initialize the plot and create additional elements.
 	 */
@@ -20,12 +26,7 @@
 		var plot,
 			el = document.createElement("div")
 		el.className = "LaserCanvasGraph2d";
-		el.innerHTML = [
-			'<div class="plot">',
-			'<canvas/>',
-			'</div>',
-			'</div>'
-		].join("");
+		el.innerHTML = Graph2d.template;
 		plot = el.querySelector(".plot");
 		this.axes.x.appendTo(plot);
 		this.axes.y.appendTo(plot);
@@ -139,8 +140,8 @@
 		var size = this.canvasSize(),
 			extents = this.getDataExtents(),
 			fontSize = this.getFontSize;
-		this.axes.x.calcTicks(extents.x, size.width, 5 * fontSize);
-		this.axes.y.calcTicks(extents.y, size.height, 2 * fontSize);
+		this.axes.x.calcTicks(extents.x, size.width, { minTickSpacing: 5 * fontSize, tightLimits: true });
+		this.axes.y.calcTicks(extents.y, size.height, { minTickSpacing: 2 * fontSize });
 	};
 
 	// ------------
