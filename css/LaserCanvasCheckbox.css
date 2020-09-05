@@ -1,0 +1,89 @@
+/*
+.checkboxInput input[type="checkbox"],
+input.laserCanvasInput[type="checkbox"] {
+	position: relative;
+	left: +0.4em;
+}
+
+	.checkboxInput input[type="checkbox"]:after,
+	input.laserCanvasInput[type="checkbox"]:after {
+		content: " ";
+		display: inline-block;
+		position: relative;
+		top: -0.4em;
+		left: -0.4em;
+		width: 1.5em;
+		height: 1.5em;
+		padding-left: 0.2em;
+		padding-top: 0.2em;
+		background: white;
+		border: 1px solid #aaa;
+		border-radius: 50%;
+		text-align: center;
+	}
+	
+		.checkboxInput input[type="checkbox"]:checked:after,
+		input.laserCanvasInput[type="checkbox"]:checked:after {
+			content: "\2714";
+			box-shadow: 0.1em 0.1em 0.2em rgba(0, 0, 0, 0.3) inset;
+			background-color: #c7c7c8;
+		}
+*/
+
+.checkboxInput input[type="checkbox"],
+input.laserCanvasInput[type="checkbox"],
+input.laserCanvasCheckbox[type="checkbox"] {
+	position: relative;
+	width: 2.5em;
+	margin-left: 1em;
+	font-size: inherit;
+}
+
+	/* Trough */
+	.checkboxInput input[type="checkbox"]::before,
+	input.laserCanvasInput[type="checkbox"]::before,
+	input.laserCanvasCheckbox[type="checkbox"]::before {
+		content: "";
+		display: inline-block;
+		position: absolute;
+		left: -0.9em;
+		top: -0.2em;
+		width: 3em;
+		height: 1.4em;
+		border-radius: 0.7em;
+		background: #a8a8a8;
+		box-shadow: 0 0 0.5em rgba(0, 0, 0, 0.2) inset;
+	}
+
+	/* Thumb */
+	.checkboxInput input[type="checkbox"]::after,
+	input.laserCanvasInput[type="checkbox"]::after,
+	input.laserCanvasCheckbox[type="checkbox"]::after {
+		content: "";
+		position: absolute;
+		width: 1.2em;
+		height: 1.2em;
+		left: -0.7em;
+		top: -0.1em;
+		border-radius: 0.5em;
+		background: #f4f4f4;
+		text-align: center;
+		transition: left 150ms;
+	}
+
+		.checkboxInput input[type="checkbox"]:checked::after,
+		input.laserCanvasInput[type="checkbox"]:checked::after,
+		input.laserCanvasCheckbox[type="checkbox"]:checked::after {
+			content: "";
+			left: 0.7em;
+		}
+
+	.checkboxInput input[type="checkbox"]::after,
+	input.laserCanvasInput[type="checkbox"]::after {
+		content: "\d7";
+	}
+
+		.checkboxInput input[type="checkbox"]:checked::after,
+		input.laserCanvasInput[type="checkbox"]:checked::after {
+			content: "\2713";
+		}
