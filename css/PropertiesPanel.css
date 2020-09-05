@@ -119,11 +119,6 @@
 .propertiesPanel thead tr[data-property-name] {
 	display: none;
 }
-
-	.propertiesPanel tr[data-property-name] td:nth-child(2),
-	.propertiesPanel tr[data-property-name] td:nth-child(5) {
-		text-align: center;
-	}
 	
 	.propertiesPanel[data-can-delete="false"] button[data-action="delete"],
 	.propertiesPanel[data-has-refractive-index="false"] button[data-action="sellmeier"] {
