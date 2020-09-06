@@ -15,10 +15,15 @@
 
 [data-theme="dark"] .laserCanvasInfo,
 [data-theme="dark"] .propertiesPanel,
+[data-theme="dark"] .helpPanel,
 [data-theme="dark"] .laserCanvasToolbar,
 [data-theme="dark"] .laserCanvasVariablesPanel {
 	color: #e7e7e7;
 	background-color: #404040;
+}
+
+[data-theme="dark"] .helpPanel a {
+	color: #a3a3ff;
 }
 
 [data-theme="line"] .laserCanvasToolbar,

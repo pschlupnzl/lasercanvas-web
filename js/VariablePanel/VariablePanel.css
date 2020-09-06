@@ -17,7 +17,7 @@
 
 button[data-action="toggleVariables"] {
 	left: 1em;
-	width: 3em;
+	width: 1.3em;
 	border-top-left-radius: 0.8em;
 	border-top-right-radius: 0.8em;
 }
