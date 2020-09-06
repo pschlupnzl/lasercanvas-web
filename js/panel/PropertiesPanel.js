@@ -165,12 +165,14 @@ LaserCanvas.PropertiesPanel = function (render, system) {
 		*/
 		onApplySellmeier = function (prop) {
 			LaserCanvas.Utilities.foreach(prop, function (propertyName, value) {
-				var input = panel.querySelector('input[data-property-name="' + propertyName + '"]');
-				if (input
-					&& currentElement.canSetProperty(propertyName)) {
-					LaserCanvas.Element.propertyStep(input, "set", value, currentElement, system);
+				if (currentElement.canSetProperty(propertyName)) {
+					currentElement.set(propertyName, value);
 				}
 			});
+
+			// Update system. Coordinates may change, e.g. Brewster-cut
+			// crystal with new refractive index.
+			system.update(true);
 		},
 		
 		// -------------------------------------------------

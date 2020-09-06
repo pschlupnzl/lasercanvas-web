@@ -107,8 +107,8 @@
 		});
 
 		// Initialize from local storage, if possible.
-		// msystem.fromJsonSource(LaserCanvas.SystemUtil.fromLocalStorage);
-		msystem.fromJsonSource();
+		msystem.fromJsonSource(LaserCanvas.SystemUtil.fromLocalStorage);
+		// msystem.fromJsonSource();
 		return this;
 	};
 
