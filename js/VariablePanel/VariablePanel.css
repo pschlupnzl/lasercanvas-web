@@ -1,0 +1,65 @@
+#LaserCanvasVariablesPanel {
+	position: absolute;
+	left: 0;
+	bottom: -221px;
+	width: 100%;
+	height: 220px;
+	transition-property: bottom;
+	transition-duration: 350ms;
+	border-top: 1px solid #ccc;
+}
+
+	[data-variables-visible="true"] #LaserCanvasVariablesPanel {
+		bottom: 0;
+	}
+
+/* Toggle variables button */
+
+button[data-action="toggleVariables"] {
+	left: 1em;
+	width: 1.3em;
+	border-top-left-radius: 0.8em;
+	border-top-right-radius: 0.8em;
+}
+
+	button[data-action="toggleVariables"] {
+		bottom: -2px;
+		transition-property: bottom;
+		transition-duration: 350ms;
+	}
+
+		button[data-action="toggleVariables"]:after {
+			/* content: "\2303"; */
+			content: "\3a3";
+			font-size: 0.8em;
+		}
+
+	[data-variables-visible="true"] button[data-action="toggleVariables"] {
+		bottom: 219px;
+	}
+
+		[data-variables-visible="true"] button[data-action="toggleVariables"]:after {
+			content: "\2304"
+		}
+
+/* Content. */
+#LaserCanvasVariablesPanel .content {
+	display: flex;
+	flex-direction: row;
+}
+
+#LaserCanvasVariablesPanel .variables {
+	width: 15em;
+}
+
+	#LaserCanvasVariablesPanel .variables .heading {
+		margin: 0 0.5em;
+		font-weight: bold;
+		border-bottom: 1px solid;
+		text-align: center;
+	}
+
+#LaserCanvasVariablesPanel .LaserCanvasGraph2d {
+	width: 320px;
+	height: 160px;
+}

@@ -2,9 +2,7 @@
 * Laser canvas system - Adjustment calculations.
 */
 (function (LaserCanvas) {
-LaserCanvas.systemAdjust = function (melements, calculateCartesianCoordinates) {
-	"use strict";
-	
+LaserCanvas.systemAdjust = function (melements, calculateCartesianCoordinates, getVariables) {
 	/** ************************************************
 	* Calculate new property values for a drag of an
 	* element with relevant constraints.
@@ -116,7 +114,7 @@ LaserCanvas.systemAdjust = function (melements, calculateCartesianCoordinates) {
 					return {
 						element: element,          // {Element} Element that can pivot, stretch, or drag.
 						loc: LaserCanvas.Utilities.extend({}, element.location(), {
-							l: element.property("distanceToNext")
+							l: element.get("distanceToNext", getVariables())
 						}),
 						index: k,                  // {number} Index of element.
 						canPivot: element.canSetProperty('outgoingAngle') // {boolean} Value indicating whether the element can pivot.
@@ -305,7 +303,7 @@ LaserCanvas.systemAdjust = function (melements, calculateCartesianCoordinates) {
 				S = S.scale(a);
 
 				if (a > 0) {
-					next.stretch.element.property('distanceToNext', a);
+					next.stretch.element.set("distanceToNext", a);
 					next.stretch.element.loc.x = ptEnd.x - S[0];
 					next.stretch.element.loc.y = ptEnd.y - S[1];
 					calculateCartesianCoordinates(mdragData.drag.index);
@@ -321,9 +319,9 @@ LaserCanvas.systemAdjust = function (melements, calculateCartesianCoordinates) {
 					pt.y - prev.stretch.loc.y)
 					.dot(S);
 				if (a > 0) {
-					prev.stretch.element.property('distanceToNext', a);
+					prev.stretch.element.set("distanceToNext", a);
 					if (next.construct) {
-						next.stretch.element.property('distanceToNext',
+						next.stretch.element.set("distanceToNext",
 							prev.stretch.loc.l + next.stretch.loc.l - a);
 					}
 					calculateCartesianCoordinates(prev.index);
@@ -351,7 +349,7 @@ LaserCanvas.systemAdjust = function (melements, calculateCartesianCoordinates) {
 				locPrev = {},           // {object} Retain previous configuration to cancel drags.
 				distPrev = null,        // {number} Retain previous distance to next to cancel drags.
 				prevPivotOutgoingAngle = mdragData.prev.pivot // {number} (rad) Initial outgoing angle after pivot.
-					? mdragData.prev.pivot.element.property('outgoingAngle')
+					? mdragData.prev.pivot.element.get("outgoingAngle")
 					: null,
 
 				// Calculate new stretch and angles.
@@ -398,7 +396,7 @@ LaserCanvas.systemAdjust = function (melements, calculateCartesianCoordinates) {
 						// Do it.
 						a = Math.abs(a);
 						if (a > 0) {
-							data.stretch.element.property('distanceToNext', a);
+							data.stretch.element.set("distanceToNext", a);
 						
 							// Angle on page.
 							// The sign of adding or subtracting the new deflection
@@ -416,7 +414,7 @@ LaserCanvas.systemAdjust = function (melements, calculateCartesianCoordinates) {
 								
 								if (dir === -1) {
 									// Standard elements, calculating backward.
-									data.pivot.element.property('outgoingAngle', q, data.pivot.index === 0);
+									data.pivot.element.set("outgoingAngle", q, data.pivot.index === 0);
 
 								} else if (!mdragData.prev.construct) {
 									// First element, calculating forwards.
@@ -425,7 +423,7 @@ LaserCanvas.systemAdjust = function (melements, calculateCartesianCoordinates) {
 										y: pt.y,
 										q: 0 // Angle set separately, below.
 									});
-									mdragData.drag.element.property('outgoingAngle', 0, true); // Set outgoing angle isFirstElement: true.
+									mdragData.drag.element.set("outgoingAngle", 0, true); // Set outgoing angle isFirstElement: true.
 									calculateCartesianCoordinates(0, mdragData.next.pivot.index);
 
 									// I can't for the life of me figure out the correct outgoing
@@ -434,11 +432,11 @@ LaserCanvas.systemAdjust = function (melements, calculateCartesianCoordinates) {
 									// then rotate the element's axis so that the pivot is back
 									// where it's supposed to be.
 									loc = mdragData.next.pivot.element.location();
-									mdragData.drag.element.property('outgoingAngle', C.atan2() - new Vector(loc.x - pt.x, loc.y - pt.y).atan2(), true);
+									mdragData.drag.element.set("outgoingAngle", C.atan2() - new Vector(loc.x - pt.x, loc.y - pt.y).atan2(), true);
 									calculateCartesianCoordinates(0, mdragData.next.pivot.index);
 									
 									// Restore next pivot angle.
-									mdragData.next.pivot.element.property('outgoingAngle', mdragData.next.pivot.loc.q); // Restore original outgoing direction.
+									mdragData.next.pivot.element.set("outgoingAngle", mdragData.next.pivot.loc.q); // Restore original outgoing direction.
 									calculateCartesianCoordinates(mdragData.drag.index);
 								}
 							}
@@ -472,17 +470,17 @@ LaserCanvas.systemAdjust = function (melements, calculateCartesianCoordinates) {
 						q = Math.asin(V.cross(W));
 						
 						// Apply angle.
-						mdragData.drag.element.property('outgoingAngle', dragLoc.q + q); // Deflect cavity to restore next pivot point.
+						mdragData.drag.element.set("outgoingAngle", dragLoc.q + q); // Deflect cavity to restore next pivot point.
 						calculateCartesianCoordinates(mdragData.prev.pivot.index, mdragData.next.pivot.index);
 						
 						// Restore next pivot angle.
-						mdragData.next.pivot.element.property('outgoingAngle', mdragData.next.pivot.loc.q); // Restore original outgoing direction.
+						mdragData.next.pivot.element.set("outgoingAngle", mdragData.next.pivot.loc.q); // Restore original outgoing direction.
 						calculateCartesianCoordinates(mdragData.drag.index);
 						return true;
 						
 					} else {
 						// Illegal placement - restore previous.
-						mdragData.prev.pivot.element.property('outgoingAngle', prevPivotOutgoingAngle);
+						mdragData.prev.pivot.element.set("outgoingAngle", prevPivotOutgoingAngle);
 						return false;
 					}
 				},
@@ -492,9 +490,9 @@ LaserCanvas.systemAdjust = function (melements, calculateCartesianCoordinates) {
 				calculateFixedDrag = function () {
 					var a = mdragData.next.stretch.loc.l
 						+ mdragData.prev.stretch.loc.l
-						- mdragData.prev.stretch.element.property("distanceToNext"); // {number} (mm) Amount moved.
+						- mdragData.prev.stretch.element.get("distanceToNext", getVariables()); // {number} (mm) Amount moved.
 					if (a > 0) {
-						mdragData.next.stretch.element.property('distanceToNext', a);
+						mdragData.next.stretch.element.set("distanceToNext", a);
 						calculateCartesianCoordinates();
 						return true;
 					}
@@ -504,7 +502,7 @@ LaserCanvas.systemAdjust = function (melements, calculateCartesianCoordinates) {
 			// Prepare to cancel, if needed.
 			if (mdragData.prev.stretch) {
 				locPrev = extend(locPrev, mdragData.prev.stretch.element.loc);
-				distPrev = mdragData.prev.stretch.element.property("distanceToNext");
+				distPrev = mdragData.prev.stretch.element.get("distanceToNext", getVariables());
 			}
 			
 			// Dragging first element (no previous).
@@ -543,7 +541,7 @@ LaserCanvas.systemAdjust = function (melements, calculateCartesianCoordinates) {
 			// Cancel drag, if needed.
 			if (!dragPermitted && mdragData.prev.stretch) {
 				extend(mdragData.prev.stretch.element.loc, locPrev);
-				mdragData.prev.stretch.element.property("distanceToNext", distPrev);
+				mdragData.prev.stretch.element.set("distanceToNext", distPrev);
 			}
 
 			// Return success.

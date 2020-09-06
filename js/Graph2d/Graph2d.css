@@ -1,0 +1,84 @@
+.LaserCanvasGraph2d {
+	position: relative;
+}
+
+	.LaserCanvasGraph2d .plot {
+		position: absolute;
+		border: 1px solid;
+
+		left: 4em;
+		top: 0.75em;
+		right: 2em;
+		bottom: 1.5em;
+	}
+
+/*
+* Axes
+*/
+.LaserCanvasGraph2d .Graph2dAxis {
+	position: absolute;
+}
+
+	.LaserCanvasGraph2d .Graph2dAxis[data-direction="horizontal"] {
+		left: 0;
+		bottom: 0;
+		width: 100%;
+		border-top: 1px solid;
+	}
+	
+	.LaserCanvasGraph2d .Graph2dAxis[data-direction="vertical"] {
+		left: 0;
+		bottom: 0;
+		height: 100%;
+		border-right: 1px solid;
+	}
+
+	.LaserCanvasGraph2d .Graph2dAxis .ticks {
+		position: absolute;
+	}
+
+		.LaserCanvasGraph2d .Graph2dAxis[data-direction="horizontal"] .ticks {
+			width: 100%;
+		}
+
+		.LaserCanvasGraph2d .Graph2dAxis[data-direction="vertical"] .ticks {
+			height: 100%;
+		}
+
+	.LaserCanvasGraph2d .Graph2dAxis .ticks label {
+		position: absolute;
+	}
+
+		.LaserCanvasGraph2d .Graph2dAxis[data-direction="horizontal"] .ticks label {
+			width: 5em;
+			margin-left: -2.5em;
+			text-align: center;
+		}
+		
+		.LaserCanvasGraph2d .Graph2dAxis[data-direction="vertical"] .ticks label {
+			width: 5em;
+			height: 1.15em;
+			line-height: 1.15em;
+			margin-left: -5.2em;
+			margin-bottom: -0.45em;
+			text-align: right;
+		}
+
+		.LaserCanvasGraph2d .Graph2dAxis .ticks label::before {
+			content: "";
+			position: absolute;
+		}
+
+			.LaserCanvasGraph2d .Graph2dAxis[data-direction="vertical"] .ticks label::before {
+				bottom: calc(50% - 2px);
+				right: -0.6em;
+				width: 0.5em;
+				border-bottom: 1px solid;
+			}
+
+			.LaserCanvasGraph2d .Graph2dAxis[data-direction="horizontal"] .ticks label::before {
+				top: -0.5em;
+				left: 50%;;
+				height: 0.5em;
+				border-left: 1px solid;
+			}

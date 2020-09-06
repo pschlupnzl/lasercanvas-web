@@ -6,6 +6,7 @@
 body {
 	padding: 0;
 	margin: 0;
+	overflow: hidden;
 	font-size: 16px;
 	font-family: 'Open Sans', sans-serif;
 }
@@ -115,110 +116,16 @@ body {
 			font-size: 100px;
 			opacity: 0;
 		}
-/*
-* Toolbar.
-*/
 
-.laserCanvasToolbar {
-	bottom: 0;
-	width: 100%;
-	height: 80px;
-	margin-top: -1px;
-	border-top: 1px solid #ccc;
-	white-space: nowrap;
-	text-align: center;
-}
-
-.generalSelector {
-	display: inline-block;
-	margin: 0.5em;
-	font-size: inherit;
-	font-family: inherit;
-}
-
-	.generalSelector .slider,
-	.generalSelector .buttons {
-		display: inline-block;
-		vertical-align: middle;
-	}
-
-	.generalSelector button {
-		display: block;
-		padding: 0.2em;
-		border: none;
-		color: inherit;
-		background: none;
-		cursor: pointer;
-	}
-
-	.generalSelector .slider {
-		width: 1em;
-		height: 2.2em;
-		padding: 0.2em;
-		background: #999;
-		border-radius: 0.6em;
-	}
-	
-		.generalSelector .slider:after {
-			content: " ";
-			position: relative;
-			display: block;
-			top: 0;
-			width: 1em;
-			height: 1em;
-			background: white;
-			border-radius: 0.5em;
-			transition: top ease-out 150ms;
-		}
-	
-		[data-interaction="inspect"] .interactionSelector .slider:after,
-		[data-theme="light"] .themeSelector .slider:after {
-			top: 1.2em;
-		}
-		
-		[data-theme="dark"] .themeSelector .slider:after {
-			top: 2.4em;
-		}
-		
-.themeSelector .slider {
-	height: 3.4em;
-}
-		
-[data-insert-element] {
-	position: relative;
-	display: inline-block;
-	min-height: 64px;
-	background: #999;
-	border: none;
-	border-radius: 1em;
-	vertical-align: top;
-}
-
-	[data-insert-element]:after {
-		position: absolute;
-		content: " ";
-		top: -1.9em;
-		left: 50%;
-		width: 0;
-		margin-left: -1em;
-		border: 1em solid transparent;
-		border-bottom-color: #999;
-	}
-
-[data-theme="line"] [data-insert-element] {
-	background: #d7d7d7;
-}
-
-	[data-theme="line"] [data-insert-element]:after {
-		border-bottom-color: #d7d7d7;
-	}
-	
-[data-theme="line"] .generalSelector .slider {
-	background-color: #d7d7d7;
-}
 /* 
 * 2d Rendering
 */
+
+.laserCanvasFrame {
+	width: 100%;
+	height: 100%;
+}
+
 [data-interaction="inspect"] .laserCanvasFrame {
 	cursor: help;
 }
@@ -269,6 +176,7 @@ body {
 
 	[data-interaction="inspect"] .laserCanvasFrame .laserCanvasInspect {
 		display: block;
+		white-space: nowrap;
 	}
 
 
@@ -278,153 +186,16 @@ canvas.render2d {
 	background-image: none;
 }
 
-.propertiesPanel,
-.elementScreenPanel,
-.sellmeierPanel {
-	position: absolute;
-	left: 20px;
-	top: 20px;
-	padding: 0.5em;
-	background: rgba(255, 255, 255, 0.85);
-	border-radius: 1em;
-	box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
-}
-
-.propertiesPanel,
-.elementScreenPanel {
-	display: none;
-}
-
-	.propertiesPanel[data-visible="true"] {
-		display: block;
-	}
-	
-	.propertiesPanel h1,
-	.elementScreenPanel h1,
-	.sellmeierPanel h1 {
-		margin: 0.2em;
-		font-size: 1em;
-		text-align: center;
-	}
-
-	.propertiesPanel h1,
-	.elementScreenPanel h1 {
-		text-transform: uppercase;
-	}
-	
-		.propertiesPanel h1 input[type="text"] {
-			width: 80%;
-			border: none;
-			background: none;
-			text-align: center;
-			font-family: inherit;
-			font-size: inherit;
-			font-weight: inherit;
-			text-transform: inherit;
-		}
-	
-.propertiesPanel table {
-	width: 100%;
-}
-
-	.propertiesPanel table th {
-		display: none;
-		border-bottom: 1px solid #666;
-	}
-
-	input.laserCanvasInput[type="number"],
-	input.laserCanvasInput[type="text"],
-	.propertiesPanel table select,
-	.propertiesPanel table input[type="number"],
-	.propertiesPanel table input[type="text"] {
-		padding: 0.1em 0.5em;
-		background: white;
-		border-radius: 0.5em;
-		font-family: inherit;
-		font-size: inherit;
-	}
-	
-	.propertiesPanel table select {
-		min-width: 6em;
-	}
-	
-	input.laserCanvasInput[type="number"],
-	input.laserCanvasInput[type="text"],
-	.propertiesPanel table input[type="number"],
-	.propertiesPanel table input[type="text"] {
-		width: 3.0em;
-		border: none;
-		box-shadow: 0.1em 0.1em 0.2em rgba(0, 0, 0, 0.3) inset;
-		text-align: right;
-	}
-
-	input.laserCanvasInput[type="checkbox"],
-	.propertiesPanel table input[type="checkbox"] {
-		position: relative;
-		/* top: +0.4em; */
-		left: +0.4em;
-	}
-	
-		input.laserCanvasInput[type="checkbox"]:after,
-		.propertiesPanel table input[type="checkbox"]:after {
-			content: " ";
-			display: inline-block;
-			position: relative;
-			top: -0.4em;
-			left: -0.4em;
-			width: 1.5em;
-			height: 1.5em;
-			padding-left: 0.2em;
-			padding-top: 0.2em;
-			background: white;
-			border: 1px solid #aaa;
-			border-radius: 50%;
-			text-align: center;
-		}
-		
-			input.laserCanvasInput[type="checkbox"]:checked:after,
-			.propertiesPanel table input[type="checkbox"]:checked:after {
-				content: "\2714";
-				box-shadow: 0.1em 0.1em 0.2em rgba(0, 0, 0, 0.3) inset;
-				background-color: #c7c7c8;
-			}
-			
-	.propertiesPanel table input[type="text"][disabled] {
-		color: #626262;
-		background-color: #e7e7e7;
-		box-shadow: none;
-	}
-
-	.propertiesPanel table td[data-content="unit"] {
-		text-align: left;
-	}
-	
-.dragbar {
-	background-image: linear-gradient(
-		to bottom,
-		#555  0%, #555  9%,
-		#fff 10%, #fff 19%,
-		#555 20%, #555 29%, 
-		#fff 30%, #fff 39%, 
-		#555 40%, #555 49%,
-		transparent 50%);
-}
-
-.propertiesPanel .dragbar,
-.elementScreenPanel .dragbar,
-.sellmeierPanel .dragbar {
-	width: calc(100% + 1em);
-	height: 2em;
-	margin-top: -0.5em;
-	margin-left: -0.5em;
-	margin-bottom: -1em;
-	border-top-left-radius: 1em;
-	border-top-right-radius: 1em;
-	opacity: 0.5;
-}
-
 [data-draggable="true"] {
 	cursor: move;
+}
+
+[data-draggable="x"] {
+	cursor: ew-resize;
+}
+
+[data-draggable="y"] {
+	cursor: ns-resize;
 }
 
 input[type="text"]::placeholder {
@@ -463,28 +234,6 @@ button.lcbutton {
 		background-color: #2e2e2e;
 	}
 
-.propertiesPanel thead tr[data-property-name] {
-	display: none;
-}
-
-	.propertiesPanel tr[data-property-name] td:nth-child(2),
-	.propertiesPanel tr[data-property-name] td:nth-child(5) {
-		text-align: center;
-	}
-	
-	.propertiesPanel[data-can-delete="false"] button[data-action="delete"],
-	.propertiesPanel[data-has-refractive-index="false"] button[data-action="sellmeier"] {
-		display: none;
-	}
-		
-	.propertiesPanel[data-can-delete="true"][data-has-refractive-index="true"] button[data-action="sellmeier"] {
-		float: left;
-	}
-	
-	.propertiesPanel[data-can-delete="true"][data-has-refractive-index="true"] button[data-action="delete"] {
-		float: right;
-	}
-
 .nowrap {
 	white-space: nowrap;
 }
@@ -507,10 +256,10 @@ button[data-step="-1"] {
 	border-bottom-right-radius: 0;
 }
 
-	.propertiesPanel tr[data-standard] button[data-action="standard"],
+	/* .propertiesPanel tr[data-standard] button[data-action="standard"],
 	.propertiesPanel tr[data-increment] button[data-action="increment"] {
 		display: inline-block;
-	}
+	} */
 
 	.propertiesPanel button[data-action="close"],
 	.elementScreenPanel button[data-action="compact"],
@@ -591,7 +340,8 @@ button[data-step="-1"] {
 #LaserCanvas,
 #LaserCanvasInfo,
 #LaserCanvasToolbar,
-#LaserCanvasToggleInfo {
+#LaserCanvasToggleInfo,
+#LaserCanvasToggleVariables {
 	 position: absolute;
 }
 

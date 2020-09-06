@@ -10,67 +10,26 @@
 	* @param {object=} loc Initial location values.
 	* @param {object} mprop Reference to properties to update.
 	* @param {Array<Element>} melements Reference to array of elements to update.
+	* @param {function} mvariablesGetter Delegate that exposes current variable values.
 	*/
-	var createNew = function (configuration, elementsInfo, loc, mprop, melements) {
-		var LaserCanvas = window.LaserCanvas,            // {object} Namespace.
-			System = LaserCanvas.System,                 // {object} System namespace.
-
-			// Create elements from an array.
-			// @param {Array<object>} items Items to create.
-			addElements = function (items) {
-				var k, key, item, element,
-					type, distanceToNext, props, arg;
-				
-				// Add new elements.
-				for (k = 0; k < items.length; k += 1) {
-					item = items[k];
-					type = item[0];              // {string} Type of element to create.
-					distanceToNext = item[1];    // {number} (mm) Distance to next element.
-					props = item[2];             // {object=} Properties to set.
-					arg = props.type;            // {object=} Additional argument to constructor function.
-					element = new LaserCanvas.Element[type](arg);
-					element.prop.distanceToNext = distanceToNext;
-					if (props) {
-						for (key in props) {
-							if (props.hasOwnProperty(key)) {
-								element.prop[key] = props[key];
-							}
-						}
-					}
-					if (element.init) {
-						element.init(this);
-					}
-					melements.push(element);
-				}
-				
-				// Collect into groups.
-				window.LaserCanvas.Element.Dielectric.collectGroups(melements);
-			};
-
-		// Properties.
+	var createNew = function (configuration, elementsInfo, loc, mprop, melements, mvariablesGetter) {
+		var System = LaserCanvas.System;
+		
 		mprop.configuration = configuration;
 		mprop.name = LaserCanvas.localize(
-			configuration === System.configuration.linear ? 'Linear resonator' :
-			configuration === System.configuration.endcap ? 'End coated resonator' :
-			configuration === System.configuration.ring ? 'Ring resonator' :
-			configuration === System.configuration.propagation ? 'Propagation' :
-			configuration === System.configuration.ultrafast ? 'Ultrafast resonator' :
-			'System');
+			configuration === System.configuration.linear ? "Linear resonator" :
+			configuration === System.configuration.endcap ? "End coated resonator" :
+			configuration === System.configuration.ring ? "Ring resonator" :
+			configuration === System.configuration.propagation ? "Propagation" :
+			configuration === System.configuration.ultrafast ? "Ultrafast resonator" :
+			"System");
 
-		// Prepare system.
-		resetElements(melements);
-
-		if (elementsInfo) {
-			addElements(elementsInfo);
-		} else {
-			LaserCanvas.SystemUtil.fromJson(
-				systemDefaults()[configuration || System.configuration.linear],
-				mprop,
-				melements);
-		}
-
-		// Initial location.
-		LaserCanvas.Utilities.extend(melements[0].loc, loc);
+		LaserCanvas.SystemUtil.fromJson(
+			systemDefaults()[configuration || System.configuration.linear],
+			mprop,
+			melements,
+			this,
+			mvariablesGetter);
 	};
 
 	/**
@@ -144,11 +103,11 @@
 							refractiveIndex: 1.5,
 							curvatureFace1: -200,
 							curvatureFace2: 0,
-							thermalLens: 0
+							thermalLens: 0,
+							thickness: 50,
+							angleOfIncidence: 0
 						},
-						priv: {
-							thickness: 50
-						}
+						priv: {}
 					},
 					{
 						type: "Lens",
@@ -163,7 +122,8 @@
 						loc: {},
 						prop: {
 							distanceToNext: 200
-						}
+						},
+						priv: {}
 					},
 					{
 						type: "Mirror",
@@ -194,6 +154,7 @@
 				}, {
 					type: "Screen",
 					name: "I2",
+					prop: {}
 				}]
 			};
 
@@ -224,7 +185,7 @@
 						prop: {
 							distanceToNext: 250,
 							radiusOfCurvature: 0,
-							angleOfIncidence: -0.5235987755982988
+							angleOfIncidence: -30
 						}
 					},
 					{
@@ -233,7 +194,7 @@
 						loc: {},
 						prop: {
 							radiusOfCurvature: 500,
-							angleOfIncidence: -0.5235987755982989
+							angleOfIncidence: -30
 						}
 					}
 				]
@@ -268,7 +229,7 @@
 						prop: {
 							distanceToNext: 105,
 							radiusOfCurvature: 200,
-							angleOfIncidence: 0.15
+							angleOfIncidence: 9
 						}
 					},
 					{
@@ -279,15 +240,14 @@
 							type: "Crystal",
 							refractiveIndex: 1.76,
 							groupVelocityDispersion: 0.064,
-							angleOfIncidence: 1.0550462304736345,
-							faceAngle: 0.517,
+							angleOfIncidence: 60,
+							faceAngle: 29.62,
+							thickness: 2,
 							curvatureFace1: 0,
 							curvatureFace2: 0,
 							thermalLens: 0
 						},
-						priv: {
-							thickness: 2
-						}
+						priv: {}
 					},
 					{
 						type: "Lens",
@@ -313,7 +273,7 @@
 						prop: {
 							distanceToNext: 170,
 							radiusOfCurvature: 200,
-							angleOfIncidence: 0.15
+							angleOfIncidence: 9
 						}
 					},
 					{
@@ -321,8 +281,8 @@
 						name: "DC1",
 						loc: {},
 						prop: {
-							distanceToNext: 217,
 							type: "Prism",
+							distanceToNext: 217,
 							prismInsertion: 0,
 							refractiveIndex: 1.5,
 							indexDispersion: 0,

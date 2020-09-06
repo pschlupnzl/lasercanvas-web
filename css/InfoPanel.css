@@ -4,7 +4,7 @@
 
 .laserCanvasInfo,
 [data-action="toggleInfo"] {
-	transition-property: left, width;
+	transition-property: left, width, height;
 	transition-duration: 350ms;
 }
 
@@ -14,6 +14,16 @@
 	left: -350px;
 	width: 340px;
 	padding: 0 5px;
+	overflow: auto;
+	background: white;
+}
+
+.laserCanvasInfo {
+	height: calc(100% - 81px);
+}
+
+[data-variables-visible="true"] .laserCanvasInfo {
+	height: calc(100% - 221px);
 }
 
 [data-info-visible="true"] .laserCanvasInfo {
@@ -28,17 +38,21 @@ button[data-action="toggleInfo"] {
 	left: 349px;
 }
 
+button[data-action="toggleInfo"],
+button[data-action="toggleVariables"] {
+	color: white;
+	background: #333;
+	border: none;
+	font-size: 24px;
+	cursor: pointer;
+}
+
 button[data-action="toggleInfo"] {
 	top: 39%;
 	height: 2em;
 	padding: 1em 0.5em 2.4em 0.5em;
-	color: white;
-	background: #333;
-	border: none;
 	border-bottom-right-radius: 1em;
 	border-top-right-radius: 1em;
-	font-size: 24px;
-	cursor: pointer;
 }
 
 	button[data-action="toggleInfo"]:after {
@@ -49,73 +63,6 @@ button[data-action="toggleInfo"] {
 			content: "\2039";
 		}
 
-.laserCanvasInfo {
-	overflow: auto;
-	background: white;
-}
-
-	.laserCanvasInfo .template {
-		display: none;
-	}
-
-	.laserCanvasInfo .system h1,
-	.laserCanvasInfo .element h1 {
-		margin: 0;
-		padding: 0.2em 0;
-		text-align: center;
-		font-size: 1em;
-	}
-
-	.laserCanvasInfo .element h1 {
-		cursor: default;
-		transition: background-color 150ms;
-	}
-
-	.laserCanvasInfo .element h1[data-highlight-element="true"],
-	.laserCanvasInfo .element h1:hover {
-			background-color: rgba(217, 218, 57, 0.5);
-	}
-	
-	.laserCanvasInfo .system table,
-	.laserCanvasInfo .element table	{
-		width: 100%;
-		border-collapse: collapse;
-	}
-
-		.laserCanvasInfo .system table thead,
-		.laserCanvasInfo .element table thead,
-		.laserCanvasInfo .render table thead,
-		.laserCanvasInfo .render h1 {
-			display: none;
-		}
-
-		.laserCanvasInfo .system table td,
-		.laserCanvasInfo .element table td {
-			padding: 0.2em;
-			border-top: 1px solid;
-			border-bottom: 1px solid;
-			border-color: #aaa;
-		}
-	
-		.laserCanvasInfo .element[data-unused="true"] {
-			display: none;
-		}
-	
-	.laserCanvasInfo [data-cell="action"],
-	.laserCanvasInfo [data-cell="value"],
-	.laserCanvasInfo [data-cell="sag"],
-	.laserCanvasInfo [data-cell="tan"],
-	.laserCanvasInfo [data-cell="mx-col-1"],
-	.laserCanvasInfo [data-cell="mx-col-2"] {
-		text-align: right;
-	}
-	
-	.laserCanvasInfo[data-show-abcd="false"] .propertyDerived,
-	.laserCanvasInfo[data-show-element="false"] .propertyElement,
-	.laserCanvasInfo[data-show-advanced="false"] .advanced {
-		display: none;
-	}
-	
 	.laserCanvasInfo ul {
 		list-style-type: none;
 		padding: 0;
@@ -125,8 +72,7 @@ button[data-action="toggleInfo"] {
 		.laserCanvasInfo ul li {
 			margin: 0.3em 0;
 		}
-	
-	
-.laserCanvasInfo button[data-action="download-svg"] {
-	display: none;
-}
+
+	.laserCanvasInfo .infoPanelOptions {
+		margin-bottom: 2.5em;
+	}

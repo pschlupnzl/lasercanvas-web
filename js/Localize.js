@@ -18,7 +18,12 @@ window.LaserCanvas.localize = (function () {
 			"symbollens": "L",
 			"symbolmirror": "M",
 			"symbolprism": "Pr",
-			"symbolscreen": "I"
+			"symbolscreen": "I",
+
+			// Property names.
+			"elementdistancetonext": "Distance To Next",
+			"abcdsag": "Sagittal ABCD",
+			"abcdtan": "Tangential ABCD",
 		},
 		
 		// Localize HTML or attribute on all child elements.

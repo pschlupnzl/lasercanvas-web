@@ -129,18 +129,20 @@ window.LaserCanvas.Utilities = {
 				var k;
 				for (k in s) {
 					if (s.hasOwnProperty(k)) {
-						if (s[k] === null
-							|| s[k] === undefined
-							|| typeof s[k] === 'string'
-							|| typeof s[k] === 'number' // Includes NaN and Infinity
-							|| typeof s[k] === 'boolean') {
-							o[k] = s[k];
-						} else if (Array.isArray(s)) {
+						if (Array.isArray(s)) {
 							o[k] = [];
 							recursive(o[k], s[k]);
+						} else if (s[k] !== null
+							&& s[k] !== undefined
+							&& typeof s[k] !== 'string'
+							&& typeof s[k] !== 'number' // Includes NaN and Infinity
+							&& typeof s[k] !== 'boolean'
+							&& !(s[k] instanceof Element)
+							&& !(s[k].prototype)) {
+								o[k] = {};
+								recursive(o[k], s[k]);
 						} else {
-							o[k] = {};
-							recursive(o[k], s[k]);
+							o[k] = s[k];
 						}
 					}
 				}
@@ -199,11 +201,15 @@ window.LaserCanvas.Utilities = {
 	*/
 	prettify: function (propertyName) {
 		"use strict";
+		var localized = window.LaserCanvas.localize(propertyName);
+		if (localized !== propertyName) {
+			return localized;
+		}
 		return propertyName[0].toUpperCase() + propertyName.slice(1).replace(/([a-z])([A-Z0-9])/g, '$1 $2');
 	},
 	
 	/**
-	* Format a number.
+	* Format a number to three significant figures or places, e.g. 1.123 or 0.0123, or 123
 	* @param {number} val Value to format.
 	* @param {boolean=} useFixed Value indicating whether to use method toFixed, rather than toPrecision.
 	* @returns {string} Formatted number.
@@ -217,11 +223,11 @@ window.LaserCanvas.Utilities = {
 		} else if (typeof val !== 'number') {
 			str = val;
 		} else if (Math.abs(val) === Infinity) {
-			str = (val < 0 ? '&minus;' : '') + '&infin;';
+			str = (val < 0 ? '−' : '') + '∞';
 		} else if (Math.abs(val) > 1e4) {
 			str = val.toPrecision(2);
 		} else if (Math.abs(val) >= 100) {
-			str = Math.round(val);
+			str = Math.round(val).toString();
 		} else {
 			str = useFixed  // First pass at string.
 				? val.toFixed(3)       // Fixed decimal point (123.123).
@@ -250,24 +256,39 @@ window.LaserCanvas.Utilities = {
 	*    handle {HTMLElement} Element to act as handle for move. Default: Original element.
 	* @param {HTMLElement} el Element to make draggable.
 	* @param {object=} optionsIn Additional options for draggable.
+	* @param {object=} thisArg Optional argument passed as `this` to callback functions.
 	*/
-	draggable: function (el, optionsIn) {
+	draggable: function (el, optionsIn, thisArg) {
 		"use strict";
 		var ptDown = null,
-			options = optionsIn || {},
-			handle = options.handle || el, // {HTMLElement} Drag handle.
+			options = LaserCanvas.Utilities.extend({
+				axis: undefined, // "x" | "y"
+				handle: el, // {HTMLElement} Drag handle.
+				onDrag: undefined, // {function(e, pt)} Can modify the pt.x and pt.y values.
+				onEnd: undefined // {function} Called when the drag ends.
+			}, optionsIn),
 		
 			// The mouse is released.
 			up = function () {
 				document.removeEventListener('mousemove', move, false);
 				document.removeEventListener('mouseup', up, false);
+				if (options.onEnd) {
+					options.onEnd.call(thisArg);
+				}
 			},
 			
 			// The mouse moves.
 			// @param {MouseEvent} e Triggering event.
 			move = function (e) {
-				el.style.left = e.clientX + ptDown.dx + 'px';
-				el.style.top = e.clientY + ptDown.dy + 'px';
+				var pt = {
+					x: options.axis === "y" ? ptDown.x : e.clientX - ptDown.dx + ptDown.x,
+					y: options.axis === "x" ? ptDown.y : e.clientY - ptDown.dy + ptDown.y
+				};
+				if (options.onDrag) {
+					options.onDrag.call(thisArg, e, pt);
+				}
+				el.style.left = pt.x + 'px';
+				el.style.top = pt.y + 'px';
 				e.preventDefault && e.preventDefault();
 			},
 			
@@ -275,13 +296,21 @@ window.LaserCanvas.Utilities = {
 			// @param {MouseEvent} e Triggering event.
 			down = function (e) {
 				var style, left, top;
-				if (e.target === handle) {
+				if (e.target === options.handle) {
 					style = window.getComputedStyle(el);
 					left = parseFloat(style.getPropertyValue('left'));
 					top = parseFloat(style.getPropertyValue('top'));
+					if (isNaN(left)) {
+						left = 0;
+					}
+					if (isNaN(top)) {
+						top = 0;
+					}
 					ptDown = {
-						dx: (!isNaN(left) ? left : 0) - e.clientX,
-						dy: (!isNaN(top) ? top : 0) - e.clientY
+						x: left,
+						y: top,
+						dx: e.clientX,
+						dy: e.clientY
 					};
 					document.addEventListener('mousemove', move, false);
 					document.addEventListener('mouseup', up, false);
@@ -315,11 +344,11 @@ window.LaserCanvas.Utilities = {
 					ev.preventDefault();
 				}
 			};
-			
-		if (!handle.hasAttribute('data-draggable')) {
-			handle.addEventListener('mousedown', down, false);
-			handle.addEventListener('touchstart', tstart, false);
-			handle.setAttribute('data-draggable', 'true');
+
+		if (!options.handle.hasAttribute('data-draggable')) {
+			options.handle.addEventListener('mousedown', down, false);
+			options.handle.addEventListener('touchstart', tstart, false);
+			options.handle.setAttribute('data-draggable', options.axis || 'true');
 		}
 	},
 

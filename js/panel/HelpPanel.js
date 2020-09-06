@@ -95,12 +95,12 @@
 			body: [
 				'<ul class="about">',
 				'<li>Laser modeling using the <em>ABCD</em> matrix calculations.</li>',
-				'<li>(c) 2007 - 2018 Philip Schlup, PhD</li>',
+				'<li>(c) 2007 - 2020 Philip Schlup, PhD</li>',
 				'<li><a href="mailto:lasercanvas@outlook.com">Send feedback</a></li>',
-				'<li><a href="LasrCanv5.exe" download>Download</a> LaserCanvas 5 Windows application</li>',
+				'<li><a href="LasrCanv5.exe" download>Download</a> LaserCanvas 5 for Windows</li>',
 				'</ul>',
 			].join(''),
-			hint: "LaserCanvas - Web r16"
+			hint: "LaserCanvas - Web"
 		},
 	];
 

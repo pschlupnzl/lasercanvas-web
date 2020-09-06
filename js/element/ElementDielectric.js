@@ -1,12 +1,13 @@
 /**
 * LaserCanvas - Interface to dielectric block element.
+* @param {function} variablesGetter Function to retrieve current variable values.
 * @param {string:Dielectric.eType} blockType Type of block. If not set, assume output face.
 */
 (function (LaserCanvas) {
-"use strict";
-LaserCanvas.Element.Dielectric = function (blockType) {
-	this.type = 'Dielectric'; // {string} Primitive element type.
-	this.name = 'D'; // {string} Name of this element (updated by System).
+LaserCanvas.Element.Dielectric = function (variablesGetter, blockType) {
+	this.type = "Dielectric"; // {string} Primitive element type.
+	this.name = "D"; // {string} Name of this element (updated by System).
+	this.variablesGetter = variablesGetter; // {function} Used to retrieve variable values.
 	this.loc = {   // Location on canvas.
 		x: 0,       // {number} (mm) Horizontal location of element.
 		y: 0,       // {number} (mm) Vertical location of element.
@@ -14,11 +15,8 @@ LaserCanvas.Element.Dielectric = function (blockType) {
 		q: 0        // {number} (rad) Rotation angle of outgoing axis.
 	};
 	this.group = [];              // {Array<Element>} Related elements: Input interface, lens, output interface.
-	this.prop = {                 // {object} Public properties.
-		distanceToNext: 0         // {number} (mm) Distance to next element.
-	};
-	this.priv = {};     // {object} Private properties.
-	this.setDefaults(blockType);
+	this.prop = this.getDefaultProp(blockType); // {object} Public properties.
+	this.priv = this.getDefaultPriv(blockType); // {object} Private properties.
 	
 	// Updated externally.
 	this.abcdQ = {}; // {object<object>}} ABCD propagation coefficient after this optic.
@@ -29,11 +27,11 @@ LaserCanvas.Element.Dielectric.Type = "Dielectric";
 
 // Types of dielectric block elements (affects angle calculations).
 LaserCanvas.Element.Dielectric.eType = {
-	Plate: 'Plate',        // Plate at arbitrary incidence angle.
-	Brewster: 'Brewster',  // Brewster plate, incidence A = atan(n).
-	Crystal: 'Crystal',    // Crystal. Angle is face normal to centerline, external incidence angle sinB = n sinA.
-	Prism: 'Prism',        // Brewster-angled prism.
-	Endcap: 'Endcap'       // Resonator end-coated.
+	Plate: "Plate",        // Plate at arbitrary incidence angle.
+	Brewster: "Brewster",  // Brewster plate, incidence A = atan(n).
+	Crystal: "Crystal",    // Crystal. Angle is face normal to centerline, external incidence angle sinB = n sinA.
+	Prism: "Prism",        // Brewster-angled prism.
+	Endcap: "Endcap"       // Resonator end-coated.
 };
 
 // Default values to use when creating a group.
@@ -45,75 +43,38 @@ LaserCanvas.Element.Dielectric.propertyDefault = {
 // -------------------------------------------------------
 //  Create a new group
 // -------------------------------------------------------
-// @param {Element} prevElement Previous element in chain, whose distance to set.
-// @param {number} segZ (mm) Distance along the segment where to insert.
-// @returns {Array<Element>} Elements to insert.
-LaserCanvas.Element.Dielectric.createGroup = function (prevElement, segZ) {
+
+/**
+ * Create a new compound Dielectric element as a group comprising input,
+ * thermal lens, and output face.
+ * @param {Element} prevElement Previous element in chain, whose distance to set.
+ * @param {number} segZ (mm) Distance along the segment where to insert.
+ * @param {function} variablesGetter Function that returns variable values.
+ * @returns {Array<Element>} Elements to insert.
+ */
+LaserCanvas.Element.Dielectric.createGroup = function (prevElement, segZ, variablesGetter) {
 	var Dielectric = LaserCanvas.Element.Dielectric, // {object} Namespace.
-		segLen = prevElement.property('distanceToNext'), // {number} (mm) Distance on segment being inserted.
+		segLen = prevElement.get("distanceToNext"), // {number} (mm) Distance on segment being inserted.
 		propertyDefault = Dielectric.propertyDefault,    // {object} Default values for properties.
 		len = propertyDefault.thickness,     // {number} (mm) Thickness of dielectric group.
 		n = propertyDefault.refractiveIndex, // {number} Refractive index.
-		elements = [
-			new this(Dielectric.eType.Plate),        // {Dielectric} Input interface (first element, with all the properties)
-			new LaserCanvas.Element.Lens(),   // {Lens} Thermal lens.
-			new this()                               // {Dielectric} Output interface.
+		group = [
+			new this(variablesGetter, Dielectric.eType.Plate), // {Dielectric} Input interface (first element, with all the properties)
+			new LaserCanvas.Element.Lens(variablesGetter),     // {Lens} Thermal lens.
+			new this(variablesGetter)                          // {Dielectric} Output interface.
 		];
 	// Input face.
-	elements[0].group = elements[2].group = elements;
-	elements[0].property('thickness', len);        // {number} (mm) Thickness of dielectric block group.
-	elements[0].property('refractiveIndex', n);    // {number} Refractive index.
+	group[0].group = group[2].group = group;
+	group[0].set("thickness", len);        // {number} (mm) Thickness of dielectric block group.
+	group[0].set("refractiveIndex", n);    // {number} Refractive index.
 	
 	// Thermal lens.
-	elements[0].updateThermalLens();
+	group[0].updateThermalLens();
 	
 	// Distances.
-	elements[2].property('distanceToNext', Math.max(0, segLen - segZ - len / 2)); // Remaining distance.
-	prevElement.property('distanceToNext', Math.max(0, segZ - len / 2)); // Set new distance.
-	return elements;
-};
-
-/**
- * Collect groups from a given system. This includes dispersion (prism) pairs
- * as well as dielectric blocks including a thermal lens.
- * @param {Array<object:Elements>} elements Elements of the system to combine.
- */
-LaserCanvas.Element.Dielectric.collectGroups = function (elements) {
-	var k, m,        // {number} Element loop counters.
-		element,      // {object:Element} Iterated element.
-		group = null; // {Array<object:Element>} Grouped elements.
-
-	for (k = 0; k < elements.length; k += 1) {
-		element = elements[k];
-		if (group === null && element.hasOwnProperty('group')) {
-			// Start a new group.
-			group = [element];
-			if (element.type === 'Dielectric') {
-				element.priv.thickness = element.property("distanceToNext");
-			}
-			
-		} else if (group) {
-			switch (element.type) {
-				case 'Lens':
-					// Continue group.
-					group.push(element);
-					break;
-			
-				case 'Dielectric':
-				case 'Dispersion':
-					// Finish group.
-					group.push(element);
-					for (m = 0; m < group.length; m += 1) {
-						if (group[m].hasOwnProperty('group')) {
-							group[m].group = group;
-						}
-					}
-					group[0].updateAngles();
-					group = null;
-					break;
-			}
-		}
-	}
+	group[2].set("distanceToNext", Math.max(0, segLen - segZ - len / 2)); // Remaining distance.
+	prevElement.set("distanceToNext", Math.max(0, segZ - len / 2)); // Set new distance.
+	return group;
 };
 
 LaserCanvas.Element.Dielectric.prototype = {
@@ -123,101 +84,109 @@ LaserCanvas.Element.Dielectric.prototype = {
 			type: this.type,
 			name: this.name,
 			loc: LaserCanvas.Utilities.extend({}, this.loc),
-			prop: LaserCanvas.Utilities.extend({}, this.prop),
-			priv: LaserCanvas.Utilities.extend({}, this.priv)
+			priv: LaserCanvas.Utilities.extend({}, this.priv),
+			prop: LaserCanvas.Utilities.extend({}, this.prop)
 		};
 	},
 
 	/** Load a serialized representation of this object. */
 	fromJson: function (json) {
 		this.name = json.name;
-		this.setDefaults(json.prop.type);
+		this.prop = this.getDefaultProp(json.prop.type);
+		this.priv = this.getDefaultPriv(json.prop.type);
 		LaserCanvas.Utilities.extend(this.loc, json.loc);
-		LaserCanvas.Utilities.extend(this.prop, json.prop);
 		LaserCanvas.Utilities.extend(this.priv, json.priv);
-		if (this.priv.thickness) {
-			// In collectGroups, the thickness is derived from the space
-			// between the elements, so update that here.
-			this.prop.distanceToNext = this.priv.thickness;
-		}
-	},
 
-	/** 
-	* Set the default public and private properties based
-	* on the placement of the interface to the block.
-	* @param {string:Dielectric.eType} blockType Type of block. If not set, assume output face.
-	*/
-	setDefaults: function (blockType) {
-		if (blockType) {
-			this.prop = {
-				distanceToNext: 0,         // {number} (mm) Distance to next element.
-				type: blockType,           // {string:Enum} Type of dielectric element (see Dielectric.type enum) 'Plate'|'Brewster'|'Crystal'.
-				refractiveIndex: 1,        // {number} Refractive index.
-				groupVelocityDispersion: 0,// {number} (um^-2) Group velocity dispersion for ultrafast calculations.
-				angleOfIncidence: 0,       // {number} (rad) Angle of incidence. Auto-calculated for Brewster and Crystal.
-				faceAngle: 0,              // {number} (rad) Face angle relative to internal propagation for Crystal (also used for painting).
-				flip: false,               // {boolean} Value indicating whether Brewster angle is flipped.
-				curvatureFace1: 0,         // {number} (mm) Radius of curvature for input interface, or 0 for flat.
-				curvatureFace2: 0,         // {number} (mm) Radius of curvature for output interface, or 0 for flat.
-				thermalLens: 0             // {number} (mm) Focal length of thermal lens, or 0 for none.
-			};
-			
-			this.priv = {
-				thickness: 0,        // {number} (mm) Thickness of element (opening element only).
-				deflectionAngle: 0   // {number} (rad) Deflection angle from axes, used when setting properties in location().
+		for (var propertyName in this.prop) {
+			if (this.prop.hasOwnProperty(propertyName)) {
+				if (typeof this.prop[propertyName] === "object") {
+					this.prop[propertyName].set(json.prop[propertyName]);
+				} else {
+					this.prop[propertyName] = json.prop[propertyName];
+				}
 			}
 		}
 	},
-	
-	
+
 	/**
-	* Re-calculate angles based on new values and type.
-	* It is assumed that any and all properties are set.
-	* This method overrides any derived quantities and 
-	* sets the remaining values.
-	* @param {number} angleOfIncidence (rad) Angle of incidence to set (for Plate).
-	* @param {number} refractiveIndex Refractive index to set.
+	 * Returns a new collection of user-settable properties.
+	 * @param {string:Dielectric.eType} blockType Type of block. If not set, assume output face.
+	 */
+	getDefaultProp: function (blockType) {
+		return {
+			type: blockType,           // {string:Enum} Type of dielectric element (see Dielectric.type enum) "Plate"|"Brewster"|"Crystal".
+			flip: false,               // {boolean} Value indicating whether Brewster angle is flipped.
+			distanceToNext: new LaserCanvas.Equation(0),         // {number} (mm) Distance to next element.
+			refractiveIndex: new LaserCanvas.Equation(1),        // {number} Refractive index.
+			groupVelocityDispersion: new LaserCanvas.Equation(0),// {number} (um^-2) Group velocity dispersion for ultrafast calculations.
+			angleOfIncidence: new LaserCanvas.Equation(0),       // {number} (deg) Angle of incidence. Auto-calculated for Brewster and Crystal.
+			faceAngle: new LaserCanvas.Equation(0),              // {number} (deg) Face angle relative to internal propagation for Crystal (also used for painting).
+			curvatureFace1: new LaserCanvas.Equation(0),         // {number} (mm) Radius of curvature for input interface, or 0 for flat.
+			curvatureFace2: new LaserCanvas.Equation(0),         // {number} (mm) Radius of curvature for output interface, or 0 for flat.
+			thermalLens: new LaserCanvas.Equation(0),            // {number} (mm) Focal length of thermal lens, or 0 for none.
+			thickness: new LaserCanvas.Equation(0)               // {number} (mm) Thickness of element (opening element only).
+		};
+	},
+
+	getDefaultPriv: function (blockType) {
+		return {
+			derivedFaceAngle: 0, // {number} (rad) Face angle relative to internal propagation, used for drawing; copied from public prop for Crystal, derived for others.
+			derivedAngleOfIncidence: 0, // {number} (rad) External angle of incidence, used for ABCD; derived for Crystals, copied from public prop for others.
+			deflectionAngle: 0   // {number} (rad) Deflection angle from axes, used when setting properties in location().
+		}
+	},
+
+	/** Hook to update properties when variables change. */
+	onVariablesChange: function () {
+		if (this === this.group[0]) {
+			this.updateAngles();
+		}
+	},
+
+	/**
+	* Re-calculate angles based on new values and type. It is assumed
+	* that any and all properties are set. The declared prop values are
+	* *not* overwritten here, because they may be defined as equations.
 	*/
 	updateAngles: function () {
 		var eType = LaserCanvas.Element.Dielectric.eType,
-			maxA = 80 * Math.PI / 180,     // {number} Maximum angle of incidence.
-			A, B, C, nsinB,                // Temporary variables.
-			n = this.prop.refractiveIndex; // {number} Refractive index (must be n >= 1).
-		
-		// Boundary conditions.
-		if (n < 1.0) {
-			n = this.prop.refractiveIndex = 1.0;
-		}
-		
+			angleLimit = 80 * Math.PI / 180,      // {number} Maximum angle of incidence.
+			A, B, C, nsinB,                       // Temporary variables.
+			type = this.get("type"),              // {eType} Current block type.
+			isBrewster = type === eType.Brewster, // {boolean} Value indicating whether the dielectric is a Brewster crystal.
+			isPrism = type === eType.Prism,       // {boolean} Value indicating whether the dielectric is a Prism.
+			sign = this.get("flip") ? -1 : 1,     // {number} Reverse angles on flip.
+			angleOfIncidence = this.get("angleOfIncidence") * Math.PI / 180, // {number} (deg) External incidence angle (n = 1 side?).
+			faceAngle = this.get("faceAngle") * Math.PI / 180, // {number} (deg) Face angle, used for Crystal.
+			n = Math.max(1, this.get("refractiveIndex"));      // {number} Refractive index (must be n >= 1).
+
 		// Brewster plate: Fix external angle of incidence.
-		if (this.prop.type === eType.Brewster
-			|| this.prop.type === eType.Prism) {
-			this.prop.angleOfIncidence = (this.prop.flip ? -1 : +1) *
-				Math.atan(this.prop.refractiveIndex);
+		if (isBrewster || isPrism) {
+			angleOfIncidence = sign * Math.atan(n);
 		}
 		
 		// Limit angles.
-		if (this.prop.angleOfIncidence > maxA) {
-			this.prop.angleOfIncidence = maxA;
-		} else if (this.prop.angleOfIncidence < -maxA) {
-			this.prop.angleOfIncidence = -maxA;
-		}
+		angleOfIncidence = Math.max(-angleLimit, Math.min(angleLimit, angleOfIncidence));
 		
 		// Derived angles.
-		switch (this.prop.type) {
+		switch (type) {
 			case eType.Plate:
 			case eType.Brewster:
 			case eType.Prism:
 				// External angle A, internal angle B, deflection angle C.
+				//
+				//  \_  A  :           A  Angle of incidence
+				//     \_  :
+				// _______\:________
+				//         :\_ 
+				//         : \ \_      B  Internal angle
+				//         :B \ C \_   C  Deflection angle
 				// Snell's law:  sinA = n sinB
 				//                  B = asin(sinA / n).
-				// Geometry:         A = B + C
-				//                   C = A - B.
-				A = this.prop.angleOfIncidence; // {number} (rad) External incidence angle.
-				B = Math.asin(Math.sin(A) / n); // {number} (rad) Internal propagation angle.
-				C = A - B;                      // {number} (rad) Deflection angle.
-				this.prop.faceAngle = B;        // Face angle, relative to internal propagation axis.
-				this.priv.deflectionAngle = C;
+				// Geometry:        A = B + C
+				//                  C = A - B.
+				A = angleOfIncidence;            // {number} (rad) External incidence angle.
+				B = Math.asin(Math.sin(A) / n);  // {number} (rad) Internal propagation angle.
 				break;
 				
 			case eType.Crystal:
@@ -227,17 +196,19 @@ LaserCanvas.Element.Dielectric.prototype = {
 				//                  A = asin(n sinB) (up to TIR)
 				// Geometry:    B + C = A
 				//                  C = A - B.
-				B = this.prop.faceAngle;        // {number} (rad) Face (normal) angle to internal propagation.
+				B = faceAngle;                  // {number} (rad) Face (normal) angle to internal propagation.
 				nsinB = n * Math.sin(B);        // External angle product.
 				A = nsinB < -1 ? -Math.PI / 2 : // {number} (rad) External incidence angle.
-					nsinB > +1 ? +Math.PI / 2 :  // Protect against TIR.
-					Math.asin(nsinB);            // Angles are good.
-				C = A - B;                      // {number} (rad) Deflection angle.
-				this.prop.angleOfIncidence = A;
-				this.priv.deflectionAngle = C;
+					nsinB > +1 ? +Math.PI / 2 : // Protect against TIR.
+					Math.asin(nsinB);           // Angles are good.
 				break;
 		}
-			
+
+		C = A - B;                  // {number} (rad) Deflection angle.
+		this.set("derivedFaceAngle", B)         // {number} (rad) Face angle relative to internal propagation axis.
+		this.set("derivedAngleOfIncidence", A); // {number} (rad) External angle of incidence relative to face normal.
+		this.set("deflectionAngle", C);         // {number} (rad) Deflection from beam propagation direction.
+	
 		// Thickness.
 		this.updateThermalLens();
 	},
@@ -247,17 +218,17 @@ LaserCanvas.Element.Dielectric.prototype = {
 	* These are distances, not angles.
 	*/
 	updateThermalLens: function () {
-		var len = 
-				this.prop.type === LaserCanvas.Element.Dielectric.eType.Endcap
-				? this.priv.thickness 
-				: this.priv.thickness / Math.cos(this.prop.faceAngle),
-			l1 = this.prop.thermalLens === 0 ? len : len / 2, // {number} (mm) Propagation before lens.
-			l2 = len - l1;  // {number} (mm) Propagation after lens.
-		this.group[0].prop.distanceToNext = l1;
-		this.group[1].setThermalLens(
-			this.prop.thermalLens, 
-			this.prop.refractiveIndex, 
-			l2);
+		var isEndcap = this.get("type") === LaserCanvas.Element.Dielectric.eType.Endcap,
+			thickness = this.get("thickness"),        // {number} (mm) Declared thickness.
+			thermalLens = this.get("thermalLens"),    // {number} (mm) Focal length of thermal lens.
+			n = this.get("refractiveIndex"),          // {number} Refractive index within dielectric.
+			faceAngle = this.get("derivedFaceAngle"), // {number} (rad) Face angle.
+			len = isEndcap ? thickness : thickness / Math.cos(faceAngle), // Thickness projected for non-endcap.
+			// Show full propagation if there is no thermal lens.
+			l1 = thermalLens === 0 ? len : len / 2,   // {number} (mm) Propagation before lens.
+			l2 = len - l1;                            // {number} (mm) Propagation after lens.
+		this.group[0].set("distanceToNext", l1);
+		this.group[1].setThermalLens(thermalLens, n, l2);
 	},
 	
 	// ----------------------------------------------------
@@ -270,10 +241,10 @@ LaserCanvas.Element.Dielectric.prototype = {
 	* @returns {number} Count of elements in this group.
 	*/
 	removeGroup: function (prevElement) {
-		prevElement.property('distanceToNext', 
-			prevElement.property('distanceToNext') 
-			+ this.group[0].property('thickness')
-			+ this.group[this.group.length - 1].property('distanceToNext'));
+		prevElement.set("distanceToNext", 
+			prevElement.get("distanceToNext") 
+			+ this.get("thickness")
+			+ this.group[this.group.length - 1].get("distanceToNext"));
 		return this.group.length;
 	},
 	
@@ -284,17 +255,16 @@ LaserCanvas.Element.Dielectric.prototype = {
 	*/
 	location: function (ax) {
 		// Deflection angle: -1 returns to parallel to input; +1 deflects again (e.g. prism)
-		var outDefl = this.group[0].prop.type === LaserCanvas.Element.Dielectric.eType.Prism ? +1 : -1;
+		var isFirst = this === this.group[0],
+			isPrism = this.get("type") === LaserCanvas.Element.Dielectric.eType.Prism,
+			deflectionAngle = this.get("deflectionAngle");
 
 		if (ax) {
 			this.loc.x = ax.x;
 			this.loc.y = ax.y;
 			this.loc.q = this.loc.p = ax.q; // {number} (rad) Incoming axis.
 
-			this.loc.q += this.group[0].priv.deflectionAngle * (
-				this === this.group[0] ? +1 :
-				this === this.group[this.group.length - 1] ? outDefl :
-				0);
+			this.loc.q += isFirst || isPrism ? deflectionAngle : -deflectionAngle;
 		}
 
 		return LaserCanvas.Utilities.extend(
@@ -316,57 +286,57 @@ LaserCanvas.Element.Dielectric.prototype = {
 
 			allProps = {
 				type: {
-					propertyName: 'type',
-					options: ['Plate', 'Brewster', 'Crystal', 'Prism'],
+					propertyName: "type",
+					options: ["Plate", "Brewster", "Crystal", "Prism"],
 					infoPanel: false
 				},
 				elementDistanceToNext: {
-					propertyName: 'elementDistanceToNext',
+					propertyName: "elementDistanceToNext",
 					increment: 5,
 					min: 0
 				},
 				refractiveIndex: {
-					propertyName: 'refractiveIndex',
+					propertyName: "refractiveIndex",
 					increment: 0.1,
 					min: 1
 				},
 				groupVelocityDispersion: {
-					propertyName: 'groupVelocityDispersion',
+					propertyName: "groupVelocityDispersion",
 					increment: 0.001
 				},
 				thickness: {
-					propertyName: 'thickness',
+					propertyName: "thickness",
 					increment: 1,
 					min: 1
 				},
 				curvatureFace1: {
-					propertyName: 'curvatureFace1',
+					propertyName: "curvatureFace1",
 					increment: 10
 				},
 				curvatureFace2: {
-					propertyName: 'curvatureFace2',
+					propertyName: "curvatureFace2",
 					increment: 10
 				},
 				angleOfIncidence: {
-					propertyName: 'angleOfIncidence',
+					propertyName: "angleOfIncidence",
 					increment: 1,
 					min: -85,
 					max: +85
 				},
 				flip: {
-					propertyName: 'flip',
-					dataType: 'boolean',
+					propertyName: "flip",
+					dataType: "boolean",
 					infoPanel: false,
 					propertyPanel: this.prop.type === eType.Brewster || this.prop.type === eType.Prism
 				},
 				faceAngle: {
-					propertyName: 'faceAngle',
+					propertyName: "faceAngle",
 					increment: 1,
 					min: -85,
 					max: +85
 				}, 
 				thermalLens: {
-					propertyName: 'thermalLens',
+					propertyName: "thermalLens",
 					increment: 10
 				}
 			},
@@ -389,7 +359,7 @@ LaserCanvas.Element.Dielectric.prototype = {
 	
 	/**
 	* Gets a value indicating whether this element can adjust transfer properties.
-	* @param {string} propertyName Name of property being probed 'distanceToNext'|'deflectionAngle'.
+	* @param {string} propertyName Name of property being probed "distanceToNext"|"deflectionAngle".
 	*/
 	canSetProperty: function (propertyName) {
 		var eType = LaserCanvas.Element.Dielectric.eType,     // {string:Enum} Type of dielectric block.
@@ -417,115 +387,148 @@ LaserCanvas.Element.Dielectric.prototype = {
 	},
 	
 	/**
-	* Sets internal parameters to match new property value -OR- gets the current value.
-	* Gets or sets internal parameters to match new property value.
-	* @param {string} propertyName Name of property to set 'distanceToNext' etc.
-	* @param {number|boolean=} newValue (mm|rad) New target value to set, if any.
-	* @param {...=} arg Additional argument, if needed (e.g. outgoing angle).
-	* @returns {number=} The current value, if retrieving only.
-	*/
-	property: function (propertyName, newValue, arg) {
+	 * Sets internal parameters to match new property value -OR- gets the current value.
+	 * Gets or sets internal parameters to match new property value.
+	 * @param {string} propertyName Name of property to set "distanceToNext" etc.
+	 * @param {number|boolean=} newValue (mm|rad) New target value to set, if any.
+	 * @param {...=} arg Additional argument, if needed (e.g. outgoing angle).
+	 * @returns {number=} The current value, if retrieving only.
+	 */
+	set: function (propertyName, newValue, arg) {
 		var eType = LaserCanvas.Element.Dielectric.eType;
-		// Set value, if specified.
-		if (newValue !== undefined) {
-			// Only the first element in the group stores property
-			// values. For setting / getting values here, we could
-			// use
-			//    this.group[0].prop[propertyName]
-			// to allow any element in the group to return the value
-			// but instead work on the assumption that only the first
-			// element has valid values and use
-			//    this.prop[propertyName]
-			// instead.
-			switch (propertyName) {
-				case 'type':
-					switch (newValue) {
-						case eType.Plate:
-							this.prop.thermalLens = 0;
-							break;
-						case eType.Brewster:
-						case eType.Prism:
-							this.prop.thermalLens =
-								this.prop.curvatureFace1 =
-								this.prop.curvatureFace2 = 0;
-							break;
-					}
-					this.prop[propertyName] = newValue;
-					this.updateAngles();
-					break;
-					
-				case 'flip':
-				case 'refractiveIndex':
-				case 'curvatureFace1':
-				case 'curvatureFace2':
-					this.prop[propertyName] = newValue;
-					this.updateAngles();
-					break;
-					
-				case 'thickness':
-					if (this.priv.thickness !== newValue) {
-						// Compensate thickness change.
-						this.group[this.group.length - 1].property('distanceToNext', Math.max(0, 
-							this.group[this.group.length - 1].property('distanceToNext') 
-							+ this.priv.thickness - newValue));
-						this.priv[propertyName] = newValue;
-						this.updateThermalLens();
-					}
-					break;
-					
-				case 'angleOfIncidence':
-				case 'faceAngle':
-					this.prop[propertyName] = newValue * Math.PI / 180.00;
-					this.updateAngles();
-					break;
-				case 'thermalLens':
-					this.prop[propertyName] = newValue;
-					this.updateThermalLens();
-					break;
+		// Only the first element in the group stores property
+		// values. For setting / getting values here, we could
+		// use
+		//    this.group[0].prop[propertyName]
+		// to allow any element in the group to return the value
+		// but instead work on the assumption that only the first
+		// element has valid values and use
+		//    this.prop[propertyName]
+		// instead.
+		switch (propertyName) {
+			case "type":
+				switch (newValue) {
+					case eType.Plate:
+						this.prop.thermalLens.set(0);
+						break;
+					case eType.Brewster:
+					case eType.Prism:
+						this.prop.thermalLens.set(0);
+						this.prop.curvatureFace1.set(0);
+						this.prop.curvatureFace2.set(0);
+						break;
+				}
+				this.prop[propertyName] = newValue;
+				this.updateAngles();
+				break;
 				
-				case 'outgoingAngle':
-					// newValue {number} (rad) New outgoing angle on canvas.
-					// arg {boolean} Value indicating whether this is first element in cavity.
-					if (arg) {
-						this.loc.q = newValue;
-					}
-					break;
+			case "flip":
+				this.prop[propertyName] = newValue;
+				this.updateAngles();
+				break;
 
-				case 'distanceToNext': // {number} (mm) New distance to next element.
-				case 'groupVelocityDispersion':
-					this.prop[propertyName] = newValue;
-					break;
+			case "refractiveIndex":
+			case "curvatureFace1":
+			case "curvatureFace2":
+				this.prop[propertyName].set(newValue);
+				this.updateAngles();
+				break;
 				
-				case 'elementDistanceToNext': // {number} (mm) New distance to next element *after* the group.
-					this.group[this.group.length - 1].prop.distanceToNext = newValue;
-					break;
-			}
-		} else {
-			// Otherwise, return the current value.
-			switch (propertyName) {
-				case 'angleOfIncidence':
-				case 'faceAngle':
-					return this.prop[propertyName] * 180.00/ Math.PI;
-					
-				case 'distanceToNext': // {number} (mm) Distance to next element.
-				case 'curvatureFace1':
-				case 'curvatureFace2':
-				case 'type':            // {string} Dielectric block type.
-				case 'refractiveIndex': // {number} Refractive index.
-				case 'groupVelocityDispersion': // {number} (um^-2) Group velocity dispersion.
-				case 'flip':            // {boolean} Value indicating whether to flip a Brewster plate.
-				case 'thermalLens':     // {number} (mm) Focal length of thermal lens, or 0 for none.
-					return this.prop[propertyName];
+			case "thickness":
+				this.prop[propertyName].set(newValue);
+				this.updateThermalLens();
+				break;
+				
+			case "angleOfIncidence":
+			case "faceAngle":
+				// this.prop[propertyName] = newValue * Math.PI / 180.00;
+				this.prop[propertyName].set(newValue);
+				this.updateAngles();
+				break;
+				
+			case "thermalLens":
+				this.prop[propertyName].set(newValue);
+				this.updateThermalLens();
+				break;
+			
+			case "outgoingAngle":
+				// newValue {number} (rad) New outgoing angle on canvas.
+				// arg {boolean} Value indicating whether this is first element in cavity.
+				if (arg) {
+					this.loc.q = newValue;
+				}
+				break;
 
-				case 'thickness':       // {number} (mm) Thickness of element.
-					return this.priv[propertyName];
+			case "distanceToNext": // {number} (mm) New distance to next element.
+			case "groupVelocityDispersion":
+				this.prop[propertyName].set(newValue);
+				break;
+			
+			case "elementDistanceToNext": // {number} (mm) New distance to next element *after* the group.
+				this.group[this.group.length - 1].prop.distanceToNext.set(newValue);
+				break;
 
-				case 'elementDistanceToNext': // {number} (mm) New distance to next element *after* the group.
-					return this.group[this.group.length - 1].prop.distanceToNext;
-			}
+			case "derivedFaceAngle":
+			case "derivedAngleOfIncidence":
+			case "deflectionAngle":
+				this.priv[propertyName] = newValue;
+				break;
+default:
+	console.warn(`Set property ${propertyName}=${newValue} not implemented`);
+	break;
+		}
+	},
+
+	/**
+	 * Returns a property value.
+	 */
+	get: function (propertyName) {
+		var variables = this.variablesGetter(),
+			value = this.prop[propertyName]
+				&& this.prop[propertyName].value
+				&& this.prop[propertyName].value(variables);
+
+		switch (propertyName) {
+			case "type":            // {string} Dielectric block type.
+			case "flip":            // {boolean} Value indicating whether to flip a Brewster plate.
+				return this.group[0].prop[propertyName];
+
+			case "angleOfIncidence":
+			case "faceAngle":
+				return value;
+				
+			case "distanceToNext": // {number} (mm) Distance to next element.
+			case "thickness":       // {number} (mm) Thickness of element.
+				return Math.max(0, value);
+
+			case "refractiveIndex": // {number} Refractive index.
+				return Math.max(1, value);
+
+			case "curvatureFace1":
+			case "curvatureFace2":
+			case "groupVelocityDispersion": // {number} (um^-2) Group velocity dispersion.
+			case "thermalLens":     // {number} (mm) Focal length of thermal lens, or 0 for none.
+				return value;
+
+			case "elementDistanceToNext": // {number} (mm) New distance to next element *after* the group.
+				return this.group[this.group.length - 1].get("distanceToNext");
+
+			case "derivedFaceAngle":
+			case "derivedAngleOfIncidence":
+			case "deflectionAngle":
+				return this.group[0].priv[propertyName];
 		}
 	},
 	
+	/** Returns the source expression for the property. */
+	expression: function (propertyName) {
+		switch (propertyName) {
+			case "elementDistanceToNext":
+				return this.group[this.group.length - 1].expression("distanceToNext");
+		}
+		return this.prop[propertyName].expression();
+	},
+
 	/**
 	* Return the group delay dispersion for the element.
 	* @param {number} lam (nm) Wavelength (note units nm).
@@ -543,18 +546,19 @@ LaserCanvas.Element.Dielectric.prototype = {
 		var Matrix2x2 = LaserCanvas.Math.Matrix2x2,
 			abcd,                               // {object:Matrix2x2} Returned matrix.
 			n1, n2, q1, q2, cosq1, cosq2, dn,   // Temporary variables.
-			prop = this.group[0].prop,          // Starting element with all the properties.
-			isFace1 = this === this.group[0],   // {boolean} Value indicating whether this is face 1 (false means face 2).
-			nint = prop.refractiveIndex,        // {number} Refractive index within dielectric block.
-			qext = prop.angleOfIncidence,       // {number} (rad) (External) Angle of incidence (assume parallel faces).
-			qint = Math.asin(Math.sin(qext) / nint), // {number} (rad) Internal angle.
-			roc = isFace1                       // {number} (mm) Radius of curvature to use.
-				? prop.curvatureFace1
-				: prop.curvatureFace2,
+			start = this.group[0],              // Starting element with all the properties.
+			isFirst = this === this.group[0],   // {boolean} Value indicating whether this is face 1 (false means face 2).
+			type = this.get("type"),            // {eType} Type of this dielectric.
+			nint = start.get("refractiveIndex"),         // {number} Refractive index within dielectric block.
+			qext = start.get("derivedAngleOfIncidence"), // {number} (rad) (External) Angle of incidence (assume parallel faces).
+			qint = Math.asin(Math.sin(qext) / nint),     // {number} (rad) Internal angle.
+			roc = isFirst                       // {number} (mm) Radius of curvature to use.
+				? start.get("curvatureFace1")
+				: start.get("curvatureFace2"),
 			dnR = 0;                            // {number} (1/mm) Scaled inverse curvature.
 
 		// Endcap: Normal incidence non-astigmatic curved mirror.
-		if (isFace1 && prop.type === LaserCanvas.Element.Dielectric.eType.Endcap) {
+		if (isFirst && type === LaserCanvas.Element.Dielectric.eType.Endcap) {
 			return new Matrix2x2(1, 0, roc === 0 ? 0 : 2 / roc, 1);
 		}
 
@@ -567,7 +571,7 @@ LaserCanvas.Element.Dielectric.prototype = {
 		//  - Input  --<--  q2 = qExt, q1 = qInt
 		//  - Output -->--  q2 = qExt, q1 = qInt
 		//  - Output --<--  q2 = qInt, q1 = qExt
-		if ((isFace1 && dir > 0) || (!isFace1 && dir < 0)) {
+		if ((isFirst && dir > 0) || (!isFirst && dir < 0)) {
 			// Entering block.
 			n1 = 1.00;
 			n2 = nint;
@@ -667,7 +671,7 @@ LaserCanvas.Element.Dielectric.prototype = {
 			U = new Vector([pt.x - this.loc.x, pt.y - this.loc.y]) // {Vector} Vector from first element to mouse..
 				.rotate(this.loc.q); // .. Rotated by axis direction.
 			return Math.abs(U[1]) < tol &&
-				U[0] > -tol && U[0] < this.priv.thickness + tol;
+				U[0] > -tol && U[0] < this.get("thickness") + tol;
 		}
 		return false;
 	},
@@ -681,12 +685,12 @@ LaserCanvas.Element.Dielectric.prototype = {
 		var 
 			eType = LaserCanvas.Element.Dielectric.eType,
 			renderLayer = LaserCanvas.Enum.renderLayer, // {Enum} Layer to draw.
-			r = 20,               // {number} Radius ('width') of dielectric block.
+			r = 20,               // {number} Radius ("width") of dielectric block.
 			l, qf, tan1, tan2, path, endcap, // Drawing variables.
 			
 			// Create a string command, rounding
 			// the coordinates as needed.
-			// @param {string} type Type of command 'M'|'L'.
+			// @param {string} type Type of command "M"|"L".
 			// @param {number} x Horizontal value to use.
 			// @param {number} y Vertical value to use.
 			// @returns {string} Command corresponding to given parameters.
@@ -710,8 +714,8 @@ LaserCanvas.Element.Dielectric.prototype = {
 				if (roc === 0) {
 					// Flat face.
 					cmds = [
-						cmd('L', l - s * tan, -s * r),
-						cmd('L', l + s * tan,  s * r)
+						cmd("L", l - s * tan, -s * r),
+						cmd("L", l + s * tan,  s * r)
 					];
 				} else {
 					// Curvature deflection (indicative only).
@@ -721,7 +725,7 @@ LaserCanvas.Element.Dielectric.prototype = {
 						kk = k < 0 ? -k : k;
 						x = c * dx[kk];  // {number} Horizontal shift.
 						y = k / n;       // {number} [-1 .. 1] Vertical position.
-						cmds.push(cmd('L', l + s * y * tan + x, s * r * y));
+						cmds.push(cmd("L", l + s * y * tan + x, s * r * y));
 					}
 				}
 				return cmds;
@@ -738,9 +742,9 @@ LaserCanvas.Element.Dielectric.prototype = {
 					rApex = 5,//TODO: Figure this out to reach apex.
 
 					cmds = [
-						cmd('M', l / 2, -s * h),
-						cmd('L', l - s * tan2, s * r),
-						cmd('L', 0 + s * tan2, s * r)
+						cmd("M", l / 2, -s * h),
+						cmd("L", l - s * tan2, s * r),
+						cmd("L", 0 + s * tan2, s * r)
 					];
 				return cmds;
 			};
@@ -751,22 +755,22 @@ LaserCanvas.Element.Dielectric.prototype = {
 				case renderLayer.optics:
 					// Parameters.
 					endcap = this.prop.type === eType.Endcap;
-					r = 20;                          // {number} Radius ('width') of dielectric block.
-					l = this.property("distanceToNext") // {number} Length of dielectric block.
-						+ this.group[1].property('distanceToNext'); // Plus thermal lens.
-					qf = -this.prop.faceAngle;       // {number} (rad) Angle of face, relative to internal propagation axis.
-					tan2 = r * Math.tan(qf || 1e-3); // {number} Face angle secant, for face offset.
-					tan1 = endcap ? 0 : tan2;        // {number} Face angle on first face.
+					r = 20;                             // {number} Radius ("width") of dielectric block.
+					l = this.get("distanceToNext")      // {number} Length of dielectric block.
+						+ this.group[1].get("distanceToNext"); // Plus thermal lens.
+					qf = -this.get("derivedFaceAngle"); // {number} (rad) Angle of face, relative to internal propagation axis.
+					tan2 = r * Math.tan(qf || 1e-3);    // {number} Face angle secant, for face offset.
+					tan1 = endcap ? 0 : tan2;           // {number} Face angle on first face.
 					
 					// Assemble path.
 					if (this.group[0].prop.type === eType.Prism) {
-						path = createPrismPath(this.prop.refractiveIndex, this.prop.flip ? -1 : +1).concat('ZFS')
+						path = createPrismPath(this.get("refractiveIndex"), this.prop.flip ? -1 : +1).concat("ZFS")
 							.join(' ');
 					} else {
-						path = [cmd('M', 0.5 * l + tan1, r)].concat(
-							createFace(this.prop.curvatureFace2, l, -1, tan2),
-							createFace(this.prop.curvatureFace1, 0, +1, tan1),
-							'ZFS').join(' ');
+						path = [cmd("M", 0.5 * l + tan1, r)].concat(
+							createFace(this.get("curvatureFace2"), l, -1, tan2),
+							createFace(this.get("curvatureFace1"), 0, +1, tan1),
+							"ZFS").join(' ');
 					}
 
 					// Render path.
@@ -779,7 +783,7 @@ LaserCanvas.Element.Dielectric.prototype = {
 					break;
 					
 				case renderLayer.annotation:
-					render.fillText(LaserCanvas.Utilities.numberFormat(this.prop.refractiveIndex), this.loc.x, this.loc.ylog);
+					render.fillText(LaserCanvas.Utilities.numberFormat(this.get("refractiveIndex")), this.loc.x, this.loc.ylog);
 					break;
 			}
 		}

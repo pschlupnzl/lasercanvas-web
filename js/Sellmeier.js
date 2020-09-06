@@ -3,8 +3,8 @@
 * @param {function=} fnReady Function to call once loaded, if any.
 * @param {object=} thisArg Object to pass as THIS to callback function.
 */
-window.LaserCanvas.Sellmeier = function (fnReady, thisArg) {
-	"use strict";
+(function (LaserCanvas) {
+LaserCanvas.Sellmeier = function (fnReady, thisArg) {
 	this.search = '';            // {string} Search string.
 	this.eq = null;              // {function?} Currently selected formula.
 	this.applyAction = {         // Action on Apply button.
@@ -19,13 +19,12 @@ window.LaserCanvas.Sellmeier = function (fnReady, thisArg) {
 /**
 * Script URL for loading refractive index data.
 */
-window.LaserCanvas.Sellmeier.refractiveIndexUrl = 'js/refractiveIndex.js';
+LaserCanvas.Sellmeier.refractiveIndexUrl = 'js/refractiveIndex.js';
 
 // Create a Sellmeier equation of the given form for the specified parameters.
 // @param {number} type Type of formula to use.
 // @param {Array<number>} coeff Coefficients for the formula.
-window.LaserCanvas.Sellmeier.formula = (function () {
-	"use strict";
+LaserCanvas.Sellmeier.formula = (function () {
 	var
 		createFormula = {
 			"1": function (c) {
@@ -85,22 +84,20 @@ window.LaserCanvas.Sellmeier.formula = (function () {
 	// @param {Array<number>} coeff Coefficients for the formula.
 	return function (type, coeff) {
 		if (!createFormula.hasOwnProperty(type)) {
-			alert(window.LaserCanvas.Utilities.stringFormat('Sellmeier type `{0}` not supported', type));
+			alert(LaserCanvas.Utilities.stringFormat('Sellmeier type `{0}` not supported', type));
 			createFormula.notSupported;
 		}
 		return createFormula[type](coeff);
 	};
 }());
 
-window.LaserCanvas.Sellmeier.prototype = {
+LaserCanvas.Sellmeier.prototype = {
 	/**
 	* Prepare the panel.
 	* @returns {HTMLDivElement} The created panel (in wait state).
 	*/
 	init: function () {
-		"use strict";
-		var LaserCanvas = window.LaserCanvas, // {object} Namespace.
-			panel = document.createElement('div'); // {HTMLDivElement} Sellmeier panel.
+		var panel = document.createElement('div'); // {HTMLDivElement} Sellmeier panel.
 			
 		// Prepare panel contents.
 		panel.innerHTML = LaserCanvas.Sellmeier.panelHtml;
@@ -149,9 +146,7 @@ window.LaserCanvas.Sellmeier.prototype = {
 	* @param {object=} thisArg Object to pass as THIS to callback function.
 	*/
 	load: function (fnReady, thisArg) {
-		"use strict";
-		var LaserCanvas = window.LaserCanvas, // {object} Namespace.
-		
+		var 
 			// Loaded, or already loaded.
 			// @this {Sellmeier} Caller from closure.
 			ready = function () {
@@ -172,7 +167,6 @@ window.LaserCanvas.Sellmeier.prototype = {
 	* The panel and refractive index data is loaded.
 	*/
 	ready: function () {
-		"use strict";
 		this.updateBooks();
 	},
 	
@@ -180,7 +174,6 @@ window.LaserCanvas.Sellmeier.prototype = {
 	* Show the panel.
 	*/
 	show: function () {
-		"use strict";
 		this.panel.setAttribute('data-visible', 'true');
 	},
 	
@@ -188,7 +181,6 @@ window.LaserCanvas.Sellmeier.prototype = {
 	* Hide the panel.
 	*/
 	hide: function () {
-		"use strict";
 		this.panel.setAttribute('data-visible', 'false');
 	},
 	
@@ -196,7 +188,6 @@ window.LaserCanvas.Sellmeier.prototype = {
 	* Destroy the panel.
 	*/
 	destroy: function () {
-		"use strict";
 		this.panel.parentNode.removeChild(this.panel);
 	},
 	
@@ -205,8 +196,7 @@ window.LaserCanvas.Sellmeier.prototype = {
 	* @param {string=} title Title to set, or default if not specified.
 	*/
 	setPanelTitle: function (title) {
-		"use strict";
-		this.panel.querySelector('h1 label').innerHTML = title || window.LaserCanvas.localize('Refractive index');
+		this.panel.querySelector('h1 label').innerHTML = title || LaserCanvas.localize('Refractive index');
 	},
 	
 	/**
@@ -215,7 +205,6 @@ window.LaserCanvas.Sellmeier.prototype = {
 	* @param {string} html Value to set.
 	*/
 	setPanelElement: function (sel, html) {
-		"use strict";
 		this.panel.querySelector(sel).innerHTML = html;
 	},
 
@@ -224,7 +213,6 @@ window.LaserCanvas.Sellmeier.prototype = {
 	* @param {string} field Field of list to clear 'book'|'source'.
 	*/
 	clearList: function (field) {
-		"use strict";
 		var k,
 			opts = this.panel.querySelectorAll('ul[data-field="' + field + '"] > li');
 		for (k = opts.length - 1; k >= 0; k -= 1) {
@@ -240,7 +228,6 @@ window.LaserCanvas.Sellmeier.prototype = {
 	* @param {object} thisArg Object to pass as THIS to callback function.
 	*/
 	activateList: function (field, fn, thisArg) {
-		"use strict";
 		var 
 			// An item is clicked. Invoke the callback function with
 			// the given THIS and value arguments.
@@ -248,7 +235,7 @@ window.LaserCanvas.Sellmeier.prototype = {
 			onclick = function () {
 				fn.call(thisArg, this.getAttribute('data-value'));
 			};
-		window.LaserCanvas.Utilities.foreach(this.panel.querySelectorAll('ul[data-field="' + field + '"] > li[data-value]'), function () {
+		LaserCanvas.Utilities.foreach(this.panel.querySelectorAll('ul[data-field="' + field + '"] > li[data-value]'), function () {
 			this.onclick = onclick;
 		});
 	},
@@ -259,8 +246,7 @@ window.LaserCanvas.Sellmeier.prototype = {
 	* @param {string} value Value of item to select.
 	*/
 	selectListItem: function (field, value) {
-		"use strict";
-		window.LaserCanvas.Utilities.foreach(this.panel.querySelectorAll('ul[data-field="' + field + '"] > li[data-value]'), function () {
+		LaserCanvas.Utilities.foreach(this.panel.querySelectorAll('ul[data-field="' + field + '"] > li[data-value]'), function () {
 			if (this.getAttribute('data-value') === value.toString()) {
 				this.setAttribute('data-selected', 'true');
 			} else {
@@ -274,9 +260,7 @@ window.LaserCanvas.Sellmeier.prototype = {
 	* or when the search changes.
 	*/
 	updateBooks: function () {
-		"use strict";
 		var re = null,
-			LaserCanvas = window.LaserCanvas, // {object} Namespace.
 			sel = this.panel.querySelector('ul[data-field="book"]'), // {HTMLULElement} Material list.
 			mats = {};         // {object} Prevent duplicates.
 		
@@ -320,9 +304,7 @@ window.LaserCanvas.Sellmeier.prototype = {
 	* @param {string} book Selected book to show.
 	*/
 	selectBook: function (book) {
-		"use strict";
-		var LaserCanvas = window.LaserCanvas, // {object} Namespace.
-			selectedValue = null,              // {number} Source to select.
+		var selectedValue = null,              // {number} Source to select.
 			sel = this.panel.querySelector('ul[data-field="source"]'); // {HTMLLIElement} Material list.
 		
 		// Prepare the lists.
@@ -356,9 +338,7 @@ window.LaserCanvas.Sellmeier.prototype = {
 	* @param {string:number} source Index of source.
 	*/
 	selectSource: function (source) {
-		"use strict";
-		var LaserCanvas = window.LaserCanvas,
-			mat = LaserCanvas.Sellmeier.refractiveIndex[+source];
+		var mat = LaserCanvas.Sellmeier.refractiveIndex[+source];
 		
 		// Check validity.
 		if (!mat) {
@@ -404,9 +384,8 @@ window.LaserCanvas.Sellmeier.prototype = {
 	* @returns {object} Calculated values.
 	*/
 	updateCalculation: function (wavelength) {
-		"use strict";
 		var prop = {},
-			Utilities = window.LaserCanvas.Utilities, // {object} Namespace.
+			Utilities = LaserCanvas.Utilities, // {object} Namespace.
 			numberFormat = Utilities.numberFormat,    // {function} Format numbers.
 			input = this.panel.querySelector('input[data-field="wavelength"]'), // {HTMLInputElement} Input field.
 			l = +input.value,    // {number} (um) Current wavelength.
@@ -439,7 +418,7 @@ window.LaserCanvas.Sellmeier.prototype = {
 /**
 * Panel contents.
 */
-window.LaserCanvas.Sellmeier.panelHtml = [
+LaserCanvas.Sellmeier.panelHtml = [
 	'<div class="dragbar"></div>',
 	'<h1>',
 		'<label data-localize="Sellmeier"></label>',
@@ -489,3 +468,4 @@ window.LaserCanvas.Sellmeier.panelHtml = [
 	'<button class="lcbutton" data-action="apply" data-localize="Apply"></button>',
 	'<a class="attribution" href="https://refractiveindex.info" target="_blank">Data from RefractiveIndex.INFO</a>'
 ].join('');
+}(window.LaserCanvas));

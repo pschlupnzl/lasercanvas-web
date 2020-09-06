@@ -5,12 +5,15 @@
 * property.
 * @param {Array<Element>} melements Optical elements to calculate for.
 * @param {object} systemProperties System properties to read and write.
+* @param {object} variables Current variable values, passed to property getters.
 * @returns {object} Object to store for system solution.
 */
-window.LaserCanvas.systemAbcd = function (melements, systemProperties) {
-	"use strict";
+(function (LaserCanvas) {
+LaserCanvas.systemAbcd = function (melements, systemProperties, variables) {
 	var 
-		Matrix2x2 = window.LaserCanvas.Math.Matrix2x2, // {function} Constructor function for matrix.
+		Matrix2x2 = LaserCanvas.Math.Matrix2x2, // {function} Constructor function for matrix.
+		wavelength = systemProperties.wavelength.value(variables),
+		initialWaist = systemProperties.initialWaist.value(variables),
 		
 		// Calculate the element ABCD.
 		// @param {number} indx Index of element whose following space to calculate.
@@ -21,26 +24,28 @@ window.LaserCanvas.systemAbcd = function (melements, systemProperties) {
 			return melements[indx].elementAbcd(dir, plane);
 		},
 		
-		// Calculate element or default ABCD for gap
-		// between given element and the next.
-		// @param {number} indx Index of element whose following space to calculate.
-		// @param {number} dir Direction -1:backwards|+1:forwards.
-		// @param {number.Enum:modePlane} plane Sagittal or tangential plane.
-		// @param {object=} len Physical and optical length to accumulate, if supplied.
-		// @returns {Matrix2x2} Transfer matrix.
+		/**
+		* Calculate element or default ABCD for gap
+		* between given element and the next.
+		* @param {number} indx Index of element whose following space to calculate.
+		* @param {number} dir Direction -1:backwards|+1:forwards.
+		* @param {number.Enum:modePlane} plane Sagittal or tangential plane.
+		* @param {object=} len Physical and optical length to accumulate, if supplied.
+		* @returns {Matrix2x2} Transfer matrix.
+		*/
 		spaceAbcd = function (indx, dir, plane, len) {
 			var L, n, gdd,
 				element = melements[indx]; // {Element} Element whose following space to calculate.
-			// if (typeof element.spaceAbcd === 'function') {
-			// 	return element.spaceAbcd(dir, plane);
-			// }
-			L = element.property('distanceToNext');
-			n = element.spaceRefractiveIndex 
-				? element.spaceRefractiveIndex()            // e.g. propagation within prism pair.
-				: element.property('refractiveIndex') || 1; // Default elements.
-			gdd = element.groupDelayDispersion
-				? element.groupDelayDispersion(systemProperties.wavelength)
-				: 0;
+				// if (typeof element.spaceAbcd === 'function') {
+				// 	return element.spaceAbcd(dir, plane);
+				// }
+				L = element.get("distanceToNext", variables);
+				n = element.spaceRefractiveIndex 
+					? element.spaceRefractiveIndex()            // e.g. propagation within prism pair.
+					: element.get("refractiveIndex") || 1; // Default elements.
+				gdd = element.groupDelayDispersion
+					? element.groupDelayDispersion(wavelength, L)
+					: 0;
 
 			if (len) {
 				len.physicalLength += L;
@@ -202,7 +207,7 @@ window.LaserCanvas.systemAbcd = function (melements, systemProperties) {
 		
 
 		
-	var modePlane = window.LaserCanvas.Enum.modePlane,
+	var modePlane = LaserCanvas.Enum.modePlane,
 		abcd = {
 			sag: null,
 			tan: null
@@ -226,7 +231,7 @@ window.LaserCanvas.systemAbcd = function (melements, systemProperties) {
 		// @returns {object} Data to store for system in this plane.
 		calculatePlane = function (plane, lam, len) {
 			var Q, dir, indx, w0,
-				configuration = window.LaserCanvas.System.configuration, // {object} Configuration enum.
+				configuration = LaserCanvas.System.configuration, // {object} Configuration enum.
 				mx = Matrix2x2.eye();
 
 			if (systemProperties.configuration === configuration.propagation) {
@@ -234,7 +239,7 @@ window.LaserCanvas.systemAbcd = function (melements, systemProperties) {
 				//  1          lam        1
 				// --- = -i ---------  + ---
 				//  q        pi w0^2      R
-				w0 = systemProperties.initialWaist; // {number} (mm) Waist.
+				w0 = initialWaist; // {number} (mm) Waist.
 				Q = {
 					R: 0,                         // {number} (mm^-1) Wavefront curvature.
 					V: lam / (Math.PI * w0 * w0), // {number} Normalized waist.
@@ -303,8 +308,8 @@ window.LaserCanvas.systemAbcd = function (melements, systemProperties) {
 		systemProperties.groupDelayDispersion = 0;
 	
 	// System matrices.
-	abcd.sag = calculatePlane(modePlane.sagittal, systemProperties.wavelength, systemProperties);
-	abcd.tan = calculatePlane(modePlane.tangential, systemProperties.wavelength);
+	abcd.sag = calculatePlane(modePlane.sagittal, wavelength, systemProperties);
+	abcd.tan = calculatePlane(modePlane.tangential, wavelength);
 	
 	// Update system properties.
 	systemProperties.modeSpacing = 299792.458 / (2 * systemProperties.opticalLength); // c / 2nL
@@ -319,7 +324,7 @@ window.LaserCanvas.systemAbcd = function (melements, systemProperties) {
 * @param {number} d Distance to propagate.
 * @returns {object} Modified parameters (for now only w).
 */
-window.LaserCanvas.systemAbcd.propagateParameters = function (params, n, d) {
+LaserCanvas.systemAbcd.propagateParameters = function (params, n, d) {
 	var w0 = params.w0,     // {number} (um) Waist size.
 		zR = n * params.zR,  // {number} (mm) Rayleigh length, reduced by refractive index.
 		z0 = n * params.z0,  // {number} (mm) Distance to waist, reduced by refractive index.
@@ -329,4 +334,4 @@ window.LaserCanvas.systemAbcd.propagateParameters = function (params, n, d) {
 		w: w0 * Math.sqrt(1 + z * z)
 	};
 };
-
+}(window.LaserCanvas));

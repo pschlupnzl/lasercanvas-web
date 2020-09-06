@@ -14,13 +14,14 @@ LaserCanvas.System = function () {
 		mprop = {                   // {object} System properties read/write by SystemAbcd.
 			name: 'System',          // {string} Name of system.
 			configuration: LaserCanvas.System.configuration.linear,
-			wavelength: 1000,        // {number} (nm) System wavelength
+			wavelength: new LaserCanvas.Equation(1000), // {number} (nm) System wavelength
 			physicalLength: 0,       // {number} (mm) Physical length.
 			opticalLength: 0,        // {number} (mm) Optical length.
 			groupDelayDispersion: 0, // {number} (fs^2/rad) System group delay dispersion.
 			modeSpacing: 0,          // {number} (MHz) Optical mode spacing.
-			initialWaist: 100        // {number} (um) Initial waist size.
+			initialWaist: new LaserCanvas.Equation(100) // {number} (um) Initial waist size.
 		},
+		mvariablesGetter = null,     // {function|null} Function to retrieve current variable values.
 		
 		// -------------------------------------------------
 		//  Accessors.
@@ -96,37 +97,58 @@ LaserCanvas.System = function () {
 		},
 		
 		/**
-		* Retrieve one of the system property values.
-		* @param {string} propertyName Name of property to retrieve.
-		* @param {number|...=} newValue New value to set to, if changing.
-		* @returns {number} Property value.
-		*/
-		property = function (propertyName, newValue) {
-			if (newValue !== undefined) {
-				switch (propertyName) {
-					case 'initialWaist':
-					case 'wavelength':
-						if (!isNaN(+newValue)) {
-							mprop[propertyName] = +newValue;
-							fireEventListeners('update');
-						}
-						break;
-				}
-			} else {
-				switch (propertyName) {
-					case 'wavelength':
-						return mprop[propertyName];
-						
-					case 'stability':
-						return [
-							(mabcd.sag.mx[0][0] + mabcd.sag.mx[1][1]) / 2,
-							(mabcd.tan.mx[0][0] + mabcd.tan.mx[1][1]) / 2
-						];
-				}
-				return mprop[propertyName];
+		 * Sets an internal property equation to a new value.
+		 * @param {string} propertyName Name of property to set, "distanceToNext"|...
+		 * @param {string|number} newValue New value to set. It is passed to the equation.
+		 * @param {boolean} arg Additional argument, e.g. for outgoing angle whether first optic.
+		 */
+		set = function (propertyName, newValue) {
+			switch (propertyName) {
+				case "wavelength":
+				case "initialWaist":
+					mprop[propertyName].set(newValue);
+					break;
+			}
+			fireEventListeners('update');
+		},
+
+		/**
+		 * Returns the property evaluated using the given variable values.
+		 * @param {string} propertyName Name of property to evaluate and return.
+		 */
+		get = function (propertyName) {
+			var variables = mvariablesGetter(),
+				value = mprop[propertyName]
+					&& mprop[propertyName].value
+					&& mprop[propertyName].value(variables);
+			switch (propertyName) {
+				case "wavelength":
+				case "initialWaist":
+					value = mprop[propertyName].value(variables);
+					return Math.max(0, value);
+
+				case "stability":
+					return [
+						(mabcd.sag.mx[0][0] + mabcd.sag.mx[1][1]) / 2,
+						(mabcd.tan.mx[0][0] + mabcd.tan.mx[1][1]) / 2
+					];
+			}
+			// Properties also includes non-equation, derived quantities.
+			return mprop[propertyName];
+		},
+
+		/** Returns a property's source equation. */
+		expression = function (propertyName) {
+			switch (propertyName) {
+				case "wavelength":
+				case "initialWaist":
+					return mprop[propertyName].expression();
+				default:
+					console.error(`expression should not be called with propertyName=${propertyName}`);
+					return "";
 			}
 		},
-		
+
 		/**
 		* Determine whether a given element property should
 		* be shown. For example, group velocity dispersion is
@@ -211,7 +233,7 @@ LaserCanvas.System = function () {
 			for (k = 0; k < kmax; k += 1) {
 				if (!filterBy || melements[k].canSetProperty(filterBy)) {
 					loc = melements[k].location(); // {Point} Current optic location.
-					zMax = melements[k].property("distanceToNext"); // {number} (mm) Distance to next element.
+					zMax = melements[k].get("distanceToNext"); // {number} (mm) Distance to next element.
 					
 					// Calculate dot product.
 					V = new Vector([   // Normalized axis vector.
@@ -261,7 +283,7 @@ LaserCanvas.System = function () {
 			var element = melements[seg.indx];
 			return LaserCanvas.systemAbcd.propagateParameters(
 				element.abcdQ[plane], 
-				element.property('refractiveIndex') || 1,
+				element.get("refractiveIndex") || 1,
 				seg.z);
 		},
 		
@@ -322,6 +344,16 @@ LaserCanvas.System = function () {
 		//  Calculations.
 		// -------------------------------------------------
 
+		/** Sets the callback function used to retrieve variable values. */
+		setVariablesGetter = function (getter) {
+			mvariablesGetter = getter;
+		},
+
+		/** Retrieves current variables, or returns empty object as callback. */
+		getVariables = function () {
+			return mvariablesGetter ? mvariablesGetter() : {};
+		},
+
 		/**
 		* Update the rotation of the cavity end elements. The
 		* elements are most likely mirrors.
@@ -360,15 +392,15 @@ LaserCanvas.System = function () {
 
 				// Alignments.
 				el.loc.p = Z.atan2();
-				el.property('deflectionAngle', Math.atan2(Z.cross(U), Z.dot(U))); // Updates angleOfIncidence.
-				le.property('deflectionAngle', Math.atan2(V.cross(Z), V.dot(Z))); // Updates angleOfIncidence.
+				el.set("deflectionAngle", Math.atan2(Z.cross(U), Z.dot(U))); // Updates angleOfIncidence.
+				le.set("deflectionAngle", Math.atan2(V.cross(Z), V.dot(Z))); // Updates angleOfIncidence.
 				le.loc.q = Z.atan2();
-				le.property("distanceToNext", l);
+				le.set("distanceToNext", l);
 			} else {
 				// Linear cavity: Normal incidence.
 				el.loc.p = el.loc.q + Math.PI;
-				le.property("distanceToNext", 0);
-				le.property('deflectionAngle', Math.PI);
+				le.set("distanceToNext", 0);
+				le.set("deflectionAngle", Math.PI);
 			}
 		},
 		
@@ -378,7 +410,8 @@ LaserCanvas.System = function () {
 		* @param {number=} kend_in Index of final element to calculate, if any. The element is included.
 		*/
 		calculateCartesianCoordinates = function (kstart_in, kend_in) {
-			var k, element, d,
+			var variables = getVariables(),
+				k, element, d,
 				loc,                                 // {object} Current element location (x, y, q, ...).
 				// /---TODO---------------------------------------------------------\
 				// | We always have to start at the beginning of the system because |
@@ -396,8 +429,7 @@ LaserCanvas.System = function () {
 				loc = element.location(k === kstart  // {object} Element transfer properties.
 					? null                       // Don't update first element ..
 					: ax);                       // ..only subsequent ones.
-				d = element.property("distanceToNext");
-
+				d = element.get("distanceToNext", variables);
 				// Traverse to next.
 				ax.q = loc.q;                   // {number} (rad) Next axis direction.
 				ax.x += d * Math.cos(ax.q); // {number} (mm) Advance horizontal location.
@@ -412,7 +444,7 @@ LaserCanvas.System = function () {
 		* Calculate the system ABCD coordinates.
 		*/
 		calculateAbcd = function () {
-			mabcd = LaserCanvas.systemAbcd(melements, mprop);
+			mabcd = LaserCanvas.systemAbcd(melements, mprop, getVariables());
 		},
 		
 		/**
@@ -421,7 +453,7 @@ LaserCanvas.System = function () {
 		* @param {Element} elDrag Element being dragged.
 		* @returns {object|boolean} dragData Data to be passed to dragElement() method, or FALSE if elements can't be found.
 		*/
-		adjust = LaserCanvas.systemAdjust(melements, calculateCartesianCoordinates),
+		adjust = LaserCanvas.systemAdjust(melements, calculateCartesianCoordinates, getVariables),
 		
 		/**
 		* Start dragging an element.
@@ -476,6 +508,16 @@ LaserCanvas.System = function () {
 			fireEventListeners('update');
 		},
 		
+		/**
+		 * Respond to a change in variables. This notifies internal
+		 * event listeners. The caller must still call update().
+		 */
+		onVariablesChange = function () {
+			melements.forEach(function (element) {
+				element.onVariablesChange && element.onVariablesChange();
+			});
+		},
+
 		// -------------------------------------------------
 		//  Add and remove elements.
 		// -------------------------------------------------
@@ -516,12 +558,12 @@ LaserCanvas.System = function () {
 				// Element.createGroup returns {Array<object>}, so
 				// we use apply to distribute the returned objects
 				// into the splice command.
-				Array.prototype.splice.apply(melements, [seg.indx + 1, 0].concat(Element.createGroup(prevElement, seg.z)));
+				Array.prototype.splice.apply(melements, [seg.indx + 1, 0].concat(Element.createGroup(prevElement, seg.z, mvariablesGetter)));
 				element = melements[seg.indx + 1];
 			} else {
-				element = new Element(); // {Element} Newly created element.
-				element.property('distanceToNext', prevElement.property('distanceToNext') - seg.z); // Remaining distance.
-				prevElement.property('distanceToNext', seg.z); // Set new distance.
+				element = new Element(mvariablesGetter); // {Element} Newly created element.
+				element.set("distanceToNext", prevElement.get("distanceToNext") - seg.z); // Remaining distance.
+				prevElement.set("distanceToNext", seg.z); // Set new distance.
 				if (element.init) {
 					element.init(this);
 				}
@@ -539,6 +581,7 @@ LaserCanvas.System = function () {
 		*/
 		removeElement = function (element) {
 			var k, prevElement,
+				variables = getVariables(),
 				n = 1; // {number} Count of items to remove.
 				
 			// Don't delete last or first elements.
@@ -548,8 +591,8 @@ LaserCanvas.System = function () {
 					if (typeof element.removeGroup === 'function') {
 						n = element.removeGroup(prevElement);
 					} else {
-						prevElement.property('distanceToNext',
-							prevElement.property('distanceToNext') + melements[k].property('distanceToNext'));
+						prevElement.set("distanceToNext",
+							prevElement.get("distanceToNext", variables) + melements[k].get("distanceToNext", variables));
 					}
 					if (element.destroy) {
 						element.destroy();
@@ -573,9 +616,11 @@ LaserCanvas.System = function () {
 		 */
 		fromJsonSource = function (jsonSource) {
 			try {
-				jsonSource(mprop, melements, this);
+				// Try to load e.g. from localStorage.
+				jsonSource(mprop, melements, this, mvariablesGetter);
 			} catch (e) {
-				createNew(LaserCanvas.System.configuration.linear);
+				// As a fallback, use a standard configuration.
+				createNew(LaserCanvas.System.configuration.linear, mvariablesGetter);
 			}
 			calculateCartesianCoordinates();
 			fireEventListeners("change");
@@ -599,7 +644,7 @@ LaserCanvas.System = function () {
 		*/
 		createNew = function (configuration, elementsInfo, loc) {
 			var SystemUtil = LaserCanvas.SystemUtil;         // {object} System namespace.
-			SystemUtil.createNew(configuration, elementsInfo, loc, mprop, melements);
+			SystemUtil.createNew(configuration, elementsInfo, loc, mprop, melements, mvariablesGetter);
 
 			// Calculate Cartesian coordinates.
 			updateElementNames();
@@ -614,7 +659,7 @@ LaserCanvas.System = function () {
 		 */
 		fromTextFile = function (src) {
 			var json = LaserCanvas.SystemUtil.textFileToJson(src);
-			LaserCanvas.SystemUtil.fromJson(json, mprop, melements);
+			LaserCanvas.SystemUtil.fromJson(json, mprop, melements, this, mvariablesGetter);
 
 			// Calculate Cartesian coordinates.
 			updateElementNames();
@@ -639,15 +684,19 @@ LaserCanvas.System = function () {
 		elementAtLocation: elementAtLocation,     // Find an element at the given mouse location.
 		element: element,                         // Returns the element at the given index.
 		elements: elements,                       // Retrieve elements for this system.
+		expression: expression,                   // Retrieve the expression of a variable.
 		fromJsonSource: fromJsonSource,           // Reset the system to the given JSON state.
 		fromTextFile: fromTextFile,               // Load a LaserCanvas 5 text file.
+		get: get,                                 // Retrieve a value.
 		insertElement: insertElement,             // Insert a new element near the given point.
 		inspectSegment: inspectSegment,           // Inspect beam on a segment (from segmentNearLocation).
 		iterateElements: iterateElements,         // Iterate all elements in the system.
-		property: property,                       // Retrieve a property value.
+		onVariablesChange: onVariablesChange,     // Respond to a change in variables.
 		removeElement: removeElement,             // Remove the given element.
 		removeEventListener: removeEventListener, // Remove an event handler.
 		segmentNearLocation: segmentNearLocation, // Segment point closest to point.
+		set: set,                                 // Set a property value.
+		setVariablesGetter: setVariablesGetter,   // Set the callback to retrieve variable values.
 		toJsonDestination: toJsonDestination,     // Write JSON to a destination.
 		update: update,                           // Update system calculation.
 		userProperties: userProperties            // Retrieve properties for read/write by user.

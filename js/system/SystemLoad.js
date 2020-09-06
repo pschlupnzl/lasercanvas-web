@@ -103,7 +103,7 @@
 		 * @param {Array<object>} elements Source element data.
 		 * @param {object} variables Variables used to evaluate expression to numeric values.
 		 */
-		elementsToJson = function (elements, variables) {
+		textElementsToJson = function (elements, variables) {
 			if (!["Mirror", "Source"].includes(elements[0].type)) {
 				throw "First element must be a mirror or source.";
 			}
@@ -123,7 +123,7 @@
 						elementJson.type = LaserCanvas.Element.Mirror.Type;
 						elementJson.prop = {
 							radiusOfCurvature: toNumber(src.ROC, variables),
-							angleOfIncidence: FLIP * toNumber(src.FaceAngle, variables) * Math.PI / 180.00
+							angleOfIncidence: FLIP * toNumber(src.FaceAngle, variables)
 						};
 						break;
 
@@ -161,12 +161,13 @@
 							flip: src.Flipped || false,
 							curvatureFace1: toNumber(src.ROC, variables),
 							curvatureFace2: toNumber(linkedElement.ROC, variables),
+							thickness: toNumber(src.Thickness, variables)
 						};
 
 						if (src.type === "CrystalInput") {
-							elementJson.prop.faceAngle = toNumber(src.FaceAngle, variables) * Math.PI / 180;
+							elementJson.prop.faceAngle = toNumber(src.FaceAngle, variables);
 						} else if (src.type === "PlateInput") {
-							elementJson.prop.angleOfIncidence = toNumber(src.FaceAngle, variables) * Math.PI / 180;
+							elementJson.prop.angleOfIncidence = toNumber(src.FaceAngle, variables);
 						}
 
 						if (elements[index + 1].type === "ThermalLens") {
@@ -174,9 +175,6 @@
 						}
 						
 						// groupVelocityDispersion: 0,// {number} (um^-2) Group velocity dispersion for ultrafast calculations.
-						elementJson.priv = {
-							thickness: toNumber(src.Thickness, variables)
-						};
 						break;
 
 					case "ThermalLens":
@@ -189,6 +187,7 @@
 						// Add thermal lens placeholder. The focal length is handled at input face.
 						jsonElements.push({
 							type: LaserCanvas.Element.Lens.Type,
+							prop: {}
 						});
 						linkedElement = findElement(elements, src.LinkedTo);
 						if (!linkedElement) {
@@ -199,9 +198,9 @@
 							type: toDielectricType(src.type),
 						};
 						if (src.type === "CrystalOutput") {
-							elementJson.prop.faceAngle = toNumber(linkedElement.FaceAngle, variables) * Math.PI / 180;
+							elementJson.prop.faceAngle = toNumber(linkedElement.FaceAngle, variables);
 						} else if (src.type === "PlateOutput") {
-							elementJson.prop.angleOfIncidence = toNumber(linkedElement.FaceAngle, variables) * Math.PI / 180;
+							elementJson.prop.angleOfIncidence = toNumber(linkedElement.FaceAngle, variables);
 						}
 						break;
 
@@ -382,7 +381,7 @@
 						name: root.name,
 						wavelength: toNumber(root.Wavelength, variables),
 					},
-					elements: elementsToJson(root.elements, variables)
+					elements: textElementsToJson(root.elements, variables)
 				};
 
 			// Initial location.

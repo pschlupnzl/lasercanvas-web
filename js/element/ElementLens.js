@@ -3,10 +3,10 @@
 * Also used as thermal lens within a block.
 */
 (function (LaserCanvas) {
-"use strict";
-LaserCanvas.Element.Lens = function () {
+LaserCanvas.Element.Lens = function (variablesGetter) {
 	this.type = 'Lens'; // {string} Primitive element type.
 	this.name = 'L'; // {string} Name of this element (updated by System).
+	this.variablesGetter = variablesGetter; // {function} Used to retrieve variable values.
 	this.loc = {   // Location on canvas.
 		x: 0,       // {number} (mm) Horizontal location of element.
 		y: 0,       // {number} (mm) Vertical location of element.
@@ -14,8 +14,8 @@ LaserCanvas.Element.Lens = function () {
 		q: 0        // {number} (rad) Rotation angle of outgoing axis.
 	};
 	this.prop = {
-		distanceToNext: 0,  // {number} (mm) Distance to next element.
-		focalLength: 250    // {number} (mm) Focal length, 0 for infinite.
+		distanceToNext: new LaserCanvas.Equation(0),  // {number} (mm) Distance to next element.
+		focalLength: new LaserCanvas.Equation(0)      // {number} (mm) Focal length, 0 for infinite.
 	};
 	this.priv = {
 		refractiveIndex: 0  // {number} Refractive index, when used as a thermal lens.
@@ -46,7 +46,11 @@ LaserCanvas.Element.Lens.prototype = {
 	fromJson: function (json) {
 		this.name = json.name;
 		LaserCanvas.Utilities.extend(this.loc, json.loc || {});
-		LaserCanvas.Utilities.extend(this.prop, json.prop || {});
+		for (var propertyName in this.prop) {
+			if (this.prop.hasOwnProperty(propertyName)) {
+				this.prop[propertyName].set(json.prop[propertyName]);
+			}
+		}
 	},
 
 	/**
@@ -57,9 +61,9 @@ LaserCanvas.Element.Lens.prototype = {
 	* @returns {Element:Lens} This element for chaining.
 	*/
 	setThermalLens: function (focalLength, refractiveIndex, distanceToNext) {
-		this.prop.focalLength = focalLength;
-		this.priv.refractiveIndex = refractiveIndex;
-		this.prop.distanceToNext = distanceToNext;
+		this.set("focalLength", focalLength);
+		this.set("refractiveIndex", refractiveIndex);
+		this.set("distanceToNext", distanceToNext);
 	},
 
 	/**
@@ -119,35 +123,50 @@ LaserCanvas.Element.Lens.prototype = {
 	},
 	
 	/**
-	* Sets internal parameters to match new property value -OR- gets the current value.
-	* @param {string} propertyName Name of property to set 'distanceToNext' etc.
-	* @param {number=} newValue (mm|rad) New target value to set, if any.
-	* @returns {number=} The current value, if retrieving only.
-	*/
-	property: function (propertyName, newValue) {
-		// Set value, if specified.
-		if (newValue !== undefined) {
-			switch (propertyName) {
-				case 'distanceToNext': // {number} (mm) New distance to next element.
-				case 'focalLength':
-					this.prop[propertyName] = newValue;
-					break;
-			}
-		} else {
-			// Otherwise, return the current value.
-			switch (propertyName) {
-				case 'refractiveIndex': // {number} Refractive index, when used as thermal lens (used by ABCD calculation).
-					return this.priv.refractiveIndex === 0 ? 1 : this.priv.refractiveIndex;
-					
-				case 'unused': // {boolean} Value indicating whether the element is unused, e.g. null thermal lens.
-					return this.isThermalLens() && this.prop.focalLength === 0;
-					
-				default:
-					return this.prop[propertyName];
-			}
+	 * Sets an internal property equation to a new value.
+	 * @param {string} propertyName Name of property to set, "distanceToNext"|...
+	 * @param {string|number} newValue New value to set. It is passed to the equation.
+	 */
+	set: function (propertyName, newValue) {
+		switch (propertyName) {
+			case "distanceToNext":
+			case "focalLength":
+				this.prop[propertyName].set(newValue);
+				break;
+			case "refractiveIndex":
+				this.priv.refractiveIndex = newValue;
+				break;
 		}
 	},
-	
+
+	/**
+	 * Returns the property evaluated using the given variable values.
+	 * @param {string} propertyName Name of property to evaluate and return.
+	 */
+	get: function (propertyName) {
+		var variables = this.variablesGetter(),
+			value = this.prop[propertyName] && this.prop[propertyName].value(variables);
+		switch (propertyName) {
+			case "distanceToNext":
+				return Math.max(0, value);
+
+			case "focalLength":
+				return value;
+
+			case "refractiveIndex":
+				return this.priv.refractiveIndex === 0 ? 1 : this.priv.refractiveIndex;
+
+			case 'unused': // {boolean} Value indicating whether the element is unused, e.g. null thermal lens.
+				return this.isThermalLens() && this.get("focalLength") === 0;
+		}
+		return value;
+	},
+
+	/** Returns a property's source equation. */
+	expression: function (propertyName) {
+		return this.prop[propertyName].expression();
+	},
+
 	/**
 	* Return the ABCD matrix for this element.
 	* Lens:
@@ -158,7 +177,7 @@ LaserCanvas.Element.Lens.prototype = {
 	* @param {number} plane The parameter is not used. Sagittal (0) or tangential (1) plane.
 	*/
 	elementAbcd: function (dir_notused, plane_notused) {
-		var f = this.prop.focalLength;  // {number} (mm) Focal length.
+		var f = this.get("focalLength");  // {number} (mm) Focal length.
 		return new LaserCanvas.Math.Matrix2x2(1, 0, f === 0 ? 0 : -1 / f, 1);
 	},
 	
@@ -173,7 +192,7 @@ LaserCanvas.Element.Lens.prototype = {
 	*/
 	draw: function (render, layer) {
 		var image, 
-			f = this.prop.focalLength,
+			f = this.get("focalLength"),
 			qc = -this.loc.p, // {number} (rad) Display angle on canvas.
 			renderLayer = LaserCanvas.Enum.renderLayer; // {Enum} Layer to draw.
 		
@@ -204,10 +223,11 @@ LaserCanvas.Element.Lens.prototype = {
 	wireframe: function (render, layer) {
 		var k, dx,
 			renderLayer = LaserCanvas.Enum.renderLayer,    // {Enum} Layer to draw.
+			Utilities = LaserCanvas.Utilities,
 			d = [], // {Array<string>} Path drawing instructions.
 			r = 8,  // {number} "Thickness" of mirror.
 			qc = -this.loc.p, // {number} (rad) Display angle on canvas.
-			f = this.prop.focalLength,
+			f = this.get("focalLength"),
 			
 			// Parabola to approximate curvature of mirror.
 			// @param {number} k Plotting point.
@@ -221,12 +241,12 @@ LaserCanvas.Element.Lens.prototype = {
 			switch (layer) {
 				case renderLayer.optics:
 					k = -4;
-					d.push(LaserCanvas.Utilities.stringFormatPrecision(2, 'M {0} {1}', dx(k), r * k));
+					d.push(Utilities.stringFormatPrecision(2, 'M {0} {1}', dx(k), r * k));
 					for (k += 1; k <= +4; k += 1) {
-						d.push(LaserCanvas.Utilities.stringFormatPrecision(2, 'L {0} {1}', dx(k), r * k));
+						d.push(Utilities.stringFormatPrecision(2, 'L {0} {1}', dx(k), r * k));
 					}
 					for (k = +4; k >= -4; k -= 1) {
-						d.push(LaserCanvas.Utilities.stringFormatPrecision(2, 'L {0} {1}', -dx(k), r * k));
+						d.push(Utilities.stringFormatPrecision(2, 'L {0} {1}', -dx(k), r * k));
 					}
 					d.push('Z');
 					render

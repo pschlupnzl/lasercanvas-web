@@ -2,10 +2,10 @@
 * LaserCanvas - Screen element for inspecting the beam.
 */
 (function (LaserCanvas) {
-	"use strict";
-LaserCanvas.Element.Screen = function () {
+LaserCanvas.Element.Screen = function (variablesGetter) {
 	this.type = "Screen"; // {string} Primitive element type.
 	this.name = 'I';      // {string} Name of this element (updated by System).
+	this.variablesGetter = variablesGetter; // {function} Used to retrieve variable values.
 	this.loc = {          // Location on canvas.
 		x: 0,              // {number} (mm) Horizontal location of element.
 		y: 0,              // {number} (mm) Vertical location of element.
@@ -13,9 +13,11 @@ LaserCanvas.Element.Screen = function () {
 		q: 0               // {number} (rad) Rotation angle of outgoing axis.
 	};
 	this.prop = {
+		distanceToNext: new LaserCanvas.Equation(0)  // {number} (mm) Distance to next element.
+	};
+	this.priv = {
 		startOptic: false, // {boolean} Value indicating whether this is the first element (e.g. propagation system).
 		endOptic: false,   // {boolean} Value indicating whether this is the final element (e.g. propagation system).
-		distanceToNext: 0  // {number} (mm) Distance to next element.
 	};
 	this.panel = null;    // {HTMLDivElement?} Information panel.
 	this.showProperties = false; // {boolean} Value indicating whether this can show properties window. FALSE to suppress.
@@ -40,7 +42,11 @@ LaserCanvas.Element.Screen.prototype = {
 	fromJson: function (json) {
 		this.name = json.name;
 		LaserCanvas.Utilities.extend(this.loc, json.loc);
-		LaserCanvas.Utilities.extend(this.prop, json.prop);
+		for (var propertyName in this.prop) {
+			if (this.prop.hasOwnProperty(propertyName)) {
+				this.prop[propertyName] = new LaserCanvas.Equation(json.prop[propertyName]);
+			}
+		}
 	},
 
 	// ----------------------------------------------------
@@ -60,7 +66,11 @@ LaserCanvas.Element.Screen.prototype = {
 	* @param {string} name New name to set.
 	*/
 	setName: function (name) {
-		this.name = this.panel.querySelector('h1').innerHTML = name;
+		// TODO: Remove this and call at System.js@525
+		// The readout panel should belong to Render, not the element.
+		if (this.panel) {
+			this.name = this.panel.querySelector('h1').innerHTML = name;
+		}
 	},
 	
 	/**
@@ -84,7 +94,7 @@ LaserCanvas.Element.Screen.prototype = {
 		};
 		
 		el = panel.querySelector('button[data-action="delete"]');
-		if (this.prop.endOptic) {
+		if (this.priv.endOptic) {
 			el.parentNode.removeChild(el);
 		} else {
 			el.onclick = function () {
@@ -92,7 +102,7 @@ LaserCanvas.Element.Screen.prototype = {
 			};
 		}
 		
-		if (!this.prop.startOptic) {
+		if (!this.priv.startOptic) {
 			document.body.appendChild(panel);
 			LaserCanvas.localize(panel);
 			LaserCanvas.Utilities.draggable(panel, {
@@ -138,45 +148,58 @@ LaserCanvas.Element.Screen.prototype = {
 	*/
 	canSetProperty: function (propertyName) {
 		return {
-			distanceToNext: !this.endOptic,
+			distanceToNext: !this.priv.endOptic,
 			insertElement: true,
-			outgoingAngle: this.prop.startOptic || this.prop.endOptic // Propagation system ends.
+			outgoingAngle: this.priv.startOptic || this.priv.endOptic // Propagation system ends.
 		}[propertyName] || false;
 	},
 	
 	/**
-	* Sets internal parameters to match new property value -OR- gets the current value.
-	* Gets or sets internal parameters to match new property value.
-	* @param {string} propertyName Name of property to set 'distanceToNext' etc.
-	* @param {number=} newValue (mm|rad) New target value to set, if any.
-	* @param {...=} arg Additional argument, if needed.
-	* @returns {number=} The current value, if retrieving only.
-	*/
-	property: function (propertyName, newValue, arg) {
-		// Set value, if specified.
-		if (newValue !== undefined) {
-			switch (propertyName) {
-				case 'distanceToNext': // {number} (mm) New distance to next element.
-					this.prop[propertyName] = newValue;
-					break;
-					
-				case 'outgoingAngle': 
-					// newValue {number} (rad) New outgoing angle on canvas.
-					// arg {boolean} Value indicating whether this is first element in cavity.
-					if (arg) {
-						this.loc.q = newValue;
-					}
-					break;
-			}
-		} else {
-			// Otherwise, return the current value.
-			switch (propertyName) {
-				case 'distanceToNext': // {number} (mm) Distance to next element.
-					return this.prop[propertyName];
-			}
+	 * Sets a user property to a new value.
+	 * @param {string} propertyName Name of property to set.
+	 * @param {number|string} newValue New value to set to, which may be an equation.
+	 * @param {boolean=} arg Optional, e.g. value indicating whether this is the first element.
+	 */
+	set: function (propertyName, newValue, arg) {
+		switch (propertyName) {
+			case "outgoingAngle":
+				// newValue {number} (rad) New outgoing angle on canvas.
+				// arg {boolean} Value indicating whether this is first element in cavity.
+				if (arg) {
+					this.loc.q = newValue;
+				}
+				break;
+
+			case "startOptic":
+			case "endOptic":
+				this.priv[propertyName] = newValue;
+				break;
+
+			case "distanceToNext":
+				this.prop[propertyName].set(newValue);
+				break;
 		}
 	},
-	
+
+	/**
+	 * Returns a user property value.
+	 */
+	get: function (propertyName) {
+		var variables = this.variablesGetter();
+		switch (propertyName) {
+			case "startOptic":
+			case "endOptic":
+				return this.prop[propertyName];
+			case "distanceToNext":
+				return this.prop[propertyName].value(variables);
+		}
+	},
+
+	/** Returns a property's source equation. */
+	expression: function (propertyName) {
+		return this.prop[propertyName].expression();
+	},
+
 	/**
 	* Return the ABCD matrix for this element.
 	* @param {number} dir Direction -1:backwards|+1:forwards

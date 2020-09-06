@@ -2,10 +2,10 @@
 * LaserCanvas - mirror element.
 */
 (function (LaserCanvas) {
-LaserCanvas.Element.Mirror = function () {
-	"use strict";
-	this.type = 'Mirror'; // {string} Primitive element type.
-	this.name = 'M'; // {string} Name of this element (updated by System).
+LaserCanvas.Element.Mirror = function (variablesGetter) {
+	this.type = "Mirror"; // {string} Primitive element type.
+	this.name = "M"; // {string} Name of this element (updated by System).
+	this.variablesGetter = variablesGetter; // {function} Used to retrieve variable values.
 	this.loc = {   // Location on canvas.
 		x: 0,       // {number} (mm) Horizontal location of element.
 		y: 0,       // {number} (mm) Vertical location of element.
@@ -13,11 +13,14 @@ LaserCanvas.Element.Mirror = function () {
 		q: 0        // {number} (rad) Rotation angle of outgoing axis.
 	};
 	this.prop = {
+		distanceToNext: new LaserCanvas.Equation(0),    // {number} (mm) Distance to next element.
+		radiusOfCurvature: new LaserCanvas.Equation(0), // {number} (mm) Radius of curvature, or 0 for flat.
+		angleOfIncidence: new LaserCanvas.Equation(90) // {number} (deg) Angle of incidence. Default no deflection
+	};
+	this.priv = {
 		startOptic: false,            // {boolean} Value indicating whether this is the cavity start optic.
 		endOptic: false,              // {boolean} Value indicating whether this is the cavity end optic.
-		distanceToNext: 0,            // {number} (mm) Distance to next element.
-		radiusOfCurvature: 0,         // {number} (mm) Radius of curvature, or 0 for flat.
-		angleOfIncidence: Math.PI / 2 // {number} (rad) Angle of incidence. Default no deflection
+		deflectionAngle: 0,           // {number} (rad) Used for construction, angle at which the beam is deflected.
 	};
 	this.abcdQ = {}; // {object<object>}} ABCD propagation coefficient after this optic.
 };
@@ -46,7 +49,11 @@ LaserCanvas.Element.Mirror.prototype = {
 	fromJson: function (json) {
 		this.name = json.name;
 		LaserCanvas.Utilities.extend(this.loc, json.loc);
-		LaserCanvas.Utilities.extend(this.prop, json.prop);
+		for (var propertyName in this.prop) {
+			if (this.prop.hasOwnProperty(propertyName)) {
+				this.prop[propertyName].set(json.prop[propertyName]);
+			}
+		}
 	},
 
 	// ----------------------------------------------------
@@ -59,12 +66,11 @@ LaserCanvas.Element.Mirror.prototype = {
 	* @returns {object} The element location object.
 	*/
 	location: function (ax) {
-		"use strict";
 		if (ax) {
 			this.loc.x = ax.x;
 			this.loc.y = ax.y;
 			this.loc.p = this.loc.q = ax.q;  // {number} (rad) Incoming axis.
-			this.loc.q += this.property('deflectionAngle'); // {number} (rad) Outgoing axis.
+			this.loc.q += this.get("deflectionAngle"); // {number} (rad) Outgoing axis.
 		}
 		return LaserCanvas.clone(this.loc);
 	},
@@ -75,25 +81,25 @@ LaserCanvas.Element.Mirror.prototype = {
 	*/
 	userProperties: function () {
 		var props = [{
-			propertyName: 'radiusOfCurvature',
+			propertyName: "radiusOfCurvature",
 			increment: 5, // {number} Increment on up/down key.
 			standard: LaserCanvas.Element.Mirror.standard // {Array<number>} Standard values.
 		}];
-		if (!(this.prop.startOptic || this.prop.endOptic)) {
+		if (!(this.priv.startOptic || this.priv.endOptic)) {
 			props = props.concat([{
-				propertyName: 'angleOfIncidence',
+				propertyName: "angleOfIncidence",
 				increment: 1,
 				wrap: 90
 			}]);
 		}
-		if (!this.prop.endOptic) {
+		if (!this.priv.endOptic) {
 			props.push({
-				propertyName: 'distanceToNext',
+				propertyName: "distanceToNext",
 				increment: 5,
 				min: 0
 			});
 		}
-		if (this.prop.startOptic || this.prop.endOptic) {
+		if (this.priv.startOptic || this.priv.endOptic) {
 			props.canDelete = false;
 		}
 		return props;
@@ -101,81 +107,90 @@ LaserCanvas.Element.Mirror.prototype = {
 	
 	/**
 	* Gets a value indicating whether this element can adjust transfer properties.
-	* @param {string} propertyName Name of property being probed 'distanceToNext'|'deflectionAngle'.
+	* @param {string} propertyName Name of property being probed "distanceToNext"|"deflectionAngle".
 	*/
 	canSetProperty: function (propertyName) {
-		"use strict";
 		return {
-			angleOfIncidence: !(this.prop.startOptic || this.prop.endOptic),
-			deflectionAngle: !(this.prop.startOptic || this.prop.endOptic),
-			distanceToNext: !this.prop.endOptic,
-			insertElement: !this.prop.endOptic,
+			angleOfIncidence: !(this.priv.startOptic || this.priv.endOptic),
+			deflectionAngle: !(this.priv.startOptic || this.priv.endOptic),
+			distanceToNext: !this.priv.endOptic,
+			insertElement: !this.priv.endOptic,
 			outgoingAngle: true, // Used by SystemAdjustLite when dragging.
 			radiusOfCurvature: true
 		}[propertyName] || false;
 	},
 	
 	/**
-	* Sets internal parameters to match new property value -OR- retrieve the current value.
-	* @param {string} propertyName Name of property to set 'distanceToNext' etc.
-	* @param {number=} newValue (mm|rad) New target value to set, if any.
-	* @param {...=} arg Additional argument, if needed.
-	* @returns {number=} The current value, if retrieving only.
-	*/
-	property: function (propertyName, newValue, arg) {
-		"use strict";
-		var i;
-		
-		// Set value, if specified.
-		if (newValue !== undefined) {
-			switch (propertyName) {
-				case 'angleOfIncidence':
-					this.prop.angleOfIncidence = newValue * Math.PI / 180;
-					break;
-					
-				case 'deflectionAngle': // {number} (rad) New deflection angle.
-					// SPECIAL CASE: Set angle of incidence to match a required deflection.
-					while (newValue < -Math.PI) {
-						newValue += 2 * Math.PI;
-					}
-					while (newValue > Math.PI) {
-						newValue -= 2 * Math.PI;
-					}
-					this.prop.angleOfIncidence = (newValue < 0 ? -1 : +1) * (Math.PI - Math.abs(newValue)) / 2;
-					break;
-					
-				case 'outgoingAngle': 
-					// newValue {number} (rad) New outgoing angle on canvas.
-					// arg {boolean} Value indicating whether this is first element in cavity.
-					if (arg) {
-						this.loc.q = newValue;
-					} else {
-						this.property('deflectionAngle', newValue - this.loc.p);
-					}
-					break;
-					
-				case 'distanceToNext': // {number} (mm) New distance to next element.
-				case 'radiusOfCurvature':
-					this.prop[propertyName] = newValue;
-					break;
-			}
-		} else {
-			// Otherwise, return the current value.
-			switch (propertyName) {
-				case 'angleOfIncidence':
-					return this.prop.angleOfIncidence * 180 / Math.PI;
-					
-				case 'deflectionAngle': // {number} (rad) New deflection angle.
-					i = this.prop.angleOfIncidence;
-					return (i < 0 ? -1 : +1) * (Math.PI - 2 * Math.abs(i));
-					
-				case "distanceToNext":
-				default:
-					return this.prop[propertyName];
-			}
+	 * Sets an internal property equation to a new value.
+	 * @param {string} propertyName Name of property to set, "distanceToNext"|...
+	 * @param {string|number} newValue New value to set. It is passed to the equation.
+	 * @param {boolean} arg Additional argument, e.g. for outgoing angle whether first optic.
+	 */
+	set: function (propertyName, newValue, arg) {
+		switch (propertyName) {
+			case "distanceToNext":
+			case "radiusOfCurvature":
+			case "angleOfIncidence":
+				this.prop[propertyName].set(newValue);
+				break;
+
+			case "deflectionAngle": // {number} (rad) New deflection angle.
+				// SPECIAL CASE: Set angle of incidence to match a required deflection.
+				while (newValue < -Math.PI) {
+					newValue += 2 * Math.PI;
+				}
+				while (newValue > Math.PI) {
+					newValue -= 2 * Math.PI;
+				}
+				this.set("angleOfIncidence", (newValue < 0 ? -1 : +1) * (Math.PI - Math.abs(newValue)) / 2 * (180 / Math.PI));
+				break;
+				
+			case "outgoingAngle": 
+				// newValue {number} (rad) New outgoing angle on canvas.
+				// arg {boolean} Value indicating whether this is first element in cavity.
+				if (arg) {
+					this.loc.q = newValue;
+				} else {
+					this.set("deflectionAngle", newValue - this.loc.p);
+				}
+				break;
+				
+			case "startOptic":
+			case "endOptic":
+				this.priv[propertyName] = newValue;
+				break;
 		}
 	},
-	
+
+	/**
+	 * Returns the property evaluated using the given variable values.
+	 * @param {string} propertyName Name of property to evaluate and return.
+	 */
+	get: function (propertyName) {
+		var i, variables = this.variablesGetter(),
+			value = this.prop[propertyName] && this.prop[propertyName].value(variables);
+		switch (propertyName) {
+			case "distanceToNext":
+				return Math.max(0, value);
+			case "radiusOfCurvature":
+				return value;
+			case "angleOfIncidence":
+				return Math.max(-180, Math.min(180, value));
+				// return Math.max(-Math.PI / 2, Math.min(Math.PI / 2, value));
+			case "angleOfIncidenceRad":
+				return this.get("angleOfIncidence") * Math.PI / 180;
+
+			case "deflectionAngle": // {number} (rad) New deflection angle.
+				i = this.get("angleOfIncidenceRad");
+				return (i < 0 ? -1 : +1) * (Math.PI - 2 * Math.abs(i));
+		}
+	},
+
+	/** Returns a property's source equation. */
+	expression: function (propertyName) {
+		return this.prop[propertyName].expression();
+	},
+
 	/**
 	* Return the ABCD matrix for this element.
 	* Mirror:
@@ -190,8 +205,8 @@ LaserCanvas.Element.Mirror.prototype = {
 	* @returns {Matrix2x} Transfer matrix.
 	*/
 	elementAbcd: function (dir, plane) {
-		var R = this.prop.radiusOfCurvature,            // {number} (mm) Radius of curvature.
-			cosq = Math.cos(this.prop.angleOfIncidence), // {number} Projection of angle of incidence.
+		var R = this.get("radiusOfCurvature"),            // {number} (mm) Radius of curvature.
+			cosq = Math.cos(this.get("angleOfIncidenceRad")), // {number} Projection of angle of incidence.
 			Re = plane === LaserCanvas.Enum.modePlane.sagittal
 				? R / cosq // Sagittal
 				: R * cosq, // Tangential
@@ -211,20 +226,19 @@ LaserCanvas.Element.Mirror.prototype = {
 	*/
 	draw: function (render, layer) {
 		////return this.wireframe(render, layer);
-		"use strict";
 		var image, roc,
-			qc = -this.loc.p + this.prop.angleOfIncidence, // {number} (rad) Display angle on canvas.
+			qc = -this.loc.p + this.get("angleOfIncidenceRad"), // {number} (rad) Display angle on canvas.
 			renderLayer = LaserCanvas.Enum.renderLayer; // {Enum} Layer to draw.
 		
 		switch (layer) {
 			case renderLayer.optics:
-				roc = this.prop.radiusOfCurvature;
+				roc = this.get("radiusOfCurvature");
 				image = LaserCanvas.theme.current[
-					roc > 300 ? 'mirrorConcave' :
-					roc < -300 ? 'mirrorConvex' :
-					roc > 0 ? 'mirrorConcaveMore' :
-					roc < 0 ? 'mirrorConvexMore' :
-					'mirrorPlane'
+					roc > 300 ? "mirrorConcave" :
+					roc < -300 ? "mirrorConvex" :
+					roc > 0 ? "mirrorConcaveMore" :
+					roc < 0 ? "mirrorConvexMore" :
+					"mirrorPlane"
 				];
 				render.drawImage(image, this.loc.x, this.loc.y, qc);
 				break;
@@ -242,13 +256,12 @@ LaserCanvas.Element.Mirror.prototype = {
 	* @param {LaserCanvas.renderLayer} layer Rendering layer.
 	*/
 	wireframe: function (render, layer) {
-		"use strict";
 		var k, dx,
 			renderLayer = LaserCanvas.Enum.renderLayer,    // {Enum} Layer to draw.
 			d = [], // {Array<string>} Path drawing instructions.
 			r = 8,  // {number} "Thickness" of mirror.
-			qc = -this.loc.p + this.prop.angleOfIncidence, // {number} (rad) Display angle on canvas.
-			roc = this.prop.radiusOfCurvature,
+			qc = -this.loc.p + this.get("angleOfIncidenceRad"), // {number} (rad) Display angle on canvas.
+			roc = this.get("radiusOfCurvature"),
 			
 			// Parabola to approximate curvature of mirror.
 			// @param {number} k Plotting point.
@@ -263,16 +276,16 @@ LaserCanvas.Element.Mirror.prototype = {
 		switch (layer) {
 			case renderLayer.optics:
 				for (k = -4; k < +4; k += 1) {
-					d.push(LaserCanvas.Utilities.stringFormatPrecision(2, 'M {0} {1} L {2} {3} L {4} {5}',
+					d.push(LaserCanvas.Utilities.stringFormatPrecision(2, "M {0} {1} L {2} {3} L {4} {5}",
 						r, (k + 1) * r,
 						dx(k), k * r,
 						dx(k + 1), (k + 1) * r));
 				}
 				render
 					.save()
-					.setStroke('#000', 1)
+					.setStroke("#000", 1)
 					.beginPath()
-					.drawPath(d.join(' '), this.loc.x, this.loc.y, qc)
+					.drawPath(d.join(" "), this.loc.x, this.loc.y, qc)
 					.stroke()
 					.restore();
 			break;

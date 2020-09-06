@@ -1,6 +1,9 @@
 <!doctype html>
 <html>
 <head>
+	<title>Laser Canvas</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1" />
+	<meta charset="utf-8">
 	<!-- Global site tag (gtag.js) - Google Analytics -->
 	<script async src="https://www.googletagmanager.com/gtag/js?id=UA-74919637-1"></script>
 	<script>
@@ -11,8 +14,6 @@
 	gtag('config', 'UA-74919637-1');
 	</script>
 
-	<title>Laser Canvas</title>
-	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1" />
 	<style type="text/css">
 		.hidden {
 			display: none;
@@ -96,7 +97,7 @@
 	<script type="text/javascript" src="js/LaserCanvasLoader.js"></script>
 </head>
 
-<body data-info-visible="false" data-loading="true">
+<body data-info-visible="false" data-variables-visible="false" data-loading="true">
 
 	<!-- Canvas -->
 	<div id="LaserCanvasFrame" class="laserCanvasFrame">
@@ -110,19 +111,6 @@
 	<!-- Toolbar -->
 	<div id="LaserCanvasToolbar" class="laserCanvasToolbar">
 
-	<!--
-		<div class="mainMenuAnchor">
-			<button class="mainMenuToggle">Main</button>
-			<div class="mainMenu">
-				<ul>
-					<li>Create new</li>
-					<li>Linear resonator</li>
-					<li>etc</li>
-				</ul>
-			</div>
-		</div>
-	-->
-		
 		<div class="generalSelector themeSelector">
 			<div class="slider" data-set-theme="toggle"></div>
 			<div class="buttons">
@@ -144,8 +132,18 @@
 		<button data-insert-element="Lens"       data-theme-image="lensConvex"  >Lens</button>
 		<button data-insert-element="Dielectric" data-theme-image="block"       >Dielectric</button>
 		<button data-insert-element="Screen"     data-theme-image="screen"      >Screen</button>
+
+		<a href="mailto:lasercanvas@outlook.com" class="feedbackLink"><span>F</span><span>e</span><span>e</span><span>d</span><span>b</span><span>a</span><span>c</span><span>k</span></a>
 	</div>
-	
+
+	<!-- Graphs and variables -->
+	<div id="LaserCanvasVariablesPanel" class="laserCanvasVariablesPanel">
+		<div class="content">
+			<div class="variables"><div class="heading">Variables</div></div>
+			<div class="graphs"></div>
+		</div>
+	</div>
+
 	<!-- New system panel -->
 	<div id="LaserCanvasNewPanel" class="laserCanvasNewPanel">
 		<button data-create-system="linear"     ><span data-localize="Linear resonator"></span></button>
@@ -160,10 +158,6 @@
 	</div>
 	
 	<!-- Info panel -->
-<!--
-		data-show-abcd="false" 
-		data-show-element="false"
--->
 	<div id="LaserCanvasInfo" class="laserCanvasInfo" 
 		data-show-advanced="false">
 		<div class="systems">
@@ -172,57 +166,24 @@
 			<div class="template" data-index="" data-element-type="">
 				<h1></h1>
 				<table>
-					<thead>
-						<tr>
-							<th>Property</th>
-							<th>Sag.</th>
-							<th>Tan.</th>
-							<th>Unit</th>
-						</tr>
-						<tr class="template" data-type="action">
-							<td data-cell="label"></td>
-							<td data-cell="action" colspan="2"></td>
-							<td data-cell="unit"></td>
-						</tr>
-						<tr class="template" data-type="unary">
-							<td data-cell="label"></td>
-							<td data-cell="value" colspan="2"></td>
-							<td data-cell="unit"></td>
-						</tr>
-						<tr class="template" data-type="sag-tan">
-							<td data-cell="label"></td>
-							<td data-cell="sag" color-theme-plane="sag"></td>
-							<td data-cell="tan" color-theme-plane="tan"></td>
-							<td data-cell="unit"></td>
-						</tr>
-						<tr class="template" data-type="mx">
-							<td data-cell="label"></td>
-							<td data-cell="mx-col-1">
-								<span data-cell="mx-1-1"></span><br><span data-cell="mx-2-1"></span>
-							</td>
-							<td data-cell="mx-col-2">
-								<span data-cell="mx-1-2"></span><br><span data-cell="mx-2-2"></span>
-							</td>
-							<td data-cell="unit"></td>
-						</tr>
-					</thead>
 					<tbody>
 					</tbody>
 				</table>
 			</div>
 		</div>
 		<ul class="infoPanelOptions">
-		    <li><label><input type="checkbox" data-action="toggleInfopanel" data-attribute="show-advanced" class="laserCanvasInput" /> &nbsp; <span data-localize="Extended data"></span></label></li>
+			<li><label><input type="checkbox" data-action="toggleInfopanel" data-attribute="show-advanced" class="laserCanvasInput" /> &nbsp; <span data-localize="Extended data"></span></label></li>
 <!--
 			<li><label><input type="checkbox" data-action="toggleInfopanel" data-attribute="show-element" class="laserCanvasInput" /> &nbsp; <span data-localize="Element properties"></span></label></li>
 			<li><label><input type="checkbox" data-action="toggleInfopanel" data-attribute="show-abcd" class="laserCanvasInput" /> &nbsp; <span data-localize="Calculated values"></span></label></li>
--->
 			<li><label><input type="checkbox" data-action="toggleRender" data-property-name="showDistance" class="laserCanvasInput" checked="checked" /> &nbsp; <span data-localize="Separations"></span></label></li>
 			<li><label><input type="checkbox" data-action="toggleRender" data-property-name="showAnnotation" class="laserCanvasInput" /> &nbsp; <span data-localize="Annotations"></span></label></li>
+-->
 			<li><button class="lcbutton padded" data-action="download-svg" data-localize="Download SVG"></button></li>
 		</ul>
 	</div>
-	<button id="LaserCanvasToggleInfo" data-action="toggleInfo"><span></span></button>
+	<button id="LaserCanvasToggleInfo" data-action="toggleInfo"></button>
+	<button id="LaserCanvasToggleVariables" data-action="toggleVariables"></button>
 
 	<!-- Help button -->
 	<div class="helpButton help" onclick="LaserCanvas.HelpPanel.show()">?</div>

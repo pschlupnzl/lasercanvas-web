@@ -1,0 +1,133 @@
+.propertiesPanel,
+.elementScreenPanel,
+.sellmeierPanel {
+	position: absolute;
+	left: 20px;
+	top: 20px;
+	padding: 0.5em;
+	background: rgba(255, 255, 255, 0.85);
+	border-radius: 1em;
+	box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+}
+
+.propertiesPanel {
+	display: none;
+}
+
+	.propertiesPanel[data-visible="true"] {
+		display: block;
+	}
+	
+	.propertiesPanel h1,
+	.elementScreenPanel h1,
+	.sellmeierPanel h1 {
+		margin: 0.2em;
+		font-size: 1em;
+		text-align: center;
+	}
+
+	.propertiesPanel h1,
+	.elementScreenPanel h1 {
+		text-transform: uppercase;
+	}
+	
+		.propertiesPanel h1 input[type="text"] {
+			width: 80%;
+			border: none;
+			background: none;
+			text-align: center;
+			font-family: inherit;
+			font-size: inherit;
+			font-weight: inherit;
+			text-transform: inherit;
+		}
+	
+.propertiesPanel table {
+	width: 100%;
+}
+
+	.propertiesPanel table th {
+		display: none;
+		border-bottom: 1px solid #666;
+	}
+
+	.propertiesPanel table th,
+	.propertiesPanel table td {
+		padding-top: 0.15em;
+		padding-bottom: 0.15em;
+	}
+
+	input.laserCanvasInput[type="number"],
+	input.laserCanvasInput[type="text"] {
+		padding: 0.1em 0.5em;
+		background: white;
+		border-radius: 0.5em;
+		font-family: inherit;
+		font-size: inherit;
+	}
+	
+	input.laserCanvasInput[type="number"],
+	input.laserCanvasInput[type="text"] {
+		width: 3.0em;
+		border: none;
+		box-shadow: 0.1em 0.1em 0.2em rgba(0, 0, 0, 0.3) inset;
+		text-align: right;
+	}
+
+.dragbar {
+	background-image: linear-gradient(
+		to bottom,
+		#555  0%, #555  9%,
+		#fff 10%, #fff 19%,
+		#555 20%, #555 29%, 
+		#fff 30%, #fff 39%, 
+		#555 40%, #555 49%,
+		transparent 50%);
+}
+
+.propertiesPanel .dragbar,
+.elementScreenPanel .dragbar,
+.sellmeierPanel .dragbar {
+	width: calc(100% + 1em);
+	height: 2em;
+	margin-top: -0.5em;
+	margin-left: -0.5em;
+	margin-bottom: -1em;
+	border-top-left-radius: 1em;
+	border-top-right-radius: 1em;
+	opacity: 0.5;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+.propertiesPanel thead tr[data-property-name] {
+	display: none;
+}
+	
+	.propertiesPanel[data-can-delete="false"] button[data-action="delete"],
+	.propertiesPanel[data-has-refractive-index="false"] button[data-action="sellmeier"] {
+		display: none;
+	}
+		
+	.propertiesPanel[data-can-delete="true"][data-has-refractive-index="true"] button[data-action="sellmeier"] {
+		float: left;
+	}
+	
+	.propertiesPanel[data-can-delete="true"][data-has-refractive-index="true"] button[data-action="delete"] {
+		float: right;
+	}

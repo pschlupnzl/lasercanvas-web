@@ -1,0 +1,101 @@
+.propertyInput {
+	position: relative;
+	display: flex;
+	flex-direction: row;
+	justify-content: flex-end;
+}
+
+	.propertyInput .selector::after,
+	.propertyInput button {
+		margin: 0 0.1em;
+		padding: 0.1em 0.5em;
+		color: white;
+		background: #333;
+		border: none;
+		border-radius: 1em;
+		font-size: 0.8em;
+		font-family: inherit;
+	}
+
+		.propertyInput button:hover {
+			background-color: #575757;
+			text-shadow: 0.1em 0.1em 0.2em rgba(0, 0, 0, 0.3);
+		}
+
+			.propertyInput button[disabled],
+			.propertyInput button[disabled]:hover {
+				background: #ccc;
+				text-shadow: none;
+			}
+
+		.propertyInput button[data-step="-1"] {
+			border-top-right-radius: 0;
+			border-bottom-right-radius: 0;
+		}
+		.propertyInput .selector::after,
+		.propertyInput button[data-step="+1"] {
+			border-top-left-radius: 0;
+			border-bottom-left-radius: 0;
+		}
+
+	.propertyInput span.input {
+		position: relative;
+		width: 4em;
+	}
+
+	.propertyInput input {
+		position: absolute;
+		left: 0;
+		top: -0.2em;
+		width: 3.0em;
+		padding: 0.1em 0.5em;
+		background: white;
+		border: none;
+		border-radius: 0.5em;
+		box-shadow: 0.1em 0.1em 0.2em rgba(0, 0, 0, 0.3) inset;
+		text-align: right;
+		font-family: inherit;
+		font-size: inherit;
+		transition: all 150ms;
+	}
+
+		.propertyInput input:focus {
+			width: 6em;
+			margin-left: -1.5em;
+			margin-right: -1.5em;
+		}
+
+		.propertyInput[disabled] {
+			color: #626262;
+			background-color: #e7e7e7;
+			box-shadow: none;
+		}
+
+	.propertyInput .selector::after {
+		content: "▼";
+		padding: 0.6em 0.8em;
+		pointer-events: none;
+		border-top-right-radius: 2em;
+		border-bottom-right-radius: 2em;
+		font-size: 0.5em;
+	}
+	
+	.propertyInput select {
+		position: absolute;
+		width: 2.4em;
+		opacity: 0.01;
+	}
+
+	.propertyInput[data-has-standard="true"] button[data-step="+1"],
+	.propertyInput .selector {
+		display: none;
+	}
+
+	.propertyInput[data-has-standard="true"] button[data-step="-1"] {
+		visibility: hidden;
+	}
+
+	.propertyInput[data-has-standard="true"] .selector {
+		display: unset;
+	}
+
