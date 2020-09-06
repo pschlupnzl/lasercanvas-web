@@ -15,7 +15,7 @@ window.LaserCanvas.theme.dark = {
 	mirrorConvexMore: 'Mirror-Convex-More.png',
 	mirrorPlane: 'Mirror-Plane.png',
 	screen: 'Screen.png',
-	mode: ['#990033', '#181875']
+	mode: ['#cc3333', '#6666ff'],
 };
 
 window.LaserCanvas.theme.light = {

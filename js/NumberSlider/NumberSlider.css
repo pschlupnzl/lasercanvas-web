@@ -6,6 +6,7 @@
 		width: 3.5em;
 		border: none;
 		background: none;
+		color: inherit;
 		font-size: inherit;
 		font-family: inherit;
 	}

@@ -13,9 +13,11 @@
 	background-color: #f1f1f1;
 }
 
+[data-theme="dark"] .laserCanvasInfo,
+[data-theme="dark"] .propertiesPanel,
 [data-theme="dark"] .laserCanvasToolbar,
 [data-theme="dark"] .laserCanvasVariablesPanel {
-	color: #f7f7f7;
+	color: #e7e7e7;
 	background-color: #404040;
 }
 
@@ -52,6 +54,13 @@
 
 [color-theme-plane="tan"] {
 	color: #339;
+}
+
+[data-theme="dark"] [color-theme-plane="sag"] {
+	color: #c66;
+}
+[data-theme="dark"] [color-theme-plane="tan"] {
+	color: #ccf;
 }
 
 [color-theme-plane="sag"]::after,
