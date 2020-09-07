@@ -136,7 +136,12 @@ LaserCanvas.Element.Dielectric.prototype = {
 		}
 	},
 
-	/** Hook to update properties when variables change. */
+	/**
+	 * Hook to update the internal properties when variables change independent
+	 * of a user-triggered `set` operation. This might happen, for example, when
+	 * variables are changed by dragging UI sliders, or when they are scanned to
+	 * build up graphs.
+	 */
 	onVariablesChange: function () {
 		if (this === this.group[0]) {
 			this.updateAngles();
@@ -473,6 +478,13 @@ LaserCanvas.Element.Dielectric.prototype = {
 			case "deflectionAngle":
 				this.priv[propertyName] = newValue;
 				break;
+
+			case "startOptic":
+			case "endOptic":
+				// NOP - ignore these. They are used to determine whether
+				// elements can be inserted.
+				break;
+
 default:
 	console.warn(`Set property ${propertyName}=${newValue} not implemented`);
 	break;

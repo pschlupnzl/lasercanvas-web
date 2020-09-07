@@ -150,10 +150,12 @@ window.LaserCanvas.Application = function (canvas, info) {
 					if (mgraphCollection.hasRange(variableName)) {
 						mgraphCollection.scanStart(variableName);
 						mvariablePanel.scan(variableName, function (variableValue) {
+							msystem.onVariablesChange();
 							msystem.calculateAbcd();
 							mgraphCollection.scanValue(variableName, variableValue);
 						});
 						mgraphCollection.scanEnd(variableName, mvariables.value()[variableName]);
+						msystem.onVariablesChange();
 					}
 				}
 			};
