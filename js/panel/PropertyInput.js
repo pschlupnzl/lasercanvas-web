@@ -18,6 +18,7 @@
 		this.input = this.el.querySelector("input");
 		this.select = this.el.querySelector("select");
 		this.update();
+		this.updateInputHint();
 	};
 	
 	/** Template for control. */
@@ -135,7 +136,15 @@
 		}
 		this.select.value = value;
 	};
-	
+
+	/**
+	 * Update the input field hint, e.g. whether the property contains an
+	 * expression rather than a numeric value.
+	 */
+	PropertyInput.prototype.updateInputHint = function () {
+		this.input.setAttribute("data-expression", isNaN(this.source.expression(this.prop.propertyName)) ? "true" : "false");
+	};
+
 	// ---------
 	//  Events.
 	// ---------
@@ -151,6 +160,7 @@
 	PropertyInput.prototype.onInputBlur = function () {
 		this.isFocused = false;
 		this.update(); // Update now with value.
+		this.updateInputHint();
 	};
 
 	var ENTER = 13,
@@ -183,7 +193,8 @@
 	PropertyInput.prototype.onInputKeyup = function () {
 		var value = this.input.value;
 		if (value !== "") {
-			this.fireChangeEvent(this.input.value);
+			this.fireChangeEvent(value);
+			this.updateInputHint();
 		}
 	};
 
@@ -222,6 +233,7 @@
 		}
 		this.update(newValue);
 		this.fireChangeEvent(newValue);
+		this.updateInputHint();
 	};
 
 	/** The value in the select chooser is changed. */

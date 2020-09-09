@@ -59,6 +59,11 @@
 		transition: all 150ms;
 	}
 
+		.propertyInput input[data-expression="true"] {
+			color: #2141bd;
+			background-color: rgb(239, 243, 249);
+		}
+
 		.propertyInput input:focus {
 			width: 6em;
 			margin-left: -1.5em;
