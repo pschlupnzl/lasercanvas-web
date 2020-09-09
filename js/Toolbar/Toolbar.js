@@ -23,7 +23,7 @@
 	/**
 	 * Initialize the toolbar controls, such as theme and inspect mode.
 	 */
-	Toolbar.prototype.init = function (variablesGetter) {
+	Toolbar.prototype.init = function (variablesGetter, variablesSetter) {
 		var msystem = this.msystem,
 			mrender = this.mrender,
 			fireEventListeners = this.fireEventListeners,
@@ -90,7 +90,7 @@
 		// Listener for file Open button.
 		window.LaserCanvas.SystemUtil.attachLoadListener(
 			document.querySelector("[data-action='openFile'] > input"),
-			msystem, mrender);
+			msystem, mrender, variablesSetter);
 		document.querySelector('button[data-action="download-svg"]').onclick = function () {
 			// LaserCanvas.getScript('js/RenderSvg.js', function () {
 				window.globalRenderSvg = new window.LaserCanvas.RenderSvg(msystem)

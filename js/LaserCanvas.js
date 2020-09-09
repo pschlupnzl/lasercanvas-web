@@ -192,7 +192,9 @@ window.LaserCanvas.Application = function (canvas, info) {
 			mgraphCollection.addEventListener("change", function () {
 				scanVariables()
 			});
-			var variablesGetter = mvariables.value.bind(mvariables);
+			var variablesGetter = mvariables.value.bind(mvariables),
+				variablesSetter = mvariablePanel.setVariables.bind(mvariablePanel);
+
 			msystem.setVariablesGetter(variablesGetter);
 			mrender.setVariablesGetter(variablesGetter);
 			minfo.init(msystem, mrender, variablesGetter, mgraphCollection.toggleGraph.bind(mgraphCollection));
@@ -202,7 +204,7 @@ window.LaserCanvas.Application = function (canvas, info) {
 			* Toolbar handler.
 			*/
 			new LaserCanvas.Toolbar(msystem, mrender, fireEventListeners)
-				.init(variablesGetter)
+				.init(variablesGetter, variablesSetter)
 				.initDrag()
 				.initSystemNew(launch);
 		},

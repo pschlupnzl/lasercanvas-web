@@ -43,6 +43,9 @@
 			// TODO:
 			// This into a separate Equation utility method
 			// Avoid using eval (?)
+			if (typeof expression === "number") {
+				return expression;
+			}
 			var expr = expression
 				.replace(/(x|y|z)/g, function (m, name) {
 					return "(" + variables[name].value + ")";
@@ -50,6 +53,51 @@
 				.replace(/(\W)(sin|cos)(\W)/g, "$1Math.$2$3");
 			value = eval(expr);
 			return value;
+		},
+
+		/**
+		 * Returns the expression, transformed as needed (not much), and with
+		 * any missing variables (e.g. `z`) substituted by its value.
+		 * @param {string} expression Equation to be evaluated.
+		 * @param {object} variables Variable values.
+		 * @param {number=} scl Optional scale, e.g. -1 to flip incidence angles.
+		 */
+		toExpression = function (expression, variables, scl) {
+			var val,
+				expr = expression
+					.replace(/(z)/g, function (m, name) {
+						return `(${variables[name].value})`;
+					});
+
+			// Try as number.
+			val = +expr;
+			if (!isNaN(val)) {
+				if (scl && scl !== 1) {
+					val *= scl;
+				}
+				return val;
+			}
+
+			// Apply scale as needed.
+			if (scl && scl !== 1) {
+				expr = `${scl}*(${expr})`;
+			}
+			return expr;
+		},
+
+		/**
+		 * Add multiple expressions together. For example, this is used when
+		 * concatenating multiple Distance To Next values.
+		 * @param {string|number} initial Value to be added to. It's assumed this is already a number if it can be.
+		 * @param {string} addad Value to be added. It is added as a number if possible.
+		 * @param {object} variables Current variable values for interpolation (e.g. "z" variable).
+		 */
+		addExpressions = function (initial, added, variables) {
+			var addedExpr = toExpression(added, variables);
+			if (typeof initial === "number" && typeof addedExpr === "number") {
+				return initial + addedExpr;
+			}
+			return `${initial} + ${addedExpr}`;
 		},
 
 		// -----------
@@ -122,15 +170,15 @@
 					case "Mirror":
 						elementJson.type = LaserCanvas.Element.Mirror.Type;
 						elementJson.prop = {
-							radiusOfCurvature: toNumber(src.ROC, variables),
-							angleOfIncidence: FLIP * toNumber(src.FaceAngle, variables)
+							radiusOfCurvature: toExpression(src.ROC, variables),
+							angleOfIncidence: toExpression(src.FaceAngle, variables, FLIP)
 						};
 						break;
 
 					case "ThinLens":
 						elementJson.type = LaserCanvas.Element.Lens.Type;
 						elementJson.prop = {
-							focalLength: toNumber(src.FL, variables)
+							focalLength: toExpression(src.FL, variables)
 						};
 						break;
 
@@ -157,21 +205,21 @@
 						elementJson.type = LaserCanvas.Element.Dielectric.Type;
 						elementJson.prop = {
 							type: toDielectricType(src.type),
-							refractiveIndex: toNumber(src.RefractiveIndex, variables),
+							refractiveIndex: toExpression(src.RefractiveIndex, variables),
 							flip: src.Flipped || false,
-							curvatureFace1: toNumber(src.ROC, variables),
-							curvatureFace2: toNumber(linkedElement.ROC, variables),
-							thickness: toNumber(src.Thickness, variables)
+							curvatureFace1: toExpression(src.ROC, variables),
+							curvatureFace2: toExpression(linkedElement.ROC, variables),
+							thickness: toExpression(src.Thickness, variables)
 						};
 
 						if (src.type === "CrystalInput") {
-							elementJson.prop.faceAngle = toNumber(src.FaceAngle, variables);
+							elementJson.prop.faceAngle = toExpression(src.FaceAngle, variables);
 						} else if (src.type === "PlateInput") {
-							elementJson.prop.angleOfIncidence = toNumber(src.FaceAngle, variables);
+							elementJson.prop.angleOfIncidence = toExpression(src.FaceAngle, variables);
 						}
 
 						if (elements[index + 1].type === "ThermalLens") {
-							elementJson.prop.thermalLens = toNumber(elements[index + 1].FL, variables);
+							elementJson.prop.thermalLens = toExpression(elements[index + 1].FL, variables);
 						}
 						
 						// groupVelocityDispersion: 0,// {number} (um^-2) Group velocity dispersion for ultrafast calculations.
@@ -198,9 +246,9 @@
 							type: toDielectricType(src.type),
 						};
 						if (src.type === "CrystalOutput") {
-							elementJson.prop.faceAngle = toNumber(linkedElement.FaceAngle, variables);
+							elementJson.prop.faceAngle = toExpression(linkedElement.FaceAngle, variables);
 						} else if (src.type === "PlateOutput") {
-							elementJson.prop.angleOfIncidence = toNumber(linkedElement.FaceAngle, variables);
+							elementJson.prop.angleOfIncidence = toExpression(linkedElement.FaceAngle, variables);
 						}
 						break;
 
@@ -208,7 +256,7 @@
 						elementJson.type = LaserCanvas.Element.Dispersion.Type;
 						elementJson.prop = {
 							type: LaserCanvas.Element.Dispersion.eType.Prism,
-							refractiveIndex: toNumber(src.RefractiveIndex, variables)
+							refractiveIndex: toExpression(src.RefractiveIndex, variables)
 						};
 						break;
 
@@ -226,14 +274,17 @@
 					default:
 						// Accumulate skipped element spacing.
 						if (src.DistanceToNext) {
-							jsonElements[jsonElements.length - 1].prop.distanceToNext += toNumber(src.DistanceToNext, variables);
+							jsonElements[jsonElements.length - 1].prop.distanceToNext =
+								addExpressions(
+									jsonElements[jsonElements.length - 1].prop.distanceToNext,
+									src.DistanceToNext, variables);
 						}
 						continue;
 				}
 
 				// Common properties.
 				elementJson.prop.distanceToNext = src.DistanceToNext !== undefined
-					? toNumber(src.DistanceToNext, variables)
+					? toExpression(src.DistanceToNext, variables)
 					: 0;
 		
 				// Append to list.
@@ -373,13 +424,14 @@
 			var root = parseTextFile(text),
 				variables = getVariables(root),
 				json = {
+					variables: variables,
 					prop: {
 						configuration: 
 							root.type === "Resonator" ? LaserCanvas.System.configuration.linear :
 							root.type === "Propagation" ? LaserCanvas.System.configuration.propagation :
 							LaserCanvas.System.configuration.linear,
 						name: root.name,
-						wavelength: toNumber(root.Wavelength, variables),
+						wavelength: toExpression(root.Wavelength, variables),
 					},
 					elements: textElementsToJson(root.elements, variables)
 				};
@@ -403,8 +455,9 @@
 		 * @param {HTMLInputElement} input Element where to attach listener.
 		 * @param {System} system System whose load to trigger.
 		 * @param {Render} render Renderer.
+		 * @param {function} variablesSetter Method to set variable values and ranges.
 		 */
-		attachLoadListener = function (input, system, render) {
+		attachLoadListener = function (input, system, render, variablesSetter) {
 			var
 				/** Create a new input field with a new listener. */
 				refreshInput = function (oldInput) {
@@ -420,7 +473,9 @@
 				/** Load the text into the system. */
 				loadText = function (src) {
 					render.resetTransform();
-					system.fromTextFile(src);
+					// TODO: A system load is more of an application load so
+					// should really be at the LaserCanvas level, not System.
+					system.fromTextFile(src, variablesSetter);
 				},
 
 				/** Completion function for text reader. */

@@ -120,13 +120,17 @@
 		}
 	};
 
-	/** Update a property, firing the change event as needed. */
-	NumberSlider.prototype.setProp = function (prop, value) {
+	/** Update a property, for example when the value or limit text fields are edited. */
+	NumberSlider.prototype.setProp = function (prop, value, fireCallback) {
 		if (reNumber.test(value)) {
 			value = +value;
 			if (!isNaN(value)) {
 				this[prop] = +value;
-				this.fireChangeEvent();
+				if (fireCallback !== false) {
+					this.fireChangeEvent();
+				} else {
+					this.el.querySelector(`[data-prop="${prop}"]`).value = LaserCanvas.Utilities.numberFormat(value, true);
+				}
 				this.updateThumb();
 			}
 		}

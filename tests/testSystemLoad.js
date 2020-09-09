@@ -1882,6 +1882,7 @@ let filter = null;
 // filter = "test_plate_face_angle_input_curved";
 // filter = /thermal_lens/;
 // filter = "test_screen_in_plate";
+// filter = "test_ultrafast";
 
 collection.systemload = {
 	label: "System load",
@@ -1895,10 +1896,21 @@ collection.systemload = {
 	 * @param {object} testCase Test case parameters from collection.
 	 */
 	test: function (testCase) {
-		const s = new LaserCanvas.System();
-		s.setVariablesGetter(function () { return {}; });
+		const s = new LaserCanvas.System(),
+			variables = {},
+			variablesGetter = function () {
+				return variables;
+			},
+			variablesSetter = function (json) {
+				for (var name in json) {
+					if (json.hasOwnProperty(name)) {
+						variables[name] = json[name].value;
+					}
+				}
+			};
+		s.setVariablesGetter(variablesGetter);
 		try {
-			s.fromTextFile(testCase.src);
+			s.fromTextFile(testCase.src, variablesSetter);
 		} catch (e) {
 			return {
 				label: testCase.label,

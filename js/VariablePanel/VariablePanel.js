@@ -40,11 +40,24 @@
 		thumbLabel.innerText = thumbInput.value = str;
 	};
 
+	/** Set the number slider values, e.g. when a system is loaded. */
+	VariablePanel.prototype.setVariables = function (json) {
+		this.mvariables.forEach(function (name) {
+			if (!json[name]) {
+				return;
+			}
+			// Set properties, suppress firing of change event.
+			this.numberSliders[name].setProp("min", json[name].min, false);
+			this.numberSliders[name].setProp("max", json[name].max, false);
+			this.numberSliders[name].setProp("value", json[name].value);
+		}, this);
+	};
+
 	/** Trigger a variable to be scanned over its range. */
 	VariablePanel.prototype.scan = function (variableName, iterator) {
 		var range = this.numberSliders[variableName].getRange();
 		this.mvariables.scan(variableName, range, VariablePanel.scanSteps, iterator);
 	};
-		
+
 	LaserCanvas.VariablePanel = VariablePanel;
 }(window.LaserCanvas));

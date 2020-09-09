@@ -657,9 +657,11 @@ LaserCanvas.System = function () {
 		 * Load a LaserCanvas 5 text file.
 		 * @param {string} src Source text file.
 		 */
-		fromTextFile = function (src) {
+		fromTextFile = function (src, variablesSetter) {
 			var json = LaserCanvas.SystemUtil.textFileToJson(src);
+			variablesSetter(json.variables);
 			LaserCanvas.SystemUtil.fromJson(json, mprop, melements, this, mvariablesGetter);
+			variablesSetter(json.variables);
 
 			// Calculate Cartesian coordinates.
 			updateElementNames();
