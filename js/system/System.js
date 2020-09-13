@@ -611,29 +611,22 @@ LaserCanvas.System = function () {
 		// -------------------------------------------------
 		
 		/**
-		 * Reset the system to the given JSON state.
-		 * @param {function} jsonSource Function to invoke to retrieve the JSON data.
+		 * Recreate the system from the given data blob.
+		 * @param {object} json Loaded JSON object.
 		 */
-		fromJsonSource = function (jsonSource) {
-			try {
-				// Try to load e.g. from localStorage.
-				jsonSource(mprop, melements, this, mvariablesGetter);
-			} catch (e) {
-				// As a fallback, use a standard configuration.
-				createNew(LaserCanvas.System.configuration.linear, mvariablesGetter);
-			}
+		fromJson = function (json) {
+			LaserCanvas.SystemUtil.fromJson(json, mprop, melements, this, mvariablesGetter);
+			updateElementNames();
 			calculateCartesianCoordinates();
 			fireEventListeners("change");
 			fireEventListeners("update");
 		},
 
 		/**
-		 * Write the current system JSON to the given destination.
-		 * @param {function} jsonDestination Function invoked to create the JSON data.
+		 * Returns a JSON representation of the system.
 		 */
-		toJsonDestination = function (jsonDestination) {
-			var json = LaserCanvas.SystemUtil.toJson(mprop, melements);
-			jsonDestination(json);
+		toJson = function () {
+			return LaserCanvas.SystemUtil.toJson(mprop, melements);
 		},
 
 		/**
@@ -645,23 +638,6 @@ LaserCanvas.System = function () {
 		createNew = function (configuration, elementsInfo, loc) {
 			var SystemUtil = LaserCanvas.SystemUtil;         // {object} System namespace.
 			SystemUtil.createNew(configuration, elementsInfo, loc, mprop, melements, mvariablesGetter);
-
-			// Calculate Cartesian coordinates.
-			updateElementNames();
-			calculateCartesianCoordinates();
-			fireEventListeners('change');
-			fireEventListeners('update');
-		},
-
-		/**
-		 * Load a LaserCanvas 5 text file.
-		 * @param {string} src Source text file.
-		 */
-		fromTextFile = function (src, variablesSetter) {
-			var json = LaserCanvas.SystemUtil.textFileToJson(src);
-			variablesSetter(json.variables);
-			LaserCanvas.SystemUtil.fromJson(json, mprop, melements, this, mvariablesGetter);
-			variablesSetter(json.variables);
 
 			// Calculate Cartesian coordinates.
 			updateElementNames();
@@ -687,8 +663,7 @@ LaserCanvas.System = function () {
 		element: element,                         // Returns the element at the given index.
 		elements: elements,                       // Retrieve elements for this system.
 		expression: expression,                   // Retrieve the expression of a variable.
-		fromJsonSource: fromJsonSource,           // Reset the system to the given JSON state.
-		fromTextFile: fromTextFile,               // Load a LaserCanvas 5 text file.
+		fromJson: fromJson,                       // Create the system from a data blob.
 		get: get,                                 // Retrieve a value.
 		insertElement: insertElement,             // Insert a new element near the given point.
 		inspectSegment: inspectSegment,           // Inspect beam on a segment (from segmentNearLocation).
@@ -699,7 +674,7 @@ LaserCanvas.System = function () {
 		segmentNearLocation: segmentNearLocation, // Segment point closest to point.
 		set: set,                                 // Set a property value.
 		setVariablesGetter: setVariablesGetter,   // Set the callback to retrieve variable values.
-		toJsonDestination: toJsonDestination,     // Write JSON to a destination.
+		toJson: toJson,                           // Returns a JSON representation of the system.
 		update: update,                           // Update system calculation.
 		userProperties: userProperties            // Retrieve properties for read/write by user.
 	};

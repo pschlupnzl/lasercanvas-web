@@ -53,6 +53,20 @@
 		}, this);
 	};
 
+	/** Returns a JSON representation of the variable states. */
+	VariablePanel.prototype.toJson = function () {
+		var json = {}
+		this.mvariables.forEach(function (name, value) {
+			var range = this.numberSliders[name].getRange();
+			json[name] = {
+				min: range.min,
+				max: range.max,
+				value: value
+			};
+		}, this);
+		return json;
+	};
+
 	/** Trigger a variable to be scanned over its range. */
 	VariablePanel.prototype.scan = function (variableName, iterator) {
 		var range = this.numberSliders[variableName].getRange();

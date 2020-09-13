@@ -145,6 +145,9 @@ window.LaserCanvas.Application = function (canvas, info) {
 			document.querySelector('#LaserCanvasToggleInfo').onclick = makeToggle("data-info-visible");
 			document.querySelector('#LaserCanvasToggleVariables').onclick = makeToggle("data-variables-visible");
 			
+			/**
+			 * Scan each variable to generate display plots, if any are used.
+			 */
 			var scanVariables = function () {
 				for (var variableName of ["x", "y"]) {
 					if (mgraphCollection.hasRange(variableName)) {
@@ -200,17 +203,57 @@ window.LaserCanvas.Application = function (canvas, info) {
 			minfo.init(msystem, mrender, variablesGetter, mgraphCollection.toggleGraph.bind(mgraphCollection));
 			mvariablePanel.appendTo(document.querySelector("#LaserCanvasVariablesPanel .variables"));
 			mgraphCollection.appendTo(document.querySelector("#LaserCanvasVariablesPanel .graphs"));
+
+			// On every change, store to local storage.
+			var toLocalStorageDelayed = new LaserCanvas.Utilities.Debounce(2500);
+			msystem.addEventListener("update", function () {
+				toLocalStorageDelayed.delay(saveJson, null, LaserCanvas.SystemUtil.toLocalStorage)
+			});
+
+			/**
+			 * A button is clicked to open a file.
+			 * @param {object} json JSON data for system, variables etc. to load.
+			 */
+			var loadJson = function (json) {
+				msystem.fromJson(json);
+				mvariablePanel.setVariables(json.variables);
+				mrender.resetTransform();
+			};
+
+			/**
+			 * A file is to be saved.
+			 * @param {function} destination Callback to invoke with JSON data.
+			 */
+			var saveJson = function (destination) {
+				var json = msystem.toJson();
+				json.variables = mvariablePanel.toJson();
+				destination(json);
+			};
+
 			/*
 			* Toolbar handler.
 			*/
 			new LaserCanvas.Toolbar(msystem, mrender, fireEventListeners)
 				.init(variablesGetter, variablesSetter)
 				.initDrag()
+				.initFileOpen(loadJson)
 				.initSystemNew(launch);
+
+				/* Load a system! */
+			var useLocalStorage = true;
+			if (useLocalStorage) {
+				// try {
+					LaserCanvas.SystemUtil.fromLocalStorage(loadJson);
+				// } catch (e) {
+				// 	msystem.createNew(LaserCanvas.System.configuration.linear);
+				// }
+			} else {
+				msystem.createNew(LaserCanvas.System.configuration.linear);
+			}
 		},
 		
 		/**
-		* Launch the application with a new cavity.
+		* Launch the application with a new cavity. This might be called from a UI button.
 		* @param {string:System.configuration} configuration Configuration of system to create.
 		*/
 		launch = function (configuration) {

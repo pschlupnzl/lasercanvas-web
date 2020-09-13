@@ -453,11 +453,9 @@
 		 * Attach a listener to the given element to trigger a system
 		 * load when the file changes.
 		 * @param {HTMLInputElement} input Element where to attach listener.
-		 * @param {System} system System whose load to trigger.
-		 * @param {Render} render Renderer.
-		 * @param {function} variablesSetter Method to set variable values and ranges.
+		 * @param {function} callback Callback function invoked with the loaded json.
 		 */
-		attachLoadListener = function (input, system, render, variablesSetter) {
+		attachLoadListener = function (input, callback) {
 			var
 				/** Create a new input field with a new listener. */
 				refreshInput = function (oldInput) {
@@ -471,17 +469,15 @@
 				},
 
 				/** Load the text into the system. */
-				loadText = function (src) {
-					render.resetTransform();
-					// TODO: A system load is more of an application load so
-					// should really be at the LaserCanvas level, not System.
-					system.fromTextFile(src, variablesSetter);
+				loadText = function (text) {
+					var json = LaserCanvas.SystemUtil.textFileToJson(text);
+					callback(json);
 				},
 
 				/** Completion function for text reader. */
 				onload = function () {
-					var src = this.result;
-					loadText(src);
+					var text = this.result;
+					loadText(text);
 				},
 
 				/** Respond to a change in the file by loading it. */

@@ -16,15 +16,10 @@
 
 		/**
 		 * Load a system from local storage.
-		 * @param {object} mprop Reference to the system's internal properties.
-		 * @param {Array<object:Element>} melements Reference to elements.
-		 * @param {System} system Optical system to which the elements belong.
-		 * @param {function} variablesGetter Delegate that exposes current variable values.
+		 * @param {functino} callback Callback invoked with loaded json data.
 		 */
-		fromLocalStorage = function (mprop, melements, system, variablesGetter) {
-			var json;
-			json = JSON.parse(window.localStorage.getItem(localStorageKey));
-			fromJson(json, mprop, melements, system, variablesGetter);
+		fromLocalStorage = function (callback) {
+			callback(JSON.parse(window.localStorage.getItem(localStorageKey)));
 		},
 
 		/**

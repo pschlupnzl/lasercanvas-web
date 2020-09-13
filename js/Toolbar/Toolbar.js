@@ -87,28 +87,24 @@
 		attachClickHandler('[data-action="toggleRender"]', toggleRenderProperty);
 		attachClickHandler('[data-action="toggleInfopanel"]', toggleInfoAttribute);
 
-		// Listener for file Open button.
-		window.LaserCanvas.SystemUtil.attachLoadListener(
-			document.querySelector("[data-action='openFile'] > input"),
-			msystem, mrender, variablesSetter);
 		document.querySelector('button[data-action="download-svg"]').onclick = function () {
-			// LaserCanvas.getScript('js/RenderSvg.js', function () {
-				window.globalRenderSvg = new window.LaserCanvas.RenderSvg(msystem)
-					.setVariablesGetter(variablesGetter)
-					.update()
-					.download();
-			// }, this);
+			new window.LaserCanvas.RenderSvg(msystem)
+				.setVariablesGetter(variablesGetter)
+				.update()
+				.download();
 		};
 
-		// On every change, store to local storage.
-		var toLocalStorageDelayed = new LaserCanvas.Utilities.Debounce(2500);
-		msystem.addEventListener("update", function () {
-			toLocalStorageDelayed.delay(msystem.toJsonDestination, msystem, LaserCanvas.SystemUtil.toLocalStorage)
-		});
+		return this;
+	};
 
-		// Initialize from local storage, if possible.
-		msystem.fromJsonSource(LaserCanvas.SystemUtil.fromLocalStorage);
-		// msystem.fromJsonSource();
+	/**
+	 * Attach a load listener to the File Open... button.
+	 * @param {function} callback Method to call once JSON is loaded.
+	 */
+	Toolbar.prototype.initFileOpen = function (callback) {
+		LaserCanvas.SystemUtil.attachLoadListener(
+			document.querySelector("[data-action='openFile'] > input"),
+			callback);
 		return this;
 	};
 
