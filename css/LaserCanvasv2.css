@@ -344,19 +344,3 @@ button[data-step="-1"] {
 #LaserCanvasToggleVariables {
 	 position: absolute;
 }
-
-/**
-* Graph panel.
-*/
-.graphPanel {
-	position: absolute;
-	width: 400px;
-	height: 280px;
-	background: rgba(255, 255, 255, 0.8);
-	box-shadow: 0 0 1em rgba(0, 0, 0, 0.3);
-}
-	
-	.graphPanel canvas {
-		pointer-events: none;
-	}
-

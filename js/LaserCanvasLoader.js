@@ -118,7 +118,6 @@ window.LaserCanvas = {
 			"js/GraphCollection/GraphItem.js",
 			"js/NumberSlider/NumberSlider.js",
 			"js/panel/CheckboxInput.js",
-			"js/panel/GraphPanel.js",
 			"js/panel/HelpPanel.js",
 			"js/panel/InfoPanel.js",
 			"js/panel/InfoPropertiesPanel.js",
