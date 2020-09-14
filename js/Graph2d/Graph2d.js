@@ -118,8 +118,8 @@
 			for (var ax of ["x", "y"]) {
 				for (var k = 0; k < line[ax].length; k += 1) {
 					p = line[ax][k];
-					if (isNaN(p)) {
-						// NOP - skip NaNs.
+					if (isNaN(p) || !isFinite(p)) {
+						// NOP - skip NaN and Infinity.
 					} else if (extents[ax].firstPoint) {
 						extents[ax].min = extents[ax].max = p;
 						delete extents[ax].firstPoint;
