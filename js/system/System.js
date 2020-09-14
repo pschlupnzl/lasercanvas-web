@@ -675,6 +675,7 @@ LaserCanvas.System = function () {
 		set: set,                                 // Set a property value.
 		setVariablesGetter: setVariablesGetter,   // Set the callback to retrieve variable values.
 		toJson: toJson,                           // Returns a JSON representation of the system.
+		type: "System",                           // For identifying data source.
 		update: update,                           // Update system calculation.
 		userProperties: userProperties            // Retrieve properties for read/write by user.
 	};

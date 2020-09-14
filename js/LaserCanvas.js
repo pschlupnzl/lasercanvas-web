@@ -217,6 +217,8 @@ window.LaserCanvas.Application = function (canvas, info) {
 			var loadJson = function (json) {
 				msystem.fromJson(json);
 				mvariablePanel.setVariables(json.variables);
+				mgraphCollection.fromJson(json.graphs, msystem, msystem.elements());
+				minfo.updateGraphs(mgraphCollection);
 				mrender.resetTransform();
 			};
 
@@ -227,6 +229,7 @@ window.LaserCanvas.Application = function (canvas, info) {
 			var saveJson = function (destination) {
 				var json = msystem.toJson();
 				json.variables = mvariablePanel.toJson();
+				json.graphs = mgraphCollection.toJson();
 				destination(json);
 			};
 

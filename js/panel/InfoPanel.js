@@ -95,6 +95,17 @@
 	};
 
 	/**
+	 * Update the graph icons (and perhaps other detailed information.)
+	 * @param {GraphCollection} graphCollection Collection whose graph status to match to.
+	 */
+	InfoPanel.prototype.updateGraphs = function (graphCollection) {
+		this.systemPropertiesPanel.updateGraphs(graphCollection);
+		this.elementPropertiesPanels.forEach(function (panel) {
+			panel.updateGraphs(graphCollection);
+		});
+	};
+
+	/**
 	 * Highlights the given element.
 	 * @param {Element} element Element to highlight.
 	 */

@@ -60,6 +60,18 @@
 	};
 
 	/**
+	 * Update the graph icons (and perhaps other detailed information.)
+	 * @param {GraphCollection} graphCollection Collection whose graph status to match to.
+	 */
+	InfoPropertiesPanel.prototype.updateGraphs = function (graphCollection) {
+		for (var row of this.rows) {
+			if (row.updateGraphs) {
+				row.updateGraphs(graphCollection);
+			}
+		}
+	},
+
+	/**
 	 * Add an event handler to the component DOM element, e.g. mouseenter,
 	 * mouseleave, or custom events e.g. "change".
 	 */

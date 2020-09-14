@@ -194,6 +194,21 @@
 		}
 	};
 
+	/**
+	 * Update the graph icons (and perhaps other detailed information.)
+	 * @param {GraphCollection} graphCollection Collection whose graph status to match to.
+	 */
+	InputPropertyRow.prototype.updateGraphs = function (graphCollection) {
+		var hasGraph;
+		switch (this.type) {
+			case InputPropertyRow.eType.unary:
+			case InputPropertyRow.eType.sagTan:
+				hasGraph = graphCollection.hasGraph(this.source, this.propertyName);
+				this.el.querySelector('[data-cell="graph"] input[type="checkbox"]').checked = hasGraph;
+				break;
+		}
+	},
+
 	/** Respond to a change in the input's value. */
 	InputPropertyRow.prototype.onInputChange = function (value) {
 		this.onChange && this.onChange(this.prop.propertyName, value);
@@ -314,6 +329,15 @@
 		this.el.querySelector('[data-cell="tan"]').innerText = LaserCanvas.Utilities.numberFormat(value[1], true);
 	};
 
+	/**
+	 * Update the graph icons (and perhaps other detailed information.)
+	 * @param {GraphCollection} graphCollection Collection whose graph status to match to.
+	 */
+	AbcdQPropertyRow.prototype.updateGraphs = function (graphCollection) {
+		var hasGraph = graphCollection.hasGraph(this.source, this.propertyName, this.fieldName);
+		this.el.querySelector('[data-cell="graph"] input[type="checkbox"]').checked = hasGraph;
+	};
+	
 	/** Hnadle a change on the graph panel button. */
 	AbcdQPropertyRow.prototype.onGraphChange = function () {
 		this.toggleGraph(this.source, this.propertyName, this.fieldName);

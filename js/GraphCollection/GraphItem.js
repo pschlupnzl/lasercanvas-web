@@ -1,12 +1,16 @@
 /**
  * Single Graph Collection item containing a 2d graph.
+ * @param {System|Element} source Data source.
+ * @param {string} propertyName Name of property on the data source.
+ * @param {string=} fieldName Optional field for ABCD/Q type properties.
+ * @param {string=} variableName Optional variable to plot against, default "x".
  */
 (function (LaserCanvas) {
-	var GraphItem = function (source, propertyName, fieldName) {
+	var GraphItem = function (source, propertyName, fieldName, variableName) {
 		this._source = source;
 		this._propertyName = propertyName;
 		this._fieldName = fieldName;
-		this._variableName = "x";
+		this._variableName = variableName || "x";
 		this.graph2d = new LaserCanvas.Graph2d();
 		this.el = this.init();
 		this.variableInput = this.el.querySelector('.variable input[type="checkbox"]');
@@ -33,6 +37,7 @@
 		el.innerHTML = GraphItem.template;
 		this.graph2d.appendTo(el.querySelector(".graph2dContainer"))
 		el.querySelector(".title").innerText = this.getTitle();
+		el.querySelector("input[type=checkbox]").checked = this._variableName !== "x";
 		return el;
 	};
 
@@ -127,11 +132,40 @@
 		return this._source;
 	};
 
+	/** Returns a serializable representation of the item. */
+	GraphItem.prototype.toJson = function () {
+		return {
+			sourceType: this._source.type,
+			sourceName: this._source.name,
+			propertyName: this._propertyName,
+			fieldName: this._fieldName,
+			variableName: this._variableName
+		};
+	};
+
+	/**
+	 * Returns the source corresponding to a previously serialized graph item.
+	 * If there are multiple elements of the same type and name, then the first
+	 * matching item is returned. If no match is found, returns `undefined`.
+	 * @param {object} json Serialized representation of the graph item to create.
+	 * @param {System} system Reference to system whose properties to check.
+	 * @param {Array<Element>} elements Reference to system's elements.
+	 */
+	GraphItem.sourceFromJson = function (json, system, elements) {
+		if (json.sourceType === "System") {
+			return system;
+		}
+		return elements.find(function (element) {
+			return element.type === json.sourceType
+				&& element.name === json.sourceName;
+		});
+	};
+
 	/** Returns a value indicating whether this item matches the properties. */
 	GraphItem.prototype.isEqual = function (source, propertyName, fieldName) {
 		return source === this._source
 			&& propertyName === this._propertyName
-			&& fieldName === this._fieldName;
+			&& (!fieldName || fieldName === this._fieldName);
 	};
 
 	// --------------

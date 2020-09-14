@@ -100,7 +100,18 @@
 	};
 
 	/**
-	 * Add a new graph for the given element and property.
+	 * Returns a value indicating whether the collection has a graph for the given
+	 * source.
+	 * @param {System|Element} source Data source.
+	 * @param {string} propertyName Name of property on the data source.
+	 * @param {string=} fieldName Optional field for ABCD/Q type properties.
+	 */
+	GraphCollection.prototype.hasGraph = function (source, propertyName, fieldName) {
+		return this.graphIndex(source, propertyName, fieldName) >= 0;
+	};
+
+	/**
+	 * Add a new graph for the given element and property or remove it if it exists.
 	 * @param {System|Element} source Data source.
 	 * @param {string} propertyName Name of property on the data source.
 	 * @param {string=} fieldName Optional field for ABCD/Q type properties.
@@ -110,12 +121,23 @@
 		if (index >= 0) {
 			this.removeGraphAt(index);
 		} else {
-			this.graphs.push(
-				new LaserCanvas.GraphItem(source, propertyName, fieldName)
-				.appendTo(this.el.querySelector(".graphItems"))
-				.addEventListener("variableChange", this.onVariableChange.bind(this)));
-			this.fireEvent("change");
+			this.addGraph(source, propertyName, fieldName);
 		}
+	};
+
+	/**
+	 * Add a new graph for the given element and property.
+	 * @param {System|Element} source Data source.
+	 * @param {string} propertyName Name of property on the data source.
+	 * @param {string=} fieldName Optional field for ABCD/Q type properties.
+	 * @param {string=} variableName Optional variable to plot against, default "x".
+	 */
+	GraphCollection.prototype.addGraph = function (source, propertyName, fieldName, variableName) {
+		this.graphs.push(
+			new LaserCanvas.GraphItem(source, propertyName, fieldName, variableName)
+			.appendTo(this.el.querySelector(".graphItems"))
+			.addEventListener("variableChange", this.onVariableChange.bind(this)));
+		this.fireEvent("change");
 		this.el.setAttribute("data-has-graphs", this.graphs.length ? "true" : "false");
 	};
 
@@ -123,6 +145,45 @@
 	GraphCollection.prototype.removeGraphAt = function (index) {
 		this.graphs[index].destroy();
 		this.graphs.splice(index, 1);
+		this.el.setAttribute("data-has-graphs", this.graphs.length ? "true" : "false");
+	};
+
+	/** Remove all current graphs. */
+	GraphCollection.prototype.removeAllGraphs = function () {
+		for (var index = this.graphs.length - 1; index >= 0; index -= 1) {
+			this.removeGraphAt(index);
+		}
+	};
+
+	// ----------------
+	//  Serialization.
+	// ----------------
+
+	/**
+	 * Returns a serializable representation of the collection of graphs. We store
+	 * references to the source by a type and name.
+	 */
+	GraphCollection.prototype.toJson = function () {
+		return this.graphs.map(function (graph) {
+			return graph.toJson();
+		});
+	};
+
+	/**
+	 * Recreates graph panels and links them to the system and elements.
+	 * @param {object} json Serialized representation of graphs to create.
+	 * @param {System} system Reference to system to be used for system graphs.
+	 * @param {Array<Element>} elements Reference to system's elements for element graphs.
+	 */
+	GraphCollection.prototype.fromJson = function (json, system, elements) {
+		var source;
+		this.removeAllGraphs();
+		for (var graphJson of json || []) {
+			source = LaserCanvas.GraphItem.sourceFromJson(graphJson, system, elements);
+			if (source) {
+				this.addGraph(source, graphJson.propertyName, graphJson.fieldName, graphJson.variableName);
+			}
+		};
 	};
 
 	// ---------
