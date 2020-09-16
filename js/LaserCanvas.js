@@ -215,7 +215,8 @@ window.LaserCanvas.Application = function (canvas, info) {
 			 * @param {object} json JSON data for system, variables etc. to load.
 			 */
 			var loadJson = function (json) {
-				msystem.fromJson(json);
+				json = LaserCanvas.SystemUtil.migrateJson(json);
+				msystem.fromJson(json.system);
 				mvariablePanel.setVariables(json.variables);
 				mgraphCollection.fromJson(json.graphs, msystem, msystem.elements());
 				minfo.updateGraphs(mgraphCollection);
@@ -227,9 +228,12 @@ window.LaserCanvas.Application = function (canvas, info) {
 			 * @param {function} destination Callback to invoke with JSON data.
 			 */
 			var saveJson = function (destination) {
-				var json = msystem.toJson();
-				json.variables = mvariablePanel.toJson();
-				json.graphs = mgraphCollection.toJson();
+				var json = {
+					version: LaserCanvas.SystemUtil.CURRENT_VERSION,
+					system: msystem.toJson(),
+					variables: mvariablePanel.toJson(),
+					graphs: mgraphCollection.toJson()
+				};
 				destination(json);
 			};
 
@@ -240,6 +244,7 @@ window.LaserCanvas.Application = function (canvas, info) {
 				.init(variablesGetter, variablesSetter)
 				.initDrag()
 				.initFileOpen(loadJson)
+				.initFileSave(saveJson)
 				.initSystemNew(launch);
 
 				/* Load a system! */

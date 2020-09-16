@@ -13,7 +13,8 @@
 	* @param {function} mvariablesGetter Delegate that exposes current variable values.
 	*/
 	var createNew = function (configuration, elementsInfo, loc, mprop, melements, mvariablesGetter) {
-		var System = LaserCanvas.System;
+		var System = LaserCanvas.System,
+			json = LaserCanvas.SystemUtil.migrateJson(systemDefaults()[configuration || System.configuration.linear]);
 		
 		mprop.configuration = configuration;
 		mprop.name = LaserCanvas.localize(
@@ -25,7 +26,7 @@
 			"System");
 
 		LaserCanvas.SystemUtil.fromJson(
-			systemDefaults()[configuration || System.configuration.linear],
+			json.system,
 			mprop,
 			melements,
 			this,

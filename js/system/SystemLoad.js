@@ -470,7 +470,15 @@
 
 				/** Load the text into the system. */
 				loadText = function (text) {
-					var json = LaserCanvas.SystemUtil.textFileToJson(text);
+					var json = null;
+					try {
+						// Try parsing as JSON file.
+						json = JSON.parse(text);
+					} catch (e) {
+						// NOP, retry below.
+					}
+					// If not JSON, try loading LaserCanvas5 text file.
+					json = json || LaserCanvas.SystemUtil.textFileToJson(text);
 					callback(json);
 				},
 

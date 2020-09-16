@@ -103,8 +103,29 @@
 	 */
 	Toolbar.prototype.initFileOpen = function (callback) {
 		LaserCanvas.SystemUtil.attachLoadListener(
-			document.querySelector("[data-action='openFile'] > input"),
+			document.querySelector('[data-action="openFile"] > input'),
 			callback);
+		return this;
+	};
+
+	/**
+	 * Attach a listener to the Save File button to download a data file.
+	 * @param {function} jsonSource Function invoked with callback to retrieve json to store.
+	 */
+	Toolbar.prototype.initFileSave = function (jsonSource) {
+		var download = function (json) {
+			var a = document.createElement("a");
+			a.href = 'data:application/json;utf-8,' + JSON.stringify(json);
+			a.target = '_blank';
+			a.style.position = 'fixed';
+			a.download = 'LaserCanvas.json';
+			a.click();
+		};
+
+		document.querySelector('[data-action="saveFile"]').onclick = function () {
+			// The JSON source provider invokes the callback with the JSON data.
+			jsonSource(download);
+		};;
 		return this;
 	};
 
