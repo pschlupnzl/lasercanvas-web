@@ -492,7 +492,7 @@
 				change = function () {
 					var file = this.files[0],
 						reader = new FileReader();
-					if (file && (file.type === "" || file.type === "text/plain")) {
+					if (file && (file.type === "" || file.type === "text/plain" || file.type === "application/json")) {
 						reader.onload = onload;
 						text = reader.readAsText(file);
 					}
