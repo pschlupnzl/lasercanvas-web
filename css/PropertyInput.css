@@ -43,11 +43,8 @@
 		width: 4em;
 	}
 
+	input.demoPropertyInput,
 	.propertyInput input {
-		position: absolute;
-		left: 0;
-		top: -0.2em;
-		width: 3.0em;
 		padding: 0.1em 0.5em;
 		background: white;
 		border: none;
@@ -59,6 +56,19 @@
 		transition: all 150ms;
 	}
 
+	.propertyInput input {
+		position: absolute;
+		left: 0;
+		top: -0.2em;
+		width: 3.0em;
+	}
+
+	input.demoPropertyInput {
+		width: 6em;
+		text-align: center;
+	}
+
+		input.demoPropertyInput[data-expression="true"],
 		.propertyInput input[data-expression="true"] {
 			color: #2141bd;
 			background-color: rgb(239, 243, 249);

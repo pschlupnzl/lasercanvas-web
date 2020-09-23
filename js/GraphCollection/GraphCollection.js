@@ -17,9 +17,9 @@
 	GraphCollection.template = [
 		'<div class="about">',
 			'<ul>',
-				'<li>You can use variables <em>x</em> and <em>y</em> in properties, for example <input disabled value="200 * cos(x)" /></li>',
-				'<li>Drag the sliders to see the effects of changing variables</li>',
-				'<li>Toggle the <span>👁</span> icon in the Info panel to plot a property\'s behaviour with varying values</li>',
+				'<li>Variables  <em>x</em>, <em>y</em> in properties: <input class="demoPropertyInput" disabled data-expression="true" value="200 * cos(x)" /></li>',
+				'<li>Sliders change values</li>',
+				'<li>Toggle graphs with <span>👁</span></li>',
 			'</ul>',
 		'</div>',
 		'<vid class="graphItems"></div>'
