@@ -216,8 +216,8 @@ window.LaserCanvas.Application = function (canvas, info) {
 			 */
 			var loadJson = function (json) {
 				json = LaserCanvas.SystemUtil.migrateJson(json);
-				msystem.fromJson(json.system);
 				mvariablePanel.setVariables(json.variables);
+				msystem.fromJson(json.system);
 				mgraphCollection.fromJson(json.graphs, msystem, msystem.elements());
 				minfo.updateGraphs(mgraphCollection);
 				mrender.resetTransform();

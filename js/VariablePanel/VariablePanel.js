@@ -49,7 +49,10 @@
 			// Set properties, suppress firing of change event.
 			this.numberSliders[name].setProp("min", json[name].min, false);
 			this.numberSliders[name].setProp("max", json[name].max, false);
-			this.numberSliders[name].setProp("value", json[name].value);
+			this.numberSliders[name].setProp("value", json[name].value, false);
+
+			// Update variable silently (don't fire change event).
+			this.mvariables.set(name, json[name].value, true);
 		}, this);
 	};
 

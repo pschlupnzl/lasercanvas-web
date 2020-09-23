@@ -21,9 +21,11 @@
 	};
 
 	/** Set a variable value and fire the change event. */
-	Variables.prototype.set = function (variableName, value) {
+	Variables.prototype.set = function (variableName, value, silent) {
 		this.byName[variableName] = value;
-		this.fireEvent("change");
+		if (!silent) {
+			this.fireEvent("change");
+		}
 	};
 
 	/** Returns a new object containing the current variable values. */
