@@ -187,8 +187,8 @@ window.LaserCanvas.Application = function (canvas, info) {
 			
 			// Variables have changed.
 			mvariables.addEventListener("change", function () {
-				msystem.onVariablesChange();
-				msystem.update(true);
+				msystem.onVariablesChange(true); // Update cartesian coordinates.
+				msystem.update();
 			});
 
 			// Graphs have changed.

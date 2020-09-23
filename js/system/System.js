@@ -511,11 +511,21 @@ LaserCanvas.System = function () {
 		/**
 		 * Respond to a change in variables. This notifies internal
 		 * event listeners. The caller must still call update().
+		 * @param {boolean} updateCoordinates Optional value indicating
+		 * whether cartesian coordinates should always be updated. By
+		 * default, coordinates are only updated for ring cavities.
 		 */
-		onVariablesChange = function () {
+		onVariablesChange = function (updateCoordinates) {
 			melements.forEach(function (element) {
 				element.onVariablesChange && element.onVariablesChange();
 			});
+
+			// On a variable change, we'll need to update the coordinates
+			// anyway, so do it now. When scanning ring cavities, we need
+			// to calculate the coordinates to determine the final leg.
+			if (updateCoordinates || this.get("configuration") === LaserCanvas.System.configuration.ring) {
+				calculateCartesianCoordinates();
+			}
 		},
 
 		// -------------------------------------------------
