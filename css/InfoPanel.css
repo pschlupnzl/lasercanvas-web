@@ -76,3 +76,7 @@ button[data-action="toggleInfo"] {
 	.laserCanvasInfo .infoPanelOptions {
 		margin-bottom: 2.5em;
 	}
+
+.laserCanvasInfo .versionInfo {
+	font-size: 0.7em;
+}

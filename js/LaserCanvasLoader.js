@@ -201,12 +201,33 @@ window.LaserCanvas = {
 				}
 				ready();
 			});
+		},
+
+		/**
+		 * Loads a single file using XHR.
+		 * @param {string} url URL to retrieve.
+		 * @param {function} callback Method called with the loaded content.
+		 */
+		get = function (url, callback) {
+			var xhr = new XMLHttpRequest();
+			xhr.open("GET", url);
+			xhr.addEventListener("load", function () {
+				callback(this.responseText);
+			});
+			xhr.send();
 		};
 	
 	// Grab document once ready.
 	document.addEventListener('DOMContentLoaded', function () {
 		progressFill = document.querySelector('.progressBarLoading > div');
 		ready();
+
+		get("version_info.php", function (info) {
+			console.log(info);
+			if (/^Version/.test(info)) {
+				document.querySelector(".versionInfo").innerText = info;
+			}
+		});
 	}, false);
 	
 	// Load all scripts.
