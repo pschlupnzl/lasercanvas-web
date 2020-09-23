@@ -7,6 +7,7 @@
 	transition-property: height;
 	transition-duration: 350ms;
 	border-top: 1px solid #ccc;
+	overflow-y: hidden;
 }
 
 	[data-variables-visible="true"] #LaserCanvasVariablesPanel {
