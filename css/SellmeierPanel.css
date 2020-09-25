@@ -3,7 +3,7 @@
 */
 
 .sellmeierPanel {
-	width: 25em;
+	width: 20em;
 }
 
 .sellmeierPanel[data-visible="false"] {
@@ -60,19 +60,55 @@
 		text-decoration: underline;
 	}
 	
+	.sellmeierPanel .scroller {
+		max-height: 14em;
+		overflow-y: auto;
+	}
+
 	.sellmeierPanel a.attribution {
-		display: block;
 		color: #999;
 		border-top: 1px solid;
 		font-size: 0.8em;
 	}
 	
+	.sellmeierPanel .parameters table {
+		width: 100%;
+		border-collapse: collapse;
+		border: 1px solid;
+		border-left: none;
+		border-right: none;
+	}
+
+		.sellmeierPanel .parameters table td {
+			border-bottom: 1px solid #ccc
+		}
+
+			.sellmeierPanel .parameters table tr:last-child td {
+				border-bottom: none;
+			}
+
+	.sellmeierPanel .wavelengthRange {
+		white-space: nowrap;
+	}
+
+	.sellmeierPanel .attribution,
 	.sellmeierPanel [data-field="references"] {
-		max-height: 7em;
-		overflow: auto;
+		display: none;
+	}
+
+	.sellmeierPanel[data-show-references="true"] .attribution {
+		display: block;
+	}
+
+	.sellmeierPanel[data-show-references="true"] [data-field="references"] {
+		display: block;
 		font-size: 0.8em;
 	}
 	
+	.sellmeierPanel .toggleReferences {
+		cursor: pointer;
+	}
+
 	.sellmeierPanel [data-action="apply"] {
 		display: none;
 		width: 8em;

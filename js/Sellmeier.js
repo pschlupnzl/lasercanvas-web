@@ -103,6 +103,14 @@ LaserCanvas.Sellmeier.prototype = {
 		panel.innerHTML = LaserCanvas.Sellmeier.panelHtml;
 		panel.className = 'sellmeierPanel';
 		LaserCanvas.localize(panel);
+		panel.querySelector(".toggleReferences").onclick = function () {
+			var attr = "data-show-references";
+			if (panel.hasAttribute(attr)) {
+				panel.removeAttribute(attr);
+			} else {
+				panel.setAttribute(attr, "true");
+			}
+		};
 		document.body.appendChild(panel);
 		LaserCanvas.Utilities.draggable(panel, {
 			handle: panel.querySelector('.dragbar')
@@ -429,43 +437,45 @@ LaserCanvas.Sellmeier.panelHtml = [
 		'<ul data-field="book"><li data-localize="Loading..."></li></ul>',
 		'<ul data-field="source"><li>&larr;</li></ul>',
 	'</div>',
-	'<div data-field="references"></div>',
-	'<div class="comments">',
-		'<span data-field="comments"></span> ',
-		'<label data-localize="Range"></label>: ',
-		'<span data-field="rangeMin"></span> - <span data-field="rangeMax"></span> &micro;m',
+	'<div class="scroller">',
+		'<div class="parameters">',
+			'<table>',
+				'<tbody>',
+					'<tr>',
+						'<td><label data-localize="Wavelength"></label></td>',
+						'<td><i>&lambda;</i></td>',
+						'<td><input type="text" class="laserCanvasInput" data-field="wavelength" value="1.064" /></td>',
+						'<td>&micro;m</td>',
+					'</tr>',
+					'<tr>',
+						'<td><label data-localize="Refractive index"></label></td>',
+						'<td><i>n</i></td>',
+						'<td><span data-value="refractiveIndex"></span></td>',
+						'<td></td>',
+					'</tr>',
+					'<tr>',
+						'<td><label data-localize="Dispersion"></label></td>',
+						'<td><span class="infrac"><span><i>dn</i></span><span><i>d&lambda;</i></span></span></td>',
+						'<td><span data-value="indexDispersion"></span></td>',
+						'<td>&micro;m&#8315;&#185;</td>',
+					'</tr>',
+					'<tr>',
+						'<td><label data-localize="GVD"></label></td>',
+						'<td><span class="infrac"><span><i>d</i>&#178;<i>n</i></span><span><i>d&lambda;</i>&#178;</span></span></td>',
+						'<td><span data-value="groupVelocityDispersion"></span></td>',
+						'<td>&micro;m&#8315;&#178;</td>',
+					'</tr>',
+				'</tbody>',
+			'</table>',
+		'</div>',
+		'<div class="comments">',
+			'<span data-field="comments"></span> ',
+			'<span class="wavelengthRange"><span data-field="rangeMin"></span>-<span data-field="rangeMax"></span> &micro;m</span>',
+			' <span class="toggleReferences">ⓘ</span>',
+		'</div>',
+		'<div data-field="references"></div>',
+		'<a class="attribution" href="https://refractiveindex.info" target="_blank">Data from RefractiveIndex.INFO</a>',
 	'</div>',
-	'<div class="parameters">',
-		'<table>',
-			'<tbody>',
-				'<tr>',
-					'<td><label data-localize="Wavelength"></label></td>',
-					'<td><i>&lambda;</i></td>',
-					'<td><input type="text" class="laserCanvasInput" data-field="wavelength" value="1.064" /></td>',
-					'<td>&micro;m</td>',
-				'</tr>',
-				'<tr>',
-					'<td><label data-localize="Refractive index"></label></td>',
-					'<td><i>n</i></td>',
-					'<td><span data-value="refractiveIndex"></span></td>',
-					'<td></td>',
-				'</tr>',
-				'<tr>',
-					'<td><label data-localize="Dispersion"></label></td>',
-					'<td><span class="infrac"><span><i>dn</i></span><span><i>d&lambda;</i></span></span></td>',
-					'<td><span data-value="indexDispersion"></span></td>',
-					'<td>&micro;m&#8315;&#185;</td>',
-				'</tr>',
-				'<tr>',
-					'<td><label data-localize="Group velocity dispersion"></label></td>',
-					'<td><span class="infrac"><span><i>d</i>&#178;<i>n</i></span><span><i>d&lambda;</i>&#178;</span></span></td>',
-					'<td><span data-value="groupVelocityDispersion"></span></td>',
-					'<td>&micro;m&#8315;&#178;</td>',
-				'</tr>',
-			'</tbody>',
-		'</table>',
-	'</div>',
-	'<button class="lcbutton" data-action="apply" data-localize="Apply"></button>',
-	'<a class="attribution" href="https://refractiveindex.info" target="_blank">Data from RefractiveIndex.INFO</a>'
+	'<button class="lcbutton" data-action="apply" data-localize="Apply"></button>'
 ].join('');
 }(window.LaserCanvas));

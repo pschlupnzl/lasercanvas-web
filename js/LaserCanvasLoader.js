@@ -145,7 +145,7 @@ window.LaserCanvas = {
 			"js/Variables.js",
 
 			// Also:
-			// refractiveIndex.js - Used by Sellmeier.
+			"js/refractiveIndex.js", // Used by Sellmeier.
 		],
 		
 		items = 2          // {number} Total count of items to load (here: DOMContentLoaded and last semaphore).
