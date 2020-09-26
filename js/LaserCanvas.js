@@ -250,11 +250,11 @@ window.LaserCanvas.Application = function (canvas, info) {
 				/* Load a system! */
 			var useLocalStorage = true;
 			if (useLocalStorage) {
-				// try {
+				try {
 					LaserCanvas.SystemUtil.fromLocalStorage(loadJson);
-				// } catch (e) {
-				// 	msystem.createNew(LaserCanvas.System.configuration.linear);
-				// }
+				} catch (e) {
+					msystem.createNew(LaserCanvas.System.configuration.linear);
+				}
 			} else {
 				msystem.createNew(LaserCanvas.System.configuration.linear);
 			}
