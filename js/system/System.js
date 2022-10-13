@@ -654,6 +654,23 @@ LaserCanvas.System = function () {
 			calculateCartesianCoordinates();
 			fireEventListeners('change');
 			fireEventListeners('update');
+		},
+		
+		/**
+		 * Load a LaserCanvas 5 text file. This is used by testSystemLoad.js.
+		 * @param {string} src Source text file.
+		 */
+		fromTextFile = function (src, variablesSetter) {
+			var json = LaserCanvas.SystemUtil.textFileToJson(src);
+			variablesSetter(json.variables);
+			LaserCanvas.SystemUtil.fromJson(json, mprop, melements, this, mvariablesGetter);
+			variablesSetter(json.variables);
+
+			// Calculate Cartesian coordinates.
+			updateElementNames();
+			calculateCartesianCoordinates();
+			fireEventListeners('change');
+			fireEventListeners('update');
 		};
 	
 	/**
@@ -674,6 +691,7 @@ LaserCanvas.System = function () {
 		elements: elements,                       // Retrieve elements for this system.
 		expression: expression,                   // Retrieve the expression of a variable.
 		fromJson: fromJson,                       // Create the system from a data blob.
+		fromTextFile: fromTextFile,               // Create the system from a LaserCanvas5 text file.
 		get: get,                                 // Retrieve a value.
 		insertElement: insertElement,             // Insert a new element near the given point.
 		inspectSegment: inspectSegment,           // Inspect beam on a segment (from segmentNearLocation).

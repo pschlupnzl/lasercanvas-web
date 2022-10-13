@@ -2,6 +2,8 @@
 
 Interactive laser cavity modeling.
 
+Live Demo: https://pschlupnzl.github.io/lasercanvas/
+
 ![Simple screenshot](docs/lcw.png)
 
 The web app is designed to start simple:
