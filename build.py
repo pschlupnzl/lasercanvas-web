@@ -50,7 +50,7 @@ def w(line = None):
             minf,
             '}();'])
         with open(outname, 'wt') as out:
-            out.write(jsmin(minf) if MINIFY_OUTPUT else minf)
+            out.write(jsmin(minf, quote_chars='\'"`') if MINIFY_OUTPUT else minf)
     else:
         minf += line
 
