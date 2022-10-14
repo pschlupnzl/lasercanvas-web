@@ -171,7 +171,11 @@ window.LaserCanvas = {
 			
 			// Prepare the document.
 			// TODO: Move this into constructor code elsewhere.
-			document.body.removeChild(progressFill.parentNode);
+			if (progressFill) {
+				progressFill.parentNode.parentNode.removeChild(
+					progressFill.parentNode
+				);
+			}
 			
 			LaserCanvas.theme.set('light',
 				function () {
@@ -209,6 +213,9 @@ window.LaserCanvas = {
 		 * @param {function} callback Method called with the loaded content.
 		 */
 		get = function (url, callback) {
+			if (!url) {
+				return;
+			}
 			var xhr = new XMLHttpRequest();
 			xhr.open("GET", url);
 			xhr.addEventListener("load", function () {

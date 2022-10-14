@@ -181,8 +181,8 @@ window.LaserCanvas.Application = function (canvas, info) {
 				scanVariables();
 				msystem.calculateAbcd();
 				mgraphCollection.change(msystem.elements());
-				minfo.change()
-				updateAll()
+				minfo.change();
+				updateAll();
 			});
 			
 			// Variables have changed.
@@ -193,7 +193,7 @@ window.LaserCanvas.Application = function (canvas, info) {
 
 			// Graphs have changed.
 			mgraphCollection.addEventListener("change", function () {
-				scanVariables()
+				scanVariables();
 			});
 			var variablesGetter = mvariables.value.bind(mvariables),
 				variablesSetter = mvariablePanel.setVariables.bind(mvariablePanel);
