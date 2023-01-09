@@ -1,2 +1,4 @@
-# Built files.
-dist/
+.DS_Store
+# Built files: Keep only the index.html
+dist/*
+!dist/index.html

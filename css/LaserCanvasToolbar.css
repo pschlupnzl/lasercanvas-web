@@ -12,6 +12,13 @@
 	text-align: center;
 }
 
+	.laserCanvasToolbar .generalSelector,
+	.laserCanvasToolbar button[data-insert-element] {
+		margin-left: 0.15em;
+		margin-right: 0.15em;
+	}
+
+
 .generalSelector {
 	display: inline-block;
 	margin: 0.5em;
