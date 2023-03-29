@@ -367,7 +367,7 @@ LaserCanvas.systemAdjust = function (melements, calculateCartesianCoordinates, g
 					
 						// Construction parameters.
 						cc = data.construct.cc,
-						Bsincc = data.construct.Bsincc,
+						b = data.construct.b, // {number} (mm) Length of fixed vector.
 						Bcoscc = data.construct.Bcoscc,
 						B2sin2cc = data.construct.B2sin2cc,
 						
@@ -376,11 +376,15 @@ LaserCanvas.systemAdjust = function (melements, calculateCartesianCoordinates, g
 							pt.x - data.pivot.loc.x,
 							pt.y - data.pivot.loc.y)
 							.scale(-dir), // .. Opposite sense for Next segment
+						c = C.norm(), // {number} (mm) New distance to mouse.
 						
 						// Quadratic formula determinant.
 						det = C.norm2() - B2sin2cc;
 					
-					if (det >= 0) {
+					// Store for construction diagram.
+					data.construct.c = c;
+
+					if (det >= 0 && c > b) {
 						// New length.
 						// The sign for adding or subtracting the square root
 						// depends on whether the construction triangle has an
@@ -526,18 +530,19 @@ LaserCanvas.systemAdjust = function (melements, calculateCartesianCoordinates, g
 						? calculatePivotDrag()
 						// Moving fixed element(s).
 						: calculateFixedDrag();
-					if (false) {
-						if (__dragElementTmr) {
-							clearTimeout(__dragElementTmr);
-						}
-						__dragElementTmr = setTimeout(function () {
-							__dragElementTmr = null;
-							__dragElementConstruction(pt, ptStart, mdragData);
-						}, 0);
-					}
 				}
 			}
-			
+
+			if (false) {
+				if (__dragElementTmr) {
+					clearTimeout(__dragElementTmr);
+				}
+				__dragElementTmr = setTimeout(function () {
+					__dragElementTmr = null;
+					__dragElementConstruction(pt, ptStart, mdragData);
+				}, 0);
+			}
+
 			// Cancel drag, if needed.
 			if (!dragPermitted && mdragData.prev.stretch) {
 				extend(mdragData.prev.stretch.element.loc, locPrev);
@@ -576,19 +581,18 @@ LaserCanvas.systemAdjust = function (melements, calculateCartesianCoordinates, g
 				// @param {number} dir Direction -1:prev, +1:next.
 				showConstruction = function (data, rgb, dir) {
 					var 
-						cc = data.construct,
 						stretchLoc = data.stretch.element.location(),
-						pivotLoc   = data.pivot.element.location();
+						pivotLoc   = data.pivot.element.location(),
+						B = data.construct.B, // Fixed construction vector.
+						b = data.construct.b, // {number} (mm) Length of fixed vector.
+						c = data.construct.c; // {number} (mm) Distance from pivot to mouse
 
 					// Pivot anchor.
+					x = pivotLoc.x;
+					y = pivotLoc.y;
 					render.setStroke(rgb, 4)
 						.beginPath()
-						.arc(pivotLoc.x, pivotLoc.y, 4, 0, 2 * Math.PI)
-						.stroke();
-					
-					render.setStroke(rgb, 2)
-						.beginPath()
-						.arc(data.pivot.loc.x, data.pivot.loc.y, 6, 0, 2 * Math.PI)
+						.arc(x, y, 4, 0, 2 * Math.PI)
 						.stroke();
 					
 					// Stretch (A).
@@ -605,24 +609,27 @@ LaserCanvas.systemAdjust = function (melements, calculateCartesianCoordinates, g
 					render.stroke();
 					
 					// Fixed (B).
-					render.setStroke(rgb, .5);
-					render.beginPath();
 					x = pivotLoc.x;
 					y = pivotLoc.y;
-					render.arc(x, y, 8, 0, 2 * Math.PI);
-					render.moveTo(x, y);
-					render.lineTo(x - dir * cc.B[0], y - dir * cc.B[1]);
-					render.stroke();
-					
+					render
+						.setStroke(rgb, 2.5)
+						.beginPath()
+						.arc(x, y, 8, 0, 2 * Math.PI)
+						.moveTo(x, y)
+						.lineTo(x - dir * B[0], y - dir * B[1])
+						.stroke();
+
+					render
+						.setStroke(rgb, 0.5)
+						.arc(x, y, b, 0, 1.8 * Math.PI)
+						.stroke();
+
 					// Arc from pivot to mouse.
-					render.setStroke(rgb, 0.5);
-					render.beginPath();
-					x = pivotLoc.x;
-					y = pivotLoc.y;
-					render.arc(x, y, 
-						Math.sqrt((pt.x - x) * (pt.x - x) + (pt.y - y) * (pt.y - y)),
-						0, 2 * Math.PI);
-					render.stroke();
+					render
+						.setStroke(rgb, 2)
+						.beginPath()
+						.arc(x, y, c, 0, 2 * Math.PI)
+						.stroke();
 				};
 				
 			render.save();
