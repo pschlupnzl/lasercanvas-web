@@ -131,6 +131,8 @@ window.LaserCanvas.Application = function (canvas, info) {
 			mvariables = new LaserCanvas.Variables();
 			mvariablePanel = new LaserCanvas.VariablePanel(mvariables);
 
+			LaserCanvas.__render = mrender; // To render construction lines
+
 			onResize();
 			window.addEventListener('resize', onResize, false);
 
