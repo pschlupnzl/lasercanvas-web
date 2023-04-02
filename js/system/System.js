@@ -171,7 +171,11 @@ LaserCanvas.System = function () {
 		* @returns {Array<Element>} Elements in this system.
 		*/
 		elements = function () {
-			return melements;
+			// Temporary offset while dragging across ring.
+			var offset = melements._offset || 0;
+			return []
+				.concat(melements.slice(offset))
+				.concat(melements.slice(0, offset))
 		},
 		
 		/**
@@ -230,6 +234,9 @@ LaserCanvas.System = function () {
 				Vector = LaserCanvas.Math.Vector, // {function} Construction function for vector.
 				kmax = mprop.configuration === LaserCanvas.System.configuration.ring
 					? melements.length : melements.length - 1;   // How many segments to check.
+			// kmax = melements.length;
+			// window['el'] =  melements[melements.length - 1]
+			// console.log(`kmax=${kmax} (see window.el)`)
 			for (k = 0; k < kmax; k += 1) {
 				if (!filterBy || melements[k].canSetProperty(filterBy)) {
 					loc = melements[k].location(); // {Point} Current optic location.
@@ -369,21 +376,8 @@ LaserCanvas.System = function () {
 			
 			if (mprop.configuration === LaserCanvas.System.configuration.ring) { 
 				// Ring cavity construction vectors.
-				// TODO: This simple ring doesn't allow optics between
-				// the last and first mirror. A complete ring layout
-				// would need changes:
-				//  - The last pivot mirror (and any subsequent inline
-				//    elements) would need proper angleOfIncidence,
-				//    distanceToNext etc. calculated.
-				//  - These values would need to accurately meet up
-				//    with the first pivot mirror location.
-				//  - Dragging the last pivot mirror (and any subsequent
-				//    elements) might be achieved by temporarily adding
-				//    a clone of the first mirror at the end of the
-				//    cavity while doing the adjustment calculations.
-				//  - Dragging the first pivot mirror would be a bit
-				//    more complex.
-				// For now - let's just make a simple ring.
+				// This closes the space between the last optic (mirror or
+				// other) to the start optic (always mirror).
 				Z = new Vector(el.loc.x - le.loc.x, el.loc.y - le.loc.y);
 				l = Z.norm();                           // Vector length.
 				Z = Z.normalize();                      // Vector from last to first element.
@@ -462,7 +456,7 @@ LaserCanvas.System = function () {
 		* @returns {boolean} Value indicating whether drag should start.
 		*/
 		dragElementStart = function (pt, elDrag) {
-			return adjust.start(pt, elDrag);
+			return adjust.start.call(this, pt, elDrag);
 		},
 		
 		/**
@@ -475,7 +469,7 @@ LaserCanvas.System = function () {
 		* @param {Element} elDrag Element being dragged. The parameter is not used.
 		*/
 		dragElement = function (pt, ptStart, elDrag_notused) {
-			var needsUpdate = adjust.drag(pt, ptStart);
+			var needsUpdate = adjust.drag.call(this, pt, ptStart);
 			if (needsUpdate) {
 				update();
 			}
@@ -488,7 +482,7 @@ LaserCanvas.System = function () {
 		* @param {Element} elDrag Element being dragged. The parameter is not used.
 		*/
 		dragElementEnd = function (ptEnd, ptStart, elDrag_notused) {
-			adjust.end(ptEnd, ptStart);
+			adjust.end.call(this, ptEnd, ptStart);
 			update();
 		},
 		
@@ -616,6 +610,22 @@ LaserCanvas.System = function () {
 			}
 		},
 		
+		/**
+		 * Move the start of the cavity to the next mirror, returning the offset
+		 * count to the new starting element. This is useful when dragging ring
+		 * cavities to prevent drags across the closing gap.
+		 * @param {number?} dir Direction to search for next mirror, default +1
+		 * for forward search.
+		 */
+		moveStart = function (dir) {
+			var count = LaserCanvas.SystemUtil.moveStart.call(this, melements, dir);
+			if (count > 0) {
+				alignEndElements();
+				calculateCartesianCoordinates();
+			}
+			return count;
+		},
+
 		// -------------------------------------------------
 		//  Empty system.
 		// -------------------------------------------------
@@ -696,6 +706,7 @@ LaserCanvas.System = function () {
 		insertElement: insertElement,             // Insert a new element near the given point.
 		inspectSegment: inspectSegment,           // Inspect beam on a segment (from segmentNearLocation).
 		iterateElements: iterateElements,         // Iterate all elements in the system.
+		moveStart: moveStart,                     // Move the start of the cavity.
 		onVariablesChange: onVariablesChange,     // Respond to a change in variables.
 		removeElement: removeElement,             // Remove the given element.
 		removeEventListener: removeEventListener, // Remove an event handler.
