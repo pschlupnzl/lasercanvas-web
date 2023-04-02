@@ -106,6 +106,10 @@ window.LaserCanvas.localize.de = {
 	"symbolmirror": "Sp",
 	"symbolscreen": "i",
 	
+	// Element labels.
+	"Plane mirror": "Flacher Spiegel",
+	"No lens": "Keine linse",
+
 	// System labels.
 	'linear resonator': 'Standwellenresonator',
 	'end coated resonator': 'Resonator mit Endkristall',

@@ -29,6 +29,7 @@ LaserCanvas.Element.Lens.Type = "Lens";
 // Standard focal lengths.
 LaserCanvas.Element.Lens.standard = [
 	-1000, -750, -500, -400, -300, -250, -200, -175, -150, -125, -100,  -75,  -50,   -25,
+	{ label: "None", value: 0 },
 	  +25,  +50,  +75, +100, +125, +150, +175, +200, +250, +300, +400, +500, +750, +1000];
 
 LaserCanvas.Element.Lens.prototype = {
