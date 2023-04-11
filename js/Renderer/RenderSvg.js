@@ -169,6 +169,29 @@ window.LaserCanvas.RenderSvg = function (system) {
 		},
 		
 		/**
+		 * Draw a vector. The arrow is drawn from (x, y) to the end of V.
+		 * @param {Vector} V Vector to draw.
+		 * @param {number} x Horizontal position of vector start.
+		 * @param {number} y Vertical position of vector start.
+		 * @param {string?} colorOptional Optional color. If specified, draws
+		 * the vector; otherwise, use stroke() to complete the rendering.
+		 */
+		drawVector = function (V, x, y, colorOptional) {
+			var dx = V[0],
+				dy = V[1];
+			this.drawPath(
+				`M ${-V.norm()} 0 L 0 0 L -12 -5 L -10 0 L -12 5 L 0 0`,
+				x + dx,
+				y + dy,
+				-V.atan2()
+			);
+			if (colorOptional) {
+				this.setStroke(colorOptional, 2).stroke();
+			}
+			return this;
+		},
+
+		/**
 		* Set the stroke and line.
 		* @param {string:ColorRef} strokeStyle Color of stroke to use.
 		* @param {number} lineWidth Thickness of stroke to use.
@@ -341,6 +364,7 @@ window.LaserCanvas.RenderSvg = function (system) {
 	this.createPattern = createPattern; // Create a pattern for filling (not implemented).
 	this.drawImage = drawImage;  // Draw an image (not implemented).
 	this.drawPath = drawPath;      // Draw a path using SVG-like commands.
+	this.drawVector = drawVector;  // Draw a vector.
 	this.fillText = fillText;      // Draw some text.
 	this.lineTo = lineTo;          // Line to drawing point.
 	this.moveTo = moveTo;          // Move drawing point.
@@ -357,14 +381,6 @@ window.LaserCanvas.RenderSvg = function (system) {
 	svg.setAttribute('xmlns:xlink', "http://www.w3.org/1999/xlink");
 	svg.setAttributeNS(null, 'viewBox', '-250 -250 500 500');
 	svg.setAttributeNS(null, 'fill', 'none');
-	
-	// ?? document.body.appendChild(svg);
-	// ?? window.LaserCanvas.Utilities.draggable(svg);
-	// ?? svg.onclick = function (e) {
-	// ?? 	if (e.ctrlKey || e.metaKey) {
-	// ?? 		saveToWindow();
-	// ?? 	}
-	// ?? };
 };
 
 // SVG namespace for creating elements.
