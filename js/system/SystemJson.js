@@ -73,8 +73,8 @@ if (element.init && !system) {
 				melements.push(element);
 			}
 			LaserCanvas.Element.collectGroups(melements);
+			melements[0].set("startOptic", true);
 			if (mprop.configuration !== LaserCanvas.System.configuration.ring) {
-				melements[0].set("startOptic", true);
 				melements[melements.length - 1].set("endOptic", true);
 			}
 		};
