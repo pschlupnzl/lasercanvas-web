@@ -167,6 +167,120 @@
 				},
 				elements: [
 					{
+					  "type": "Mirror",
+					  "name": "M1",
+					  "loc": {
+						"x": -136.00000000000006,
+						"y": 55.999999999999915,
+						"p": 2.193666806351656,
+						"q": 0.13072433516542503
+						// "q": 0
+					  },
+					  "prop": {
+						"distanceToNext": {
+						  "_number": 253.16002844051042,
+						  "_expression": null
+						},
+						"radiusOfCurvature": { "_number": 0, "_expression": null },
+						"angleOfIncidence": {
+						  "_number": -30.901051511370262,
+						  "_expression": null
+						}
+					  }
+					},
+					{
+					  "type": "Mirror",
+					  "name": "M2",
+					  "loc": { },
+					  "prop": {
+						"distanceToNext": {
+						  "_number": 129.8613980246407 + 100,
+						  "_expression": null
+						},
+						"radiusOfCurvature": { "_number": 0, "_expression": null },
+						"angleOfIncidence": {
+						  "_number": -22.07051216518057,
+						  "_expression": null
+						}
+					  }
+					},
+					{
+					  "type": "Mirror",
+					  "name": "M3",
+					  "loc": { },
+					  "prop": {
+						"distanceToNext": {
+						  "_number": 70.7011981521356,
+						  "_expression": null
+						},
+						"radiusOfCurvature": { "_number": 500, "_expression": null },
+						"angleOfIncidence": {
+						  "_number": -14.40857137540875 + 10,
+						  "_expression": null
+						}
+					  }
+					},
+					{
+						"type": "Dielectric",
+						"name": "D1",
+						"loc": { },
+						"prop": {
+							// "type": "Plate",
+							"type": "Prism",
+							"flip": false,
+							"distanceToNext": {
+							"_number": 24.037008503093265,
+							"_expression": null
+							},
+							"refractiveIndex": { "_number": 2, "_expression": null },
+							"groupVelocityDispersion": { "_number": 0, "_expression": null },
+							"angleOfIncidence": { "_number": 0, "_expression": null },
+							"faceAngle": { "_number": 0, "_expression": null },
+							"curvatureFace1": { "_number": 0, "_expression": null },
+							"curvatureFace2": { "_number": 0, "_expression": null },
+							"thermalLens": { "_number": 0, "_expression": null },
+							"thickness": { "_number": 20, "_expression": null }
+						}
+						},
+						{
+						"type": "Lens",
+						"name": "L1",
+						"loc": { },
+						"prop": {
+							"distanceToNext": { "_number": 0, "_expression": null },
+							"focalLength": { "_number": 0, "_expression": null }
+						}
+						},
+						{
+						"type": "Dielectric",
+						"name": "D2",
+						"loc": { },
+						"prop": {
+							"flip": false,
+							"distanceToNext": {
+							"_number": 164.83658437865768 - 100,
+							"_expression": null
+							},
+							"refractiveIndex": { "_number": 1, "_expression": null },
+							"groupVelocityDispersion": { "_number": 0, "_expression": null },
+							"angleOfIncidence": { "_number": 0, "_expression": null },
+							"faceAngle": { "_number": 0, "_expression": null },
+							"curvatureFace1": { "_number": 0, "_expression": null },
+							"curvatureFace2": { "_number": 0, "_expression": null },
+							"thermalLens": { "_number": 0, "_expression": null },
+							"thickness": { "_number": 0, "_expression": null }
+						}
+						}				  ]
+				};
+
+			_systemDefaults['x'+LaserCanvas.System.configuration.ring] = {
+				prop: {
+					name: "Ring resonator",
+					configuration: "ring",
+					wavelength: 1000,
+				},
+				elements: [
+					{
 						type: "Mirror",
 						name: "M1",
 						loc: {
@@ -196,6 +310,44 @@
 						prop: {
 							radiusOfCurvature: 500,
 							angleOfIncidence: -30
+
+					// 		,distanceToNext: 125
+					// 	}
+					// },
+					// {
+					// 	type: "Dielectric",
+					// 	name: "D1",
+					// 	loc: {},
+					// 	prop: {
+					// 		distanceToNext: 0,
+					// 		refractiveIndex: 1.5,
+					// 		thickness: 0
+					// 	}
+					// },
+					// {
+					// 	type: "Lens",
+					// 	name: "L1",
+					// 	loc: {},
+					// 	prop: {
+					// 		focalLength: 0
+					// 	}
+					// },
+					// {
+					// 	type: "Dielectric",
+					// 	name: "D2",
+					// 	loc: {},
+					// 	prop: {
+
+
+					// 		,distanceToNext: 125
+					// 	}
+					// },
+					// {
+					// 	type: "Lens",
+					// 	name: "L1",
+					// 	loc: {},
+					// 	prop: {
+					// 		focalLength: 500
 						}
 					}
 				]

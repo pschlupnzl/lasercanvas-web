@@ -250,7 +250,7 @@ window.LaserCanvas.Application = function (canvas, info) {
 				.initSystemNew(launch);
 
 				/* Load a system! */
-			var useLocalStorage = true;
+			var useLocalStorage = false;
 			if (useLocalStorage) {
 				try {
 					LaserCanvas.SystemUtil.fromLocalStorage(loadJson);
@@ -258,7 +258,8 @@ window.LaserCanvas.Application = function (canvas, info) {
 					msystem.createNew(LaserCanvas.System.configuration.linear);
 				}
 			} else {
-				msystem.createNew(LaserCanvas.System.configuration.linear);
+				// msystem.createNew(LaserCanvas.System.configuration.linear);
+				msystem.createNew(LaserCanvas.System.configuration.ring);
 			}
 		},
 		

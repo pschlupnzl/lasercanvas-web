@@ -15,7 +15,7 @@ LaserCanvas.Render = function (system, info, canvas) {
 		mzoom = {
 			xWorld: 0,       // {number} (mm) World horizontal origin.
 			yWorld: 0,       // {number} (mm) World vertical origin.
-			s: 1,            // {number} Render zoom factor.
+			s: 1.5,            // {number} Render zoom factor.
 			xCanvas: 0,      // {number} (px) Canvas horizontal origin.
 			yCanvas: 0       // {number} (px) Canvas vertical origin.
 		},

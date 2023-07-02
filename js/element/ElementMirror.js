@@ -242,6 +242,16 @@ LaserCanvas.Element.Mirror.prototype = {
 					"mirrorPlane"
 				];
 				render.drawImage(image, this.loc.x, this.loc.y, qc);
+				if (this.priv.startOptic) {
+					render
+						.beginPath()
+						.drawPath("M 0 0 L 30 0 L 20 5 L 20 -5 L 30 0 F",
+							this.loc.x,
+							this.loc.y,
+							-this.loc.q)
+						.setStroke("#000", 3)
+						.stroke();
+				}
 				break;
 			case renderLayer.annotation:
 				render.fillText(this.name, this.loc.x, this.loc.y, 

@@ -16,15 +16,14 @@
       le.set("distanceToNext", 0);
       le.set("deflectionAngle", Math.PI);
     },
-
     /**
      * Calculate the closing segment of a ring cavity. This is similar to
      * the alignment calculation in SystemAdjust, except we're not
      * guaranteed to hit the closing optic, and we only have the last
      * segment to work with.
      * @param {Element[]} melements System elements.
-	 * @returns The index of the last pivot element, beyond which the cartesian
-	 * coordinates will need to be re-calculated.
+     * @returns The index of the last pivot element, beyond which the cartesian
+     * coordinates will need to be re-calculated.
      */
     alignEndElementsRing = function (melements) {
       var Vector = LaserCanvas.Math.Vector,
@@ -160,9 +159,11 @@
             console.warn("Ring not closed with stretch segment.");
           }
           // Rotate last pivot to line up the endpoints.
-          q = Math.acos(A.add(B).normalizeDot(C));
+        //   q = Math.acos(A.add(B).normalizeDot(C));
+          q = -Math.asin(A.add(B).normalizeCross(C));
 
-          // console.log(Math.acos(B.add(A).normalizeDot(C)))
+        //   console.log((Math.acos(B.add(A).normalizeDot(C)) * 180) / Math.PI);
+        //   console.log(`q=${(q * 180) / Math.PI}˚`);
 
           W = A.rotate(q);
           Z = new Vector(1, 0).rotate(-pivot.loc.q).rotate(q);
@@ -177,10 +178,10 @@
           ////// // Outgoing angle: To first pivot, plus triangle, plus angle to fixed.
           ////// Z = new Vector(1, 0).rotate(-pivot.loc.q).rotate(q);
           ////// // .rotate(q);
-		//   // For display, rotate to line up with new angle.
-        //   A = A.rotate(q);
-        //   B = B.rotate(q);
-        //   C = C.rotate(-q);
+          //   // For display, rotate to line up with new angle.
+          //   A = A.rotate(q);
+          //   B = B.rotate(q);
+          //   C = C.rotate(-q);
 
           ////// // Z = V.rotate(Math.PI);
           ////// // Z = C.rotate(aa).normalize(); // Target outgoing angle.
@@ -265,7 +266,7 @@
         // Original straight-line segment.
         render
           .drawVector(C0, pivot.loc.x, pivot.loc.y)
-          .setStroke("#903", 3)
+          .setStroke(q > 0 ? "#093" : "#903", 5)
           .stroke();
 
         // FROM element.
@@ -337,20 +338,29 @@
 
         // bb: Angle at end angle.
         render.fillText(
-          ((180 / Math.PI) * bb).toFixed(0),
-          melements[0].loc.x,
-          melements[0].loc.y,
+          ((bb * 180) / Math.PI).toFixed(0),
+          first.loc.x,
+          first.loc.y,
           -3,
           0
         );
 
         // cc: Angle between stretch and fixed vector.
         render.fillText(
-          ((180 / Math.PI) * cc).toFixed(0),
+          ((cc * 180) / Math.PI).toFixed(0),
           stretch.loc.x,
           stretch.loc.y,
           0.5,
           0
+        );
+
+        // Moved angle.
+        render.fillText(
+          ((q * 180) / Math.PI).toFixed(1),
+          first.loc.x,
+          first.loc.y,
+          0,
+          5
         );
 
         // render
@@ -367,7 +377,7 @@
         // 	.stroke();
       }, 0);
 
-	  return pivotIndex;
+      return pivotIndex;
     },
     /**
      * Update the rotation of the cavity end elements. The
