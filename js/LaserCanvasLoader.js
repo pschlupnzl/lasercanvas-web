@@ -136,6 +136,7 @@ window.LaserCanvas = {
 			"js/system/SystemNew.js",
 			"js/Toolbar/Toolbar.js",
 			"js/VariablePanel/VariablePanel.js",
+			"js/Worker/LaserCanvasWorker.js",
 			"js/Equation.js",
 			"js/LaserCanvasTheme.js",
 			"js/Localize.js",
