@@ -624,22 +624,6 @@ LaserCanvas.System = function () {
 			}
 		},
 		
-		/**
-		 * Move the start of the cavity to the next mirror, returning the offset
-		 * count to the new starting element. This is useful when dragging ring
-		 * cavities to prevent drags across the closing gap.
-		 * @param {number?} dir Direction to search for next mirror, default +1
-		 * for forward search.
-		 */
-		moveStart = function (dir) {
-			var count = LaserCanvas.SystemUtil.moveStart.call(this, melements, dir);
-			if (count > 0) {
-				alignEndElements();
-				calculateCartesianCoordinates();
-			}
-			return count;
-		},
-
 		// -------------------------------------------------
 		//  Empty system.
 		// -------------------------------------------------
@@ -720,7 +704,6 @@ LaserCanvas.System = function () {
 		insertElement: insertElement,             // Insert a new element near the given point.
 		inspectSegment: inspectSegment,           // Inspect beam on a segment (from segmentNearLocation).
 		iterateElements: iterateElements,         // Iterate all elements in the system.
-		moveStart: moveStart,                     // Move the start of the cavity.
 		onVariablesChange: onVariablesChange,     // Respond to a change in variables.
 		removeElement: removeElement,             // Remove the given element.
 		removeEventListener: removeEventListener, // Remove an event handler.

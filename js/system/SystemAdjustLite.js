@@ -247,29 +247,8 @@ LaserCanvas.systemAdjust = function (melements, calculateCartesianCoordinates, g
 		* @returns {boolean} Value indicating whether drag should start.
 		*/
 		dragElementStart = function (pt, elDrag) {
-			var system = this, // {System} System being edited.
-				ptStart = LaserCanvas.Utilities.extend({}, pt),
-				dir = 0, // {number} Moved starting element, if dragging across ring.
-				isRing = system.get("configuration") ===
-					LaserCanvas.System.configuration.ring;
-
 			mdragData = getDragElements(pt, elDrag);
-			
-			if (isRing && !mdragData.prev.pivot) {
-				dir = -1;
-			} else if (isRing && !mdragData.next.pivot) {
-				dir = +1;
-			}
-
-			if (dir) {
-				system.moveStart(dir);
-				mdragData = getDragElements(ptStart, elDrag);
-				mdragData.unmoveStart = -dir;
-			}
-			if (mdragData) {
-				return true;
-			}
-			return false;
+			return !!mdragData;
 		},
 		
 		/** Snapshot of state before drag. */
@@ -635,10 +614,6 @@ LaserCanvas.systemAdjust = function (melements, calculateCartesianCoordinates, g
 		* @param {Element} elDrag_notused Element being dragged.
 		*/
 		dragElementEnd = function (ptEnd_notused, ptStart_notused, elDrag_notused) {
-			var system = this;
-			if (mdragData.unmoveStart) {
-				system.moveStart(mdragData.unmoveStart);
-			}
 			mdragData = {};
 		},
 		
