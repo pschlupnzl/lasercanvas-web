@@ -22,6 +22,7 @@
      * guaranteed to hit the closing optic, and we only have the last
      * segment to work with.
      * @param {Element[]} melements System elements.
+     * @throws Error if the move cannot be completed as expected.
      * @returns The index of the last pivot element, beyond which the cartesian
      * coordinates will need to be re-calculated.
      */
@@ -68,7 +69,8 @@
 
       // console.log(`alignEndElements pivot; stretches; cavity:`, pivot, stretches, melements)
 
-      while (stretches.length > 0) {
+      do {
+        // Stretch the segment after the last optic only.
         stretch = stretches[0];
 
         // Accumulate fixed vector.
@@ -146,17 +148,23 @@
           bb = Math.asin((Math.sin(cc) * B.norm()) / C.norm());
           // Sum angle formula for third angle.
           aa = Math.PI - bb - cc;
+          if (isNaN(aa)) {
+            throw new Error("Ring close error calculating construction angle aa");
+          }
+
           // Cosine rule to get stretch length.
           l2 = B.norm2() + C.norm2() - 2 * B.norm() * C.norm() * Math.cos(aa);
 
           // Length of stretch vector, limited to zero.
-          if (l2 < 0) console.warn("Ring stretch error l2 < 0:", l2);
+          if (l2 < 0) {
+            throw new Error("Ring stretch error l2 < 0: " + l2);
+          }
           l = l2 < 0 ? 0 : Math.sqrt(l2);
           // Scaled stretch vector.
           A = A.normalize().scale(l);
           // Determine whether this completes the leg.
           if (Math.abs(A.add(B).norm() - C.norm()) > eps) {
-            console.warn("Ring not closed with stretch segment.");
+            throw new Error("Ring not closed with stretch segment.");
           }
           // Rotate last pivot to line up the endpoints.
         //   q = Math.acos(A.add(B).normalizeDot(C));
@@ -210,9 +218,8 @@
         pivot.set("deflectionAngle", Math.atan2(V.cross(Z), V.dot(Z))); // Updates angleOfIncidence.
         pivot.loc.q = Z.atan2();
         stretch.set("distanceToNext", l);
+      } while (false);
 
-        break;
-      }
       ////// // Z = new Vector(le.loc.x - el.loc.x, le.loc.y - el.loc.y);
       ////// // Z = new Vector(el.loc.x - le.loc.x, el.loc.y - le.loc.y);
       ////// Z = new Vector(0,  1);
@@ -261,120 +268,124 @@
       ////// pivot.set("deflectionAngle", Math.atan2(V.cross(Z), V.dot(Z))); // Updates angleOfIncidence.
 
       setTimeout(function () {
-        var render = LaserCanvas.__render;
+        try {
+          var render = LaserCanvas.__render;
 
-        // Original straight-line segment.
-        render
-          .drawVector(C0, pivot.loc.x, pivot.loc.y)
-          .setStroke(q > 0 ? "#093" : "#903", 5)
-          .stroke();
+          // Original straight-line segment.
+          render
+            .drawVector(C0, pivot.loc.x, pivot.loc.y)
+            .setStroke(q > 0 ? "#093" : "#903", 5)
+            .stroke();
 
-        // FROM element.
-        render
-          .drawPath("M -32 0 L 32 0 M 0 -32 L 0 32", pivot.loc.x, pivot.loc.y)
-          .setStroke("red", 1)
-          .stroke();
-        // render.drawVector(Z.normalize().scale(pivot.get("distanceToNext")), pivot.loc.x, pivot.loc.y, "red");
+          // FROM element.
+          render
+            .drawPath("M -32 0 L 32 0 M 0 -32 L 0 32", pivot.loc.x, pivot.loc.y)
+            .setStroke("red", 1)
+            .stroke();
+          // render.drawVector(Z.normalize().scale(pivot.get("distanceToNext")), pivot.loc.x, pivot.loc.y, "red");
 
-        render.drawVector(
-          B.add(A), //.normalize().scale(pivot.get("distanceToNext")),
-          pivot.loc.x,
-          pivot.loc.y,
-          "#c90"
-        );
+          render.drawVector(
+            B.add(A), //.normalize().scale(pivot.get("distanceToNext")),
+            pivot.loc.x,
+            pivot.loc.y,
+            "#c90"
+          );
 
-        // TO element.
-        render
-          .drawPath("M -32 0 L 32 0 M 0 -32 L 0 32", first.loc.x, first.loc.y)
-          .setStroke("blue", 1)
-          .stroke();
-        render.drawVector(
-          U.normalize().scale(100),
-          first.loc.x,
-          first.loc.y,
-          "blue"
-        );
-        render.drawVector(
-          W.normalize().scale(20),
-          first.loc.x,
-          first.loc.y,
-          "skyblue"
-        );
+          // TO element.
+          render
+            .drawPath("M -32 0 L 32 0 M 0 -32 L 0 32", first.loc.x, first.loc.y)
+            .setStroke("blue", 1)
+            .stroke();
+          render.drawVector(
+            U.normalize().scale(100),
+            first.loc.x,
+            first.loc.y,
+            "blue"
+          );
+          render.drawVector(
+            W.normalize().scale(20),
+            first.loc.x,
+            first.loc.y,
+            "skyblue"
+          );
 
-        // Between FROM TO element (straight-line).
-        render
-          .drawVector(C, pivot.loc.x, pivot.loc.y)
-          .setStroke("#c90", 2)
-          .stroke();
-        render
-          .beginPath()
-          .arc(pivot.loc.x, pivot.loc.y, C.norm(), 0, 2 * Math.PI)
-          .setStroke("#c90", 0.5)
-          .stroke();
+          // Between FROM TO element (straight-line).
+          render
+            .drawVector(C, pivot.loc.x, pivot.loc.y)
+            .setStroke("#c90", 2)
+            .stroke();
+          render
+            .beginPath()
+            .arc(pivot.loc.x, pivot.loc.y, C.norm(), 0, 2 * Math.PI)
+            .setStroke("#c90", 0.5)
+            .stroke();
 
-        // A: Stretch outgoing vector.
-        render.drawVector(A, stretch.loc.x, stretch.loc.y, "#66c");
-        render
-          .beginPath()
-          .arc(pivot.loc.x, pivot.loc.y, A.add(B).norm(), 0, 2 * Math.PI)
-          .setStroke("#66c", 0.5)
-          .stroke();
-        // B: Fixed vector.
-        render.drawVector(B, pivot.loc.x, pivot.loc.y, "green");
-        render
-          .beginPath()
-          .arc(pivot.loc.x, pivot.loc.y, B.norm(), 0, 2 * Math.PI)
-          .setStroke("green", 0.5)
-          .stroke();
+          // A: Stretch outgoing vector.
+          render.drawVector(A, stretch.loc.x, stretch.loc.y, "#66c");
+          render
+            .beginPath()
+            .arc(pivot.loc.x, pivot.loc.y, A.add(B).norm(), 0, 2 * Math.PI)
+            .setStroke("#66c", 0.5)
+            .stroke();
+          // B: Fixed vector.
+          render.drawVector(B, pivot.loc.x, pivot.loc.y, "green");
+          render
+            .beginPath()
+            .arc(pivot.loc.x, pivot.loc.y, B.norm(), 0, 2 * Math.PI)
+            .setStroke("green", 0.5)
+            .stroke();
 
-        // aa: Angle at pivot.
-        render.fillText(
-          ((180 / Math.PI) * aa).toFixed(0),
-          pivot.loc.x,
-          pivot.loc.y,
-          0,
-          -1
-        );
+          // aa: Angle at pivot.
+          render.fillText(
+            ((180 / Math.PI) * aa).toFixed(0),
+            pivot.loc.x,
+            pivot.loc.y,
+            0,
+            -1
+          );
 
-        // bb: Angle at end angle.
-        render.fillText(
-          ((bb * 180) / Math.PI).toFixed(0),
-          first.loc.x,
-          first.loc.y,
-          -3,
-          0
-        );
+          // bb: Angle at end angle.
+          render.fillText(
+            ((bb * 180) / Math.PI).toFixed(0),
+            first.loc.x,
+            first.loc.y,
+            -3,
+            0
+          );
 
-        // cc: Angle between stretch and fixed vector.
-        render.fillText(
-          ((cc * 180) / Math.PI).toFixed(0),
-          stretch.loc.x,
-          stretch.loc.y,
-          0.5,
-          0
-        );
+          // cc: Angle between stretch and fixed vector.
+          render.fillText(
+            ((cc * 180) / Math.PI).toFixed(0),
+            stretch.loc.x,
+            stretch.loc.y,
+            0.5,
+            0
+          );
 
-        // Moved angle.
-        render.fillText(
-          ((q * 180) / Math.PI).toFixed(1),
-          first.loc.x,
-          first.loc.y,
-          0,
-          5
-        );
+          // Moved angle.
+          render.fillText(
+            ((q * 180) / Math.PI).toFixed(1),
+            first.loc.x,
+            first.loc.y,
+            0,
+            5
+          );
 
-        // render
-        // 	.drawVector(B, pivot.loc.x, pivot.loc.y)
-        // 	.setStroke("green", 2)
-        // 	.stroke();
+          // render
+          // 	.drawVector(B, pivot.loc.x, pivot.loc.y)
+          // 	.setStroke("green", 2)
+          // 	.stroke();
 
-        // render
-        // 	.drawVector(
-        // 		Z,
-        // 		pivot.loc.x,
-        // 		pivot.loc.y)
-        // 	.setStroke("red", 2)
-        // 	.stroke();
+          // render
+          // 	.drawVector(
+          // 		Z,
+          // 		pivot.loc.x,
+          // 		pivot.loc.y)
+          // 	.setStroke("red", 2)
+          // 	.stroke();
+        } catch (err) {
+          // don't care
+        }
       }, 0);
 
       return pivotIndex;

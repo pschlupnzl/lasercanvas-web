@@ -272,6 +272,55 @@ LaserCanvas.systemAdjust = function (melements, calculateCartesianCoordinates, g
 			return false;
 		},
 		
+		/** Snapshot of state before drag. */
+		msnapshot = [],
+
+		/**
+		 * Take a snapshot of the system being rearranged.
+		 */
+		takeSnapshot = function () {
+			var extend = LaserCanvas.Utilities.extend;
+			msnapshot = [
+				["prev", "stretch"],
+				["prev", "pivot"],
+				["next", "stretch"],
+				["next", "pivot"],
+			].map(function (relType) {
+				var rel = relType[0],
+					type = relType[1],
+					element = mdragData[rel]?.[type]?.element;
+				 return element && {
+					element: element,
+					loc: extend({}, element.loc),
+					dist: type === "stretch"
+						? element.get("distanceToNext")
+						: undefined,
+					aoi: type === "pivot"
+						? element.get("angleOfIncidence")
+						: undefined
+				};
+			}).filter(function(snapshot) {
+				return !!snapshot
+			});
+		},
+
+		/**
+		 * Apply an earlier snapshot of the system being rearranged.
+		 */
+		applySnapshot = function (apply) {
+			var extend = LaserCanvas.Utilities.extend;
+			msnapshot.forEach(function (snapshot) {
+				var element = snapshot.element;
+				extend(element.loc, snapshot.loc);
+				if (snapshot.dist !== undefined) {
+					element.set("distanceToNext", snapshot.dist);
+				} 
+				if (snapshot.aoi !== undefined) {
+					element.set("angleOfIncidence", snapshot.aoi);
+				}
+			});
+		},
+
 		/**
 		* An element is being dragged. This calculates the new stretch and
 		* pivot values for the relevant anchor points and updates the system
@@ -286,9 +335,17 @@ LaserCanvas.systemAdjust = function (melements, calculateCartesianCoordinates, g
 			pt.x += mdragData.offset.dx;
 			pt.y += mdragData.offset.dy;
 			
-			return mdragData.stretchOnly
-				? dragElementStretch(pt, ptStart, elDrag_notused)
-				: dragElementPivot(pt, ptStart, elDrag_notused);
+			try {
+				takeSnapshot();
+				return mdragData.stretchOnly
+					? dragElementStretch(pt, ptStart, elDrag_notused)
+					: dragElementPivot(pt, ptStart, elDrag_notused);
+			} catch (err) {
+				// Problem moving, undo.
+				applySnapshot();
+				calculateCartesianCoordinates();
+				return false;
+			}
 		},
 		
 		/**
@@ -371,7 +428,7 @@ LaserCanvas.systemAdjust = function (melements, calculateCartesianCoordinates, g
 
 				// Calculate new stretch and angles.
 				// From Wikipedia,         ____________________
-				//    |A| = B cos cc +/- \/ |C|^2 - B^2sin^2cc
+				//    |A| = B cos cc +/-  √ |C|^2 - B^2sin^2cc
 				// @param {object} data Data for prev or next segment.
 				// @param {number} dir Direction -1:prev, +1:next.
 				// @returns {boolean} Value indicating whether the move yields valid values.
