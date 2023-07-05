@@ -131,6 +131,21 @@ window.LaserCanvas.Application = function (canvas, info) {
 			mvariables = new LaserCanvas.Variables();
 			mvariablePanel = new LaserCanvas.VariablePanel(mvariables);
 			mworker = new LaserCanvas.StabilityWorker().init();
+			[
+				'#LaserCanvasFrame',
+				'#LaserCanvasToolbar',
+				'#LaserCanvasNewPanel',
+				// '#LaserCanvasVariablesPanel',
+				// '#LaserCanvasInfo',
+				// '#LaserCanvasToggleInfo',
+				'.helpButton'
+			].forEach(function (sel) {
+				Array.prototype.forEach.call(
+					document.querySelectorAll(sel),
+					function (el) {
+						el.style.display = 'none';
+					});
+			});
 
 			onResize();
 			window.addEventListener('resize', onResize, false);

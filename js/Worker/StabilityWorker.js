@@ -1,3 +1,7 @@
+//#region Namespace.
+var LaserCanvas = {};
+
+//#endregion
 //#region StabilityWorker class definition.
 /**
  * Class to handle the stability worker load.
@@ -57,10 +61,28 @@ var stabilityWorker = new StabilityWorker();
 onmessage = function (event) {
   switch (event.data.type) {
     case "init":
-      stabilityWorker.onInit(event.data.params);
+      // console.log(event.data.params);
+      event.data.params.forEach(function (item) {
+        console.log(item);
+        var field,
+        dest = LaserCanvas,
+        subpaths = item.path.split('.'),
+        prop = item.Sdef
+          ? Function("return " + item.Sdef)()
+          : function () {};
+
+        while(subpaths.length > 1) {
+          field = subpaths.splice(0, 1)[0];
+          dest[field]=dest[field]||{};
+          dest = dest[field];
+        }
+        dest[subpaths[0]]=prop;
+      });
+      console.log(LaserCanvas);
+      // stabilityWorker.onInit(event.data.params);
       break;
     case "system":
-      stabilityWorker.onSystem(event.data.params);
+      // stabilityWorker.onSystem(event.data.params);
       break;
   }
 };

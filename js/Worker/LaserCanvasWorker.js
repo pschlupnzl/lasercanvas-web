@@ -21,14 +21,18 @@
     var variablesGetter = function () {};
     this._worker.postMessage({
       type: "init",
-      params: [LaserCanvas.Element.Mirror].map(function (Element) {
-        var element = new Element(variablesGetter);
-        return {
-          type: element.type,
-          getStr: element.get.toString(),
-          elementAbcdStr: element.elementAbcd.toString(),
-        };
-      }),
+      params: [
+        { path: 'systemAbcd', Sdef:  LaserCanvas.systemAbcd.toString()}
+      ].concat(
+        [LaserCanvas.Element.Mirror].map(function (Element) {
+          var element = new Element(variablesGetter);
+          return {
+            path:'Element.' + element.type,
+            Sget: element.get.toString(),
+            SelementAbcd: element.elementAbcd.toString(),
+          };
+        }),
+      ),
     });
     this._worker.postMessage({ type: "test" });
     return this;
