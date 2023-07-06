@@ -150,6 +150,24 @@ LaserCanvas.System = function () {
 		},
 
 		/**
+		 * Returns a value indicating whether the given element can be removed
+		 * from the system. This will normally be TRUE, but FALSE to ensure at
+		 * least three mirrors remain in a ring cavity.
+		 * @param {Element} element Element queried for removal.
+		 */
+		canDeleteElement = function (element) {
+			if (element.type === LaserCanvas.Element.Mirror.Type &&
+				mprop.configuration === LaserCanvas.System.configuration.ring &&
+				melements.reduce(function(count, elem) {
+					return count + (elem.type === LaserCanvas.Element.Mirror.Type ? 1 : 0);
+				}, 0) <= 3
+			) {
+				return false;
+			}
+			return true;
+		},
+
+		/**
 		* Determine whether a given element property should
 		* be shown. For example, group velocity dispersion is
 		* only used in ultrafast resonator types.
@@ -234,9 +252,7 @@ LaserCanvas.System = function () {
 				Vector = LaserCanvas.Math.Vector, // {function} Construction function for vector.
 				kmax = mprop.configuration === LaserCanvas.System.configuration.ring
 					? melements.length : melements.length - 1;   // How many segments to check.
-			// kmax = melements.length;
-			// window['el'] =  melements[melements.length - 1]
-			// console.log(`kmax=${kmax} (see window.el)`)
+
 			for (k = 0; k < kmax; k += 1) {
 				if (!filterBy || melements[k].canSetProperty(filterBy)) {
 					loc = melements[k].location(); // {Point} Current optic location.
@@ -532,7 +548,11 @@ LaserCanvas.System = function () {
 			// anyway, so do it now. When scanning ring cavities, we need
 			// to calculate the coordinates to determine the final leg.
 			if (updateCoordinates || this.get("configuration") === LaserCanvas.System.configuration.ring) {
-				calculateCartesianCoordinates();
+				try {
+					calculateCartesianCoordinates();
+				} catch (err) {
+					// TODO: Handle bad cavity (e.g. ring that didn't close)
+				}
 			}
 		},
 
@@ -690,6 +710,7 @@ LaserCanvas.System = function () {
 		showElementProperty: showElementProperty, // Determine whether a given element property should be shown.
 		calculateAbcd: calculateAbcd,             // Calculate the ABCD values for this system.
 		canSetProperty: canSetProperty,           // Determine whether a property value can be set.
+		canDeleteElement: canDeleteElement,       // Determine whether an element can be deleted.
 		createNew: createNew,                     // Create a new system.
 		dragElement: dragElement,                 // Update during drag.
 		dragElementEnd: dragElementEnd,           // Finished dragging an element.

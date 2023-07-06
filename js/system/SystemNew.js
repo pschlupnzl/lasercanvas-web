@@ -219,7 +219,8 @@
 						  "_expression": null
 						}
 					  }
-					},
+					}
+				].concat(Math.random() < 0.5 ? [
 					{
 						"type": "Dielectric",
 						"name": "D1",
@@ -228,9 +229,9 @@
 							// "type": "Plate",
 							"type": "Prism",
 							"flip": false,
-							"distanceToNext": {
-							"_number": 24.037008503093265,
-							"_expression": null
+								"distanceToNext": {
+								"_number": 24.037008503093265,
+								"_expression": null
 							},
 							"refractiveIndex": { "_number": 2, "_expression": null },
 							"groupVelocityDispersion": { "_number": 0, "_expression": null },
@@ -241,8 +242,8 @@
 							"thermalLens": { "_number": 0, "_expression": null },
 							"thickness": { "_number": 20, "_expression": null }
 						}
-						},
-						{
+					},
+					{
 						"type": "Lens",
 						"name": "L1",
 						"loc": { },
@@ -250,16 +251,16 @@
 							"distanceToNext": { "_number": 0, "_expression": null },
 							"focalLength": { "_number": 0, "_expression": null }
 						}
-						},
-						{
+					},
+					{
 						"type": "Dielectric",
 						"name": "D2",
 						"loc": { },
 						"prop": {
-							"flip": false,
-							"distanceToNext": {
-							"_number": 164.83658437865768 - 100,
-							"_expression": null
+								"flip": false,
+								"distanceToNext": {
+								"_number": 164.83658437865768 - 100,
+								"_expression": null
 							},
 							"refractiveIndex": { "_number": 1, "_expression": null },
 							"groupVelocityDispersion": { "_number": 0, "_expression": null },
@@ -270,8 +271,19 @@
 							"thermalLens": { "_number": 0, "_expression": null },
 							"thickness": { "_number": 0, "_expression": null }
 						}
-						}				  ]
-				};
+					}
+				] : [
+					{
+						"type": "Lens",
+						"name": "L1",
+						"loc": { },
+						"prop": {
+							"distanceToNext": { "_number": 0, "_expression": null },
+							"focalLength": { "_number": 0, "_expression": null }
+						}
+					}
+				]),
+			};
 
 			_systemDefaults['x'+LaserCanvas.System.configuration.ring] = {
 				prop: {
