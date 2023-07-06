@@ -55,19 +55,15 @@
       // Find pivot and stretch element(s).
       for (k = melements.length - 1; k > 0; k -= 1) {
         el = melements[k];
-        // console.log(`element ${el.name} ${el.type} next=${el.canSetProperty("distanceToNext") ? "TRUE":"false"} angle=${el.canSetProperty("outgoingAngle")}`)
         if (el.canSetProperty("distanceToNext")) {
           stretches.push(el);
         }
         if (el.canSetProperty("outgoingAngle")) {
-          // console.log(`found - bailing`)
           pivot = el;
           pivotIndex = k;
           break;
         }
       }
-
-      // console.log(`alignEndElements pivot; stretches; cavity:`, pivot, stretches, melements)
 
       do {
         // Stretch the segment after the last optic only.
@@ -149,7 +145,9 @@
           // Sum angle formula for third angle.
           aa = Math.PI - bb - cc;
           if (isNaN(aa)) {
-            throw new Error("Ring close error calculating construction angle aa");
+            throw new Error(
+              "Ring close error calculating construction angle aa"
+            );
           }
 
           // Cosine rule to get stretch length.
@@ -167,49 +165,10 @@
             throw new Error("Ring not closed with stretch segment.");
           }
           // Rotate last pivot to line up the endpoints.
-        //   q = Math.acos(A.add(B).normalizeDot(C));
           q = -Math.asin(A.add(B).normalizeCross(C));
-
-        //   console.log((Math.acos(B.add(A).normalizeDot(C)) * 180) / Math.PI);
-        //   console.log(`q=${(q * 180) / Math.PI}˚`);
 
           W = A.rotate(q);
           Z = new Vector(1, 0).rotate(-pivot.loc.q).rotate(q);
-
-          ////// const n = (v) => `${v.toFixed(3)} (${(v * 180 / Math.PI).toFixed(1)}˚)`
-          ////
-          ////// console.log(`aa=${n(aa)} B->${n(B.atan2())} pivot.loc.q=${n(pivot.loc.q)} dot=${n(Z.normalizeDot(B))}`)
-          ////// Z = C.normalize().rotate(aa).rotate(B.atan2() - pivot.loc.q)
-          ////
-          ////// // Bisected incoming vector to last element.
-          ////// V = new Vector(1, 0).rotate(-pivot.loc.p);
-          ////// // Outgoing angle: To first pivot, plus triangle, plus angle to fixed.
-          ////// Z = new Vector(1, 0).rotate(-pivot.loc.q).rotate(q);
-          ////// // .rotate(q);
-          //   // For display, rotate to line up with new angle.
-          //   A = A.rotate(q);
-          //   B = B.rotate(q);
-          //   C = C.rotate(-q);
-
-          ////// // Z = V.rotate(Math.PI);
-          ////// // Z = C.rotate(aa).normalize(); // Target outgoing angle.
-          ////// // Z = new Vector(1, 0);
-          ////// // // Z = new Vector(1, 0).rotate(30 * Math.PI / 180);
-          ////// pivot.set("deflectionAngle", Math.atan2(V.cross(Z), V.dot(Z))); // Updates angleOfIncidence.
-          ////// pivot.loc.q = Z.atan2();
-          ////
-          ////// // stretch.set("distanceToNext", l);
-          ////
-          ////// // Incoming vector to first element.
-          ////// // W = new Vector(1, 0).rotate(melements[melements.length - 1].loc.q)//.rotate(q);
-          ////// W = new Vector(1, 0).rotate(Math.PI / 2)
-          ////// // Bisected outgoing vector from first element.
-          ////// U = new Vector(1, 0).rotate(-first.loc.q);
-          ////// // Vector incoming
-          ////// // first.set("deflectionAngle", Math.atan2(W.cross(U), W.dot(U))); // Updates angleOfIncidence.
-          ////// // first.set("deflectionAngle", Math.atan2(W.cross(U), W.dot(U))); // Updates angleOfIncidence.
-          ////// // first.set("deflectionAngle", Math.atan2(U.cross(W), U.dot(W))); // Updates angleOfIncidence.
-          ////// first.set("deflectionAngle", Math.PI); // Updates angleOfIncidence.
         }
 
         // Alignments.
@@ -219,175 +178,6 @@
         pivot.loc.q = Z.atan2();
         stretch.set("distanceToNext", l);
       } while (false);
-
-      ////// // Z = new Vector(le.loc.x - el.loc.x, le.loc.y - el.loc.y);
-      ////// // Z = new Vector(el.loc.x - le.loc.x, el.loc.y - le.loc.y);
-      ////// Z = new Vector(0,  1);
-      ////// console.log(`(${el.loc.x}, ${el.loc.y}) -> (${le.loc.x}, ${le.loc.y}) Z.atan2=${Z.atan2()}`)
-      ////// Z = Z.normalize();
-      ////// U = new Vector(1, 0).rotate(-el.loc.q); // Bisected outgoing vector from first element.
-      ////// V = new Vector(1, 0).rotate(-le.loc.p); // Bisected incoming vector to last element.
-      ////
-      ////// le.set("deflectionAngle", Math.atan2(Z.cross(U), Z.dot(U))); // Updates angleOfIncidence.
-      ////// el.set("deflectionAngle", Math.atan2(V.cross(Z), V.dot(Z))); // Updates angleOfIncidence.
-      ////// el.loc.q = Z.atan2();
-      ////
-      ////// pivot.set("outgoingAngle", Z.atan2());
-      ////// var Vector = LaserCanvas.Math.Vector, // {function} Vector construction function.
-      ////// 	U, V, Z, l,         // Vectors for ring cavity.
-      ////// 	el = melements[0],  // {Element} Starting element.
-      ////// 	le = melements[melements.length - 1]; // {Element} Final element.
-      ////
-      ////// Ring cavity construction vectors.
-      ////// This closes the space between the last optic (mirror or
-      ////// other) to the start optic (always mirror).
-      ////// Z = new Vector(el.loc.x - le.loc.x, el.loc.y - le.loc.y);
-      ////// l = Z.norm();                           // Vector length.
-      ////// Z = Z.normalize();                      // Vector from last to first element.
-      ////// U = new Vector(1, 0).rotate(-el.loc.q); // Bisected outgoing vector from first element.
-      ////// V = new Vector(1, 0).rotate(-le.loc.p); // Bisected incoming vector to last element.
-      ////
-      ////// // Alignments.
-      ////// el.loc.p = Z.atan2();
-      ////// el.set("deflectionAngle", Math.atan2(Z.cross(U), Z.dot(U))); // Updates angleOfIncidence.
-      ////// le.set("deflectionAngle", Math.atan2(V.cross(Z), V.dot(Z))); // Updates angleOfIncidence.
-      ////// le.loc.q = Z.atan2();
-      ////// le.set("distanceToNext", l);
-      ////
-      /////** Final outgoing angle of the pivot. */
-      ////
-      ////// q = 0;
-      ////// // P = new Vector(1, 0).rotate(-pivot.loc.p);
-      ////// /** Normalized vector representing angle incoming to pivot. */
-      ////// V = new Vector(1, 0).rotate(-pivot.loc.p);
-      ////// /** Normalized vector representing outgoing angle from pivot. */
-      ////// Z = new Vector(1, 0).rotate(-90 * Math.PI / 180);
-      ////
-      ////// Z: Vector from last to first element, i.e. target angle.
-      ////// V: Bisected incoming vector to last (pivot) element.
-      ////// pivot.set("deflectionAngle", Math.atan2(V.cross(Z), V.dot(Z))); // Updates angleOfIncidence.
-
-      setTimeout(function () {
-        try {
-          var render = LaserCanvas.__render;
-
-          // Original straight-line segment.
-          render
-            .drawVector(C0, pivot.loc.x, pivot.loc.y)
-            .setStroke(q > 0 ? "#093" : "#903", 5)
-            .stroke();
-
-          // FROM element.
-          render
-            .drawPath("M -32 0 L 32 0 M 0 -32 L 0 32", pivot.loc.x, pivot.loc.y)
-            .setStroke("red", 1)
-            .stroke();
-          // render.drawVector(Z.normalize().scale(pivot.get("distanceToNext")), pivot.loc.x, pivot.loc.y, "red");
-
-          render.drawVector(
-            B.add(A), //.normalize().scale(pivot.get("distanceToNext")),
-            pivot.loc.x,
-            pivot.loc.y,
-            "#c90"
-          );
-
-          // TO element.
-          render
-            .drawPath("M -32 0 L 32 0 M 0 -32 L 0 32", first.loc.x, first.loc.y)
-            .setStroke("blue", 1)
-            .stroke();
-          render.drawVector(
-            U.normalize().scale(100),
-            first.loc.x,
-            first.loc.y,
-            "blue"
-          );
-          render.drawVector(
-            W.normalize().scale(20),
-            first.loc.x,
-            first.loc.y,
-            "skyblue"
-          );
-
-          // Between FROM TO element (straight-line).
-          render
-            .drawVector(C, pivot.loc.x, pivot.loc.y)
-            .setStroke("#c90", 2)
-            .stroke();
-          render
-            .beginPath()
-            .arc(pivot.loc.x, pivot.loc.y, C.norm(), 0, 2 * Math.PI)
-            .setStroke("#c90", 0.5)
-            .stroke();
-
-          // A: Stretch outgoing vector.
-          render.drawVector(A, stretch.loc.x, stretch.loc.y, "#66c");
-          render
-            .beginPath()
-            .arc(pivot.loc.x, pivot.loc.y, A.add(B).norm(), 0, 2 * Math.PI)
-            .setStroke("#66c", 0.5)
-            .stroke();
-          // B: Fixed vector.
-          render.drawVector(B, pivot.loc.x, pivot.loc.y, "green");
-          render
-            .beginPath()
-            .arc(pivot.loc.x, pivot.loc.y, B.norm(), 0, 2 * Math.PI)
-            .setStroke("green", 0.5)
-            .stroke();
-
-          // aa: Angle at pivot.
-          render.fillText(
-            ((180 / Math.PI) * aa).toFixed(0),
-            pivot.loc.x,
-            pivot.loc.y,
-            0,
-            -1
-          );
-
-          // bb: Angle at end angle.
-          render.fillText(
-            ((bb * 180) / Math.PI).toFixed(0),
-            first.loc.x,
-            first.loc.y,
-            -3,
-            0
-          );
-
-          // cc: Angle between stretch and fixed vector.
-          render.fillText(
-            ((cc * 180) / Math.PI).toFixed(0),
-            stretch.loc.x,
-            stretch.loc.y,
-            0.5,
-            0
-          );
-
-          // Moved angle.
-          render.fillText(
-            ((q * 180) / Math.PI).toFixed(1),
-            first.loc.x,
-            first.loc.y,
-            0,
-            5
-          );
-
-          // render
-          // 	.drawVector(B, pivot.loc.x, pivot.loc.y)
-          // 	.setStroke("green", 2)
-          // 	.stroke();
-
-          // render
-          // 	.drawVector(
-          // 		Z,
-          // 		pivot.loc.x,
-          // 		pivot.loc.y)
-          // 	.setStroke("red", 2)
-          // 	.stroke();
-        } catch (err) {
-          // don't care
-        }
-      }, 0);
-
       return pivotIndex;
     },
     /**
@@ -402,11 +192,6 @@
      * @param {Element[]} melements System elements.
      */
     alignEndElements = function (mprop, melements) {
-      // var Vector = LaserCanvas.Math.Vector, // {function} Vector construction function.
-      // 	U, V, Z, l,         // Vectors for ring cavity.
-      // 	el = melements[0],  // {Element} Starting element.
-      // 	le = melements[melements.length - 1]; // {Element} Final element.
-
       if (mprop.configuration === LaserCanvas.System.configuration.ring) {
         return alignEndElementsRing(melements);
       } else {
