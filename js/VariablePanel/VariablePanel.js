@@ -9,6 +9,9 @@
 	/** Number of scanning steps (not including starting point). */
 	VariablePanel.scanSteps = 32;
 
+	/** First density of mimap for 2d scans. */
+	VariablePanel.scan2dMin = 16;
+
 	/** Maximum density of mimap for 2d scans. */
 	VariablePanel.scan2dMax = 64;
 
@@ -91,7 +94,6 @@
 		var self = this,
 			vx, vy,
 			scan2dId = ++this.scan2dId,
-			m = 0,
 			n = 16, // Starting mipmap resolution.
 			ranges = variableNames.map(function (variableName) {
 				return self.numberSliders[variableName].getRange();
@@ -113,7 +115,7 @@
 					vx = ranges[0].min + x * steps[0] / n;
 					self.mvariables.set(variableNames[0], vx, true);
 					for (var y = 0; y < n; y += 1) {
-						if (m > 0 && x % m === 0 && y % m === 0) {
+						if (n > VariablePanel.scan2dMin && x % 2 === 0 && y % 2 === 0) {
 							// Skip previously set.
 							continue;
 						}
@@ -129,7 +131,6 @@
 				});		
 
 				// Prepare for next iteration.
-				m = n;
 				n *= 2;
 				if (n <= VariablePanel.scan2dMax) {
 					setTimeout(iterate, 0);
