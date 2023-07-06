@@ -2,11 +2,15 @@
 	var VariablePanel = function (mvariables) {
 		this.mvariables = mvariables;
 		this.numberSliders = {};
+		this.scan2dId = 0;
 		this.el = this.init();
 	};
 
 	/** Number of scanning steps (not including starting point). */
 	VariablePanel.scanSteps = 32;
+
+	/** Maximum density of mimap for 2d scans. */
+	VariablePanel.scan2dMax = 64;
 
 	/** Initializes the component, filling its DOM element. */
 	VariablePanel.prototype.init = function () {
@@ -74,6 +78,65 @@
 	VariablePanel.prototype.scan = function (variableName, iterator) {
 		var range = this.numberSliders[variableName].getRange();
 		this.mvariables.scan(variableName, range, VariablePanel.scanSteps, iterator);
+	};
+
+	/**
+	 * Iterate over two variable names. We fill the plane with a mipmap-style
+	 * algorithm, starting coarse and finishing fine, unless the scan is called
+	 * again before the layering is finished.
+	 * @param {[string, string]} variableNames The two variables to scan.
+	 * @param {function} iterator Delegate to call on every variable step.
+	 */
+	VariablePanel.prototype.scan2 = function (variableNames, iterator) {
+		var self = this,
+			vx, vy,
+			scan2dId = ++this.scan2dId,
+			m = 0,
+			n = 16, // Starting mipmap resolution.
+			ranges = variableNames.map(function (variableName) {
+				return self.numberSliders[variableName].getRange();
+			}),
+			steps = ranges.map(function (range) {
+				return range.max - range.min;
+			}),
+			current = self.mvariables.value(),
+
+			/** Iterate the next level. */
+			iterate = function () {
+				// Abort if re-triggered since scan started.
+				if (scan2dId !== self.scan2dId) {
+					return;
+				}
+
+				// Scan one resolution.
+				for (var x = 0; x < n; x += 1) {
+					vx = ranges[0].min + x * steps[0] / n;
+					self.mvariables.set(variableNames[0], vx, true);
+					for (var y = 0; y < n; y += 1) {
+						if (m > 0 && x % m === 0 && y % m === 0) {
+							// Skip previously set.
+							continue;
+						}
+						vy = ranges[1].min + y * steps[1] / n;
+						self.mvariables.set(variableNames[1], vy, true);
+						iterator([x, y], n);
+					}
+				}
+
+				// Restore all variables.
+				variableNames.forEach(function (variableName) {
+					self.mvariables.set(variableName, current[variableName], true);
+				});		
+
+				// Prepare for next iteration.
+				m = n;
+				n *= 2;
+				if (n <= VariablePanel.scan2dMax) {
+					setTimeout(iterate, 0);
+				}
+			};
+
+		setTimeout(iterate, 0);
 	};
 
 	LaserCanvas.VariablePanel = VariablePanel;

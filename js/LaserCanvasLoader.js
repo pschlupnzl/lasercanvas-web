@@ -112,6 +112,7 @@ window.LaserCanvas = {
 			"js/element/ElementLens.js",
 			"js/element/ElementMirror.js",
 			"js/element/ElementScreen.js",
+			"js/Graph2d/Colormap.js",
 			"js/Graph2d/Graph2d.js",
 			"js/Graph2d/Graph2dAxis.js",
 			"js/GraphCollection/GraphCollection.js",

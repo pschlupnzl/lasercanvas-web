@@ -131,21 +131,6 @@ window.LaserCanvas.Application = function (canvas, info) {
 			mvariables = new LaserCanvas.Variables();
 			mvariablePanel = new LaserCanvas.VariablePanel(mvariables);
 			mworker = new LaserCanvas.StabilityWorker().init();
-			[
-				'#LaserCanvasFrame',
-				'#LaserCanvasToolbar',
-				'#LaserCanvasNewPanel',
-				// '#LaserCanvasVariablesPanel',
-				// '#LaserCanvasInfo',
-				// '#LaserCanvasToggleInfo',
-				'.helpButton'
-			].forEach(function (sel) {
-				Array.prototype.forEach.call(
-					document.querySelectorAll(sel),
-					function (el) {
-						el.style.display = 'none';
-					});
-			});
 
 			onResize();
 			window.addEventListener('resize', onResize, false);
@@ -177,6 +162,31 @@ window.LaserCanvas.Application = function (canvas, info) {
 						msystem.onVariablesChange();
 					}
 				}
+
+				var canvas = document.getElementById("scan-canvas"),
+					colormap = new LaserCanvas.ColorMap("ire", 256);
+				if (!canvas) {
+					canvas = document.createElement("canvas");
+					canvas.id = "scan-canvas";
+					document.body.appendChild(canvas);
+					canvas.style.position = "absolute";
+					canvas.style.left = "0";
+					canvas.style.top = "0";
+					canvas.style.zIndex = "10000";
+					canvas.style.border = "1px solid red";
+				}
+				mvariablePanel.scan2(["x", "y"], function (variableValues, n) {
+					var ctx = canvas.getContext("2d"),
+						x = variableValues[0],
+						y = variableValues[1],
+						dx = canvas.width / n,
+						dy = canvas.height / n;
+					msystem.onVariablesChange();
+					msystem.calculateAbcd();
+					var stability = msystem.get("stability");
+					ctx.fillStyle = colormap.rgb(stability[0], [-10, 10]);
+					ctx.fillRect(x * dx, (n - y - 1) * dy, dx, dy);
+				});
 			};
 
 			var updateAll = function () {
