@@ -45,7 +45,6 @@
 	InputPropertyRow.template = {
 		/** Template HTML for an ABCD matrix value row. */
 		mx: [
-			'<td data-cell="graph-placeholder"></td>',
 			'<td data-cell="label"></td>',
 			'<td data-cell="mx-col-1">',
 				'<span data-cell="mx-1-1"></span><br><span data-cell="mx-2-1"></span>',
@@ -54,31 +53,32 @@
 				'<span data-cell="mx-1-2"></span><br><span data-cell="mx-2-2"></span>',
 			'</td>',
 			'<td data-cell="unit"></td>',
+			'<td data-cell="graph-placeholder"></td>',
 		].join(""),
 
 		/** Template HTML for a unary value row. */
 		unary: [
-			'<td data-cell="graph"><span><input type="checkbox" /></span></td>',
 			'<td data-cell="label"></td>',
 			'<td data-cell="value" colspan="2"></td>',
 			'<td data-cell="unit"></td>',
+			'<td data-cell="graph"><span><input type="checkbox" /></span></td>',
 		].join(""),
 
 		/** Template HTML for a sagittal / tangential value row. */
 		sagTan: [
-			'<td data-cell="graph"><span><input type="checkbox" /></span></td>',
 			'<td data-cell="label"></td>',
 			'<td data-cell="sag" color-theme-plane="sag"></td>',
 			'<td data-cell="tan" color-theme-plane="tan"></td>',
-			'<td data-cell="unit"></td>'
+			'<td data-cell="unit"></td>',
+			'<td data-cell="graph"><span><input type="checkbox" /></span></td>',
 		].join(""),
 
 		/** Template HTML for an input data row. */
 		action: [
-			'<td data-cell="graph-placeholder"></td>',
 			'<td data-cell="label"></td>',
 			'<td data-cell="action" colspan="2" class="nowrap"></td>',
-			'<td data-cell="unit"></td>'
+			'<td data-cell="unit"></td>',
+			'<td data-cell="graph-placeholder"></td>',
 		].join(""),
 
 		/** Template HTML for a select action data row. */
@@ -296,6 +296,7 @@
 		this.fieldName = fieldName;
 		this.source = source;
 		this.toggleGraph = toggleGraph;
+		this.onGraphChange = this.onGraphChange.bind(this);
 		this.el = this.init();
 	};
 
@@ -306,7 +307,7 @@
 		tr.setAttribute("data-property-name", this.propertyName);
 		tr.querySelector('[data-cell="label"]').innerText = LaserCanvas.Utilities.prettify(this.propertyName);
 		tr.querySelector('[data-cell="unit"]').innerText = window.LaserCanvas.unit[this.propertyName] || "";
-		tr.querySelector('[data-cell="graph"] input[type="checkbox"]').onchange = this.onGraphChange.bind(this);
+		tr.querySelector('[data-cell="graph"] input[type="checkbox"]').onchange = this.onGraphChange;
 		return tr;
 	};
 

@@ -19,7 +19,7 @@
 			'<ul>',
 				'<li>Variables  <em>x</em>, <em>y</em> in properties: <input class="demoPropertyInput" disabled data-expression="true" value="200 * cos(x)" /></li>',
 				'<li>Sliders change values</li>',
-				'<li>Toggle graphs with <span>👁</span></li>',
+				'<li>Toggle graphs with <span>&#x1f4ca;</span> in information panel</li>',
 			'</ul>',
 		'</div>',
 		'<vid class="graphItems"></div>'

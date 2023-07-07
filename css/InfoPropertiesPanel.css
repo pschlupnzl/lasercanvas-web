@@ -65,16 +65,29 @@
 	cursor: pointer;
 }
 
+	[data-cell="graph"] input[type="checkbox"]::before,
 	[data-cell="graph"] input[type="checkbox"]::after {
-		content: "\1f441";
 		position: absolute;
 		left: 0;
-		top: -0.1em;
 		visibility: visible;
-		opacity: 0.2;
-		transition: opacity 150ms;
 	}
 
+	[data-cell="graph"] input[type="checkbox"]::before {
+		/*
+			- U+1f441 eye
+			- U+1f4c8 graph with upwards trend
+			- U+1f4ca bar chart
+		*/
+		content: "\1f4ca";
+		top: -0.1em;
+	}
+	[data-cell="graph"] input[type="checkbox"]::after {
+		content: "\2713";
+		top: -0.4em;
+		font-size: 2em;
+		opacity: 0;
+		transition: opacity 250ms;
+	}
 		[data-cell="graph"] input[type="checkbox"]:checked::after {
 			opacity: 1;
 		}
