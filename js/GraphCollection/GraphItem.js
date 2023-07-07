@@ -263,7 +263,7 @@
 		var el = document.createElement("div");
 		el.className = "graphCollectionPanel"; 
 		el.innerHTML = GraphHeatMapItem.template;
-		this.graph.appendTo(el.querySelector(".graph2dContainer"))
+		this.graph.appendTo(el.querySelector(".graph2dContainer"));
 		el.querySelector(".title").innerText = this.getTitle();
 		el.querySelector('input[type="checkbox"]').checked = 
 			this._plane !== LaserCanvas.Enum.modePlane.sagittal;
@@ -274,6 +274,7 @@
 	GraphHeatMapItem.prototype.appendTo = GraphItem.prototype.appendTo;
 	GraphHeatMapItem.prototype.destroy = GraphItem.prototype.destroy;
 	GraphHeatMapItem.prototype.addEventListener = GraphItem.prototype.addEventListener;
+	GraphHeatMapItem.prototype.fireEvent = GraphItem.prototype.fireEvent;
 	GraphHeatMapItem.prototype.getTitle = GraphItem.prototype.getTitle;
 	GraphHeatMapItem.prototype.source = GraphItem.prototype.source;
 	GraphHeatMapItem.prototype.toJson = GraphItem.prototype.toJson;
@@ -316,6 +317,7 @@
 	 */
 	GraphHeatMapItem.prototype.scan2dStart = function (extents) {
 		this.graph.calcTicks(extents);
+		this.graph.fillColormap(this._colormap, this._colorRange);
 	};
 
 	/**

@@ -92,10 +92,16 @@
 	 * @param {function} iterator Delegate to call on every variable step.
 	 */
 	VariablePanel.prototype.scan2d = function (variableNames, init, iterator) {
+		// TODO: Track this in code, not DOM
+		if (document.body.getAttribute("data-variables-visible") !== "true") {
+			return;
+		}
+
 		var self = this,
-			vx, vy,
+			x, y, vx, vy,
 			scan2dId = ++this.scan2dId,
-			subs = 16, // Starting mipmap resolution.
+			subs = VariablePanel.scan2dMin, // Starting mipmap resolution.
+			blockSize = subs * subs, // Ensure one full scan.
 			extents = variableNames.map(function (variableName) {
 				return self.numberSliders[variableName].getRange();
 			}),
@@ -111,21 +117,47 @@
 					return;
 				}
 
-				// Scan one resolution.
-				for (var x = 0; x < subs; x += 1) {
-					vx = extents[0].min + x * steps[0] / subs;
-					self.mvariables.set(variableNames[0], vx, true);
-					for (var y = 0; y < subs; y += 1) {
-						if (subs > VariablePanel.scan2dMin &&
-							x % 2 === 0 &&
-							y % 2 === 0) {
-							// Skip value from previous subdivision.
-							continue;
-						}
+				// Scan an arbitrary block of steps.
+				for (var kk = blockSize; kk > 0; kk -= 1) {
+					// We can skip values from previous subdivision.
+					if (!(subs > VariablePanel.scan2dMin &&
+						x % 2 === 0 &&
+						y % 2 === 0)) {
+						
+						vx = extents[0].min + x * steps[0] / subs;
+						self.mvariables.set(variableNames[0], vx, true);
+						
 						vy = extents[1].min + y * steps[1] / subs;
 						self.mvariables.set(variableNames[1], vy, true);
+						
 						iterator([x, y], subs, extents);
 					}
+
+					// Advance to next step.
+					x += 1;
+					if (x >= subs) {
+						x = 0;
+						y += 1;
+						if (y >= subs) {
+							y = 0;
+							subs *= 2;
+							if (subs > VariablePanel.scan2dMax) {
+								break;
+							}
+						}
+					}
+					// y += 1;
+					// if (y >= subs) {
+					// 	y = 0;
+					// 	x += 1;
+					// 	if (x >= subs) {
+					// 		x = 0;
+					// 		subs *= 2;
+					// 		if (subs > VariablePanel.scan2dMax) {
+					// 			break;
+					// 		}
+					// 	}
+					// }
 				}
 
 				// Restore all variables.
@@ -133,14 +165,43 @@
 					self.mvariables.set(variableName, current[variableName], true);
 				});		
 
-				// Prepare for next iteration.
-				subs *= 2;
+				// Prepare for next block.
 				if (subs <= VariablePanel.scan2dMax) {
 					setTimeout(iterate, 0);
 				}
+				
+
+				// // Scan one resolution.
+				// for (; x < subs; x += 1) {
+				// 	vx = extents[0].min + x * steps[0] / subs;
+				// 	self.mvariables.set(variableNames[0], vx, true);
+				// 	for (var y = 0; y < subs; y += 1) {
+				// 		if (subs > VariablePanel.scan2dMin &&
+				// 			x % 2 === 0 &&
+				// 			y % 2 === 0) {
+				// 			// Skip value from previous subdivision.
+				// 			continue;
+				// 		}
+				// 		vy = extents[1].min + y * steps[1] / subs;
+				// 		self.mvariables.set(variableNames[1], vy, true);
+				// 		iterator([x, y], subs, extents);
+				// 	}
+				// }
+
+				// // Restore all variables.
+				// variableNames.forEach(function (variableName) {
+				// 	self.mvariables.set(variableName, current[variableName], true);
+				// });		
+
+				// // Prepare for next iteration.
+				// subs *= 2;
+				// if (subs <= VariablePanel.scan2dMax) {
+				// 	setTimeout(iterate, 0);
+				// }
 			};
 
 		// Start a new scan.
+		x = y = 0;
 		init(extents);
 		setTimeout(iterate, 0);
 	};

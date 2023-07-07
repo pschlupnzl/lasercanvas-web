@@ -1,10 +1,18 @@
 (function (LaserCanvas) {
+  /** Fractional width of colorbar display. */
+  var COLORMAP_WIDTH = 0.04;
+
   /**
    * Class to display a heatmap of values.
    */
   var GraphHeatMap = function () {
+    this._extents = [
+      { min: 0, max: 1 },
+      { min: 0, max: 1 },
+    ];
     this.axes = this.initAxes();
     this.el = this.init();
+    this.activate();
     this.events = {
       variableChange: [],
     };
@@ -13,7 +21,8 @@
   GraphHeatMap.template = [
     // Template.
     '<div class="plot">',
-    "<canvas />",
+    '<canvas style="cursor: crosshair"></canvas>',
+    '<div class="tooltip" style="position: absolute; pointer-events: none; background: white;"></div>',
     "</div>",
   ].join("");
 
@@ -30,6 +39,30 @@
     this.axes.x.appendTo(plot);
     this.axes.y.appendTo(plot);
     return el;
+  };
+
+  /**
+   * Activate listeners on the elements.
+   */
+  GraphHeatMap.prototype.activate = function () {
+    var self = this,
+      canvas = this.el.querySelector("canvas"),
+      tooltip = this.el.querySelector(".tooltip");
+    this.el.querySelector("canvas").addEventListener("mousemove", function (e) {
+      var extents = self._extents,
+        rect = canvas.getBoundingClientRect(),
+        posx = e.pageX - rect.left,
+        posy = e.pageY - rect.top,
+        rx = posx / ((1 - COLORMAP_WIDTH) * rect.width),
+        ry = 1 - posy / rect.height,
+        x = (1 - rx) * extents[0].min + rx * extents[0].max,
+        y = (1 - ry) * extents[1].min + ry * extents[1].max;
+      if (rx >= 0 && rx <= 1) {
+        tooltip.style.left = posx + "px";
+        tooltip.style.top = posy + "px";
+        tooltip.innerText = "(" + Math.round(x) + ", " + Math.round(y) + ")";
+      }
+    });
   };
 
   /** Attach the graph to the parent element. */
@@ -77,8 +110,9 @@
   GraphHeatMap.prototype.calcTicks = function (extents) {
     var size = this.canvasSize(),
       fontSize = this.getFontSize();
+    this._extents = extents;
     this.axes.x
-      .calcTicks(extents[0], size.width, {
+      .calcTicks(extents[0], (1 - COLORMAP_WIDTH) * size.width, {
         minTickSpacing: 2.5 * fontSize,
         tightLimits: true,
       })
@@ -104,8 +138,11 @@
       width = parseInt(container.offsetWidth, 10),
       height = parseInt(container.offsetHeight, 10);
     if (canvas.width !== width || canvas.height !== height) {
-      canvas.width = parseInt(width);
-      canvas.height = parseInt(height);
+      canvas.width = width;
+      canvas.height = height;
+      this.el.querySelector(
+        '.Graph2dAxis[data-direction="horizontal"]'
+      ).style.width = 100 * (1 - COLORMAP_WIDTH) + "%";
     }
     return {
       width: width,
@@ -126,6 +163,22 @@
   };
 
   /**
+   * Draw the colormap into the canvas space.
+   * @param {colormap} colormap Colormap whose scale to draw.
+   */
+  GraphHeatMap.prototype.fillColormap = function (colormap) {
+    var canvas = this.el.querySelector("canvas"),
+      ctx = canvas.getContext("2d"),
+      w = canvas.width,
+      h = canvas.height,
+      dx = COLORMAP_WIDTH * canvas.width;
+    for (var k = 0; k < h; k += 1) {
+      ctx.fillStyle = colormap.rgb(k, [0, h - 1]);
+      ctx.fillRect(w - dx, k, dx, 1);
+    }
+  };
+
+  /**
    * Draw a single patch of value. The graph doesn't actually store the raw
    * data, this merely draws a patch. We may need to change this.
    * @param {string} fillStyle Color to draw.
@@ -137,7 +190,7 @@
       ctx = canvas.getContext("2d"),
       x = coords[0],
       y = coords[1],
-      dx = (0.95 * canvas.width) / subs,
+      dx = ((1 - COLORMAP_WIDTH) * canvas.width) / subs,
       dy = canvas.height / subs;
     ctx.fillStyle = fillStyle;
     ctx.fillRect(x * dx, (subs - y - 1) * dy, dx, dy);
