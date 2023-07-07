@@ -68,18 +68,18 @@
 	color: #ccf;
 }
 
-[color-theme-plane="sag"]::after,
-[color-theme-plane="tan"]::after {
+[color-theme-plane="sag"]:not(.noPlaneAnnotation)::after,
+[color-theme-plane="tan"]:not(.noPlaneAnnotation)::after {
 	position: relative;
 	bottom: -0.2em;
 	font-size: 0.6em;
 	font-style: italic;
 }
 
-[color-theme-plane="sag"]::after {
+[color-theme-plane="sag"]:not(.noPlaneAnnotation)::after {
 	content: "S";
 }
 
-[color-theme-plane="tan"]::after {
+[color-theme-plane="tan"]:not(.noPlaneAnnotation)::after {
 	content: "T";
 }

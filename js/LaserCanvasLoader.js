@@ -115,6 +115,7 @@ window.LaserCanvas = {
 			"js/Graph2d/Colormap.js",
 			"js/Graph2d/Graph2d.js",
 			"js/Graph2d/Graph2dAxis.js",
+			"js/Graph2d/GraphHeatMap.js",
 			"js/GraphCollection/GraphCollection.js",
 			"js/GraphCollection/GraphItem.js",
 			"js/NumberSlider/NumberSlider.js",

@@ -108,8 +108,7 @@
 	 * Returns the extents (ranges) of data across all plotting lines.
 	 */
 	Graph2d.prototype.getDataExtents = function () {
-		var firstPoint = true,
-			extents = {
+		var extents = {
 				x: { min: 0, max: 1, firstPoint: true },
 				y: { min: 0, max: 1, firstPoint: true }
 			};

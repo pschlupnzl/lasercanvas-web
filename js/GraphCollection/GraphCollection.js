@@ -58,7 +58,7 @@
 	/** Returns a value indicating whether any graphs depend on the variable. */
 	GraphCollection.prototype.hasRange = function (variableName) {
 		return this.graphs.some(function (graph) { 
-			return graph.variableName() === variableName;
+			return graph.variableNames().includes(variableName);
 		});
 	};
 
@@ -133,8 +133,12 @@
 	 * @param {string=} variableName Optional variable to plot against, default "x".
 	 */
 	GraphCollection.prototype.addGraph = function (source, propertyName, fieldName, variableName) {
+		var Item = 
+			["System.stability"].includes(source.type + "." + propertyName)
+			? LaserCanvas.GraphHeatMapItem
+			: LaserCanvas.GraphItem
 		this.graphs.push(
-			new LaserCanvas.GraphItem(source, propertyName, fieldName, variableName)
+			new Item(source, propertyName, fieldName, variableName)
 			.appendTo(this.el.querySelector(".graphItems"))
 			.addEventListener("variableChange", this.onVariableChange.bind(this)));
 		this.fireEvent("change");

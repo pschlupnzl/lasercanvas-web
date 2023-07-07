@@ -1,5 +1,6 @@
 /**
- * Single Graph Collection item containing a 2d graph.
+ * Single Graph Collection item containing a line graph of a property value
+ * against either "x" or "y" variable.
  * @param {System|Element} source Data source.
  * @param {string} propertyName Name of property on the data source.
  * @param {string=} fieldName Optional field for ABCD/Q type properties.
@@ -28,6 +29,7 @@
 		'<span>x</span>',
 		'<input type="checkbox" class="laserCanvasCheckbox" />',
 		'<span>y</span>',
+		'</div>'
 	].join("");
 
 	/** Initialize the DOM element. */
@@ -122,9 +124,12 @@
 	//  Accessors.
 	// ------------
 
-	/** Returns the current variable dependency. */
-	GraphItem.prototype.variableName = function () {
-		return this._variableName;
+	/**
+	 * Returns the current variable dependency.
+	 * @returns {string[]}
+	 */
+	GraphItem.prototype.variableNames = function () {
+		return [this._variableName];
 	};
 
 	/** Returns this item's source. */
@@ -196,4 +201,122 @@
 	};
 
 	LaserCanvas.GraphItem = GraphItem;
+}(window.LaserCanvas));
+
+
+// =======================================================
+//  Graph2d Item.
+// =======================================================
+(function (LaserCanvas) {
+	/** Reference to {@link GraphItem} - much of the code is the same. */
+	const GraphItem = LaserCanvas.GraphItem;
+
+	/**
+	 * Single Graph Collection item containing a 2d heatmap graph, suitable e.g.
+	 * for plotting the cavity stability.
+	 * Broadly matches the {@link GraphItem} interface.
+	 * @param {System|Element} source Data source.
+	 * @param {string} propertyName Name of property on the data source.
+	 * @param {string=} fieldName Optional field for ABCD/Q type properties.
+	 */
+	var GraphHeatMapItem = function (source, propertyName, fieldName) {
+		this._source = source;
+		this._propertyName = propertyName;
+		this._fieldName = fieldName;
+		this._variableNames = ["x", "y"];
+		this._extents = {
+			x: { min: 0, max: 1 },
+			y: { min: 0, max: 1 }
+		};
+		this._plane = LaserCanvas.Enum.modePlane.sagittal;
+		this.graph = new LaserCanvas.GraphHeatMap();
+		this.el = this.init();
+		this.events = {
+			variableChange: []
+		};
+	};
+
+	/** Template HTML for the item. */
+	GraphHeatMapItem.template = [
+		'<div class="title"></div>',
+		'<div class="graph2dContainer"></div>',
+		'<div class="variable">',
+		'<span class="noPlaneAnnotation" color-theme-plane="sag"><em>S</em></span>',
+		'<input type="checkbox" class="laserCanvasCheckbox" />',
+		'<span class="noPlaneAnnotation" color-theme-plane="tan"><em>T</em></span>',
+ 		'</div>'
+	].join("");
+
+	/** Initialize the DOM element. */
+	GraphHeatMapItem.prototype.init = function () {
+		// TODO: We may need separate CSS class names.
+		var el = document.createElement("div");
+		el.className = "graphCollectionPanel"; 
+		el.innerHTML = GraphHeatMapItem.template;
+		this.graph.appendTo(el.querySelector(".graph2dContainer"))
+		el.querySelector(".title").innerText = this.getTitle();
+		el.querySelector('input[type="checkbox"]').checked = 
+			this._plane !== LaserCanvas.Enum.modePlane.sagittal;
+		return el;
+	};
+
+	// Copy prototype methods from GraphItem.
+	GraphHeatMapItem.prototype.appendTo = GraphItem.prototype.appendTo;
+	GraphHeatMapItem.prototype.destroy = GraphItem.prototype.destroy;
+	GraphHeatMapItem.prototype.addEventListener = GraphItem.prototype.addEventListener;
+	GraphHeatMapItem.prototype.getTitle = GraphItem.prototype.getTitle;
+	GraphHeatMapItem.prototype.getGraphValue = GraphItem.prototype.getGraphValue;
+	GraphHeatMapItem.prototype.source = GraphItem.prototype.source;
+	GraphHeatMapItem.prototype.toJson = GraphItem.prototype.toJson;
+	GraphHeatMapItem.prototype.sourceFromJson = GraphItem.prototype.sourceFromJson;
+	GraphHeatMapItem.prototype.isEqual = GraphItem.prototype.isEqual;
+
+	// -------------
+	//  Accessors.
+	// -------------
+
+	/**
+	 * Returns the current variable dependency.
+	 * @returns {string[]}
+	 */
+	GraphHeatMapItem.prototype.variableNames = function () {
+		return this._variableNames;
+	};
+
+	/**
+	 * Prepare for a new variable scan.
+	 * @param {string} variableName Variable being scanned.
+	 */
+	GraphHeatMapItem.prototype.scanStart = function (variableName) {
+		this._extents[variableName].min = NaN;
+		this._extents[variableName].max = NaN;
+	};
+
+	/**
+	 * Add a scanning data point.
+	 * @param {string} variableName Name of variable being scanned.
+	 * @param {number} variableValue Current value of the variable.
+	 */
+	GraphHeatMapItem.prototype.scanValue = function (variableName, variableValue) {
+		var range = this._extents[variableName];
+		range.min = isNaN(range.min)
+			? variableValue
+			: Math.min(range.min, variableValue);
+		range.max = isNaN(range.max)
+			? variableValue
+			: Math.max(range.max, variableValue);
+	};
+
+	/**
+	 * Complete a variable scan and update the graphs.
+	 */
+	GraphHeatMapItem.prototype.scanEnd = function () {
+		var extents = this._extents;
+		console.log(`extents=`,extents)
+		if (!isNaN(extents.x.min + extents.y.max + extents.x.min + extents.y.max)) {
+			this.graph.calcTicks(extents);
+		}
+	};
+
+	LaserCanvas.GraphHeatMapItem = GraphHeatMapItem;
 }(window.LaserCanvas));
