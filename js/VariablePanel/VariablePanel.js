@@ -88,18 +88,19 @@
 	 * algorithm, starting coarse and finishing fine, unless the scan is called
 	 * again before the layering is finished.
 	 * @param {[string, string]} variableNames The two variables to scan.
+	 * @param {function} init Delegate called when a scan starts.
 	 * @param {function} iterator Delegate to call on every variable step.
 	 */
-	VariablePanel.prototype.scan2 = function (variableNames, iterator) {
+	VariablePanel.prototype.scan2d = function (variableNames, init, iterator) {
 		var self = this,
 			vx, vy,
 			scan2dId = ++this.scan2dId,
-			n = 16, // Starting mipmap resolution.
-			ranges = variableNames.map(function (variableName) {
+			subs = 16, // Starting mipmap resolution.
+			extents = variableNames.map(function (variableName) {
 				return self.numberSliders[variableName].getRange();
 			}),
-			steps = ranges.map(function (range) {
-				return range.max - range.min;
+			steps = extents.map(function (extent) {
+				return extent.max - extent.min;
 			}),
 			current = self.mvariables.value(),
 
@@ -111,17 +112,19 @@
 				}
 
 				// Scan one resolution.
-				for (var x = 0; x < n; x += 1) {
-					vx = ranges[0].min + x * steps[0] / n;
+				for (var x = 0; x < subs; x += 1) {
+					vx = extents[0].min + x * steps[0] / subs;
 					self.mvariables.set(variableNames[0], vx, true);
-					for (var y = 0; y < n; y += 1) {
-						if (n > VariablePanel.scan2dMin && x % 2 === 0 && y % 2 === 0) {
-							// Skip previously set.
+					for (var y = 0; y < subs; y += 1) {
+						if (subs > VariablePanel.scan2dMin &&
+							x % 2 === 0 &&
+							y % 2 === 0) {
+							// Skip value from previous subdivision.
 							continue;
 						}
-						vy = ranges[1].min + y * steps[1] / n;
+						vy = extents[1].min + y * steps[1] / subs;
 						self.mvariables.set(variableNames[1], vy, true);
-						iterator([x, y], n);
+						iterator([x, y], subs, extents);
 					}
 				}
 
@@ -131,12 +134,14 @@
 				});		
 
 				// Prepare for next iteration.
-				n *= 2;
-				if (n <= VariablePanel.scan2dMax) {
+				subs *= 2;
+				if (subs <= VariablePanel.scan2dMax) {
 					setTimeout(iterate, 0);
 				}
 			};
 
+		// Start a new scan.
+		init(extents);
 		setTimeout(iterate, 0);
 	};
 

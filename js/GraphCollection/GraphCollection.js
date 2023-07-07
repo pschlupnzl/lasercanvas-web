@@ -65,27 +65,56 @@
 	/** Prepare for a new variable scan by clearing any data lines. */
 	GraphCollection.prototype.scanStart = function (variableName) {
 		this.graphs.forEach(function (graph) {
-			graph.scanStart(variableName);
+			graph.scanStart && graph.scanStart(variableName);
 		});
 	};
 
 	/** Add a scanning variable data point. */
 	GraphCollection.prototype.scanValue = function (variableName, variableValue) {
 		this.graphs.forEach(function (graph) {
-			graph.scanValue(variableName, variableValue);
+			graph.scanValue && graph.scanValue(variableName, variableValue);
 		});
 	};
 
 	/** Complete a variable scan and update the graphs. */
 	GraphCollection.prototype.scanEnd = function (variableName, currentValue) {
 		this.graphs.forEach(function (graph) {
-			graph.scanEnd(variableName, currentValue);
+			graph.scanEnd && graph.scanEnd(variableName, currentValue);
 		});
 	};
 
 	/** One of the graph's variable dependencies has changed. */
 	GraphCollection.prototype.onVariableChange = function () {
 		this.fireEvent("change");
+	};
+
+	// -----------
+	//  2d Scans.
+	// -----------
+
+	/** Returns a value indicating whether any graphs use 2d scan (e.g. heat map). */
+	GraphCollection.prototype.has2dRange = function () {
+		return this.graphs.some(function (graph) {
+			return !!graph.scan2dStart;
+		})
+	};
+
+	/** Start a new 2d scan. */
+	GraphCollection.prototype.scan2dStart = function (extents) {
+		this.graphs.forEach(function (graph) {
+			graph.scan2dStart && graph.scan2dStart(extents);
+		})
+	};
+
+	/**
+	 * Iterate a single patch (pixel) at the given subdivision resolution.
+	 * @param {[number, number]} coords Coordinates on plane being scanned.
+	 * @param {number} subs Subdivision of plane for current mipmap level.
+	 */
+	GraphCollection.prototype.scan2dValue = function (coords, subs) {
+		this.graphs.forEach(function (graph) {
+			graph.scan2dValue && graph.scan2dValue(coords, subs);
+		})
 	};
 
 	// -------------------

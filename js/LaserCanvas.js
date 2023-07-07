@@ -161,44 +161,62 @@ window.LaserCanvas.Application = function (canvas, info) {
 						msystem.onVariablesChange();
 					}
 				}
-
-				var canvas = document.getElementById("scan-canvas"),
-					// colormap = new LaserCanvas.ColorMap("rainbow", 256);
-					colormap = new LaserCanvas.ColorMap("ire", 256);
-				if (!canvas) {
-					canvas = document.createElement("canvas");
-					canvas.id = "scan-canvas";
-					document.body.appendChild(canvas);
-					canvas.style.position = "absolute";
-					canvas.style.left = "0";
-					canvas.style.top = "0";
-					canvas.style.zIndex = "10000";
-					canvas.style.border = "1px solid red";
-					(function (ctx, N) {
-						var w = ctx.canvas.width,
-							h = ctx.canvas.height,
-							dx = 0.05 * w,
-							dy = h / N;
-						for (var z = 0; z < N; z += 1) {
-							ctx.fillStyle = colormap.rgb(z, [0, N]);
-							ctx.fillRect(w - dx, h - z * dy, dx, -dy);						
-						}
-					})(canvas.getContext("2d"), 64);
-				}
-				mvariablePanel.scan2(["x", "y"], function (variableValues, n) {
-					var ctx = canvas.getContext("2d"),
-						x = variableValues[0],
-						y = variableValues[1],
-						dx = 0.95 * canvas.width / n,
-						dy = canvas.height / n;
-					msystem.onVariablesChange();
-					msystem.calculateAbcd();
-					var stability = msystem.get("stability");
-					ctx.fillStyle = colormap.rgb(stability[0], [-2, 2]);
-					ctx.fillRect(x * dx, (n - y - 1) * dy, dx, dy);
-				});
+				scanVariables2d();
 			};
 
+			var scanVariables2d = function () {
+				if (mgraphCollection.has2dRange()) {
+					mvariablePanel.scan2d(
+						["x", "y"],
+						function init (extents) {
+							mgraphCollection.scan2dStart(extents);
+						},
+						function iterator (coords, subs) {
+							msystem.onVariablesChange();
+							msystem.calculateAbcd();
+							mgraphCollection.scan2dValue(coords, subs);
+						});
+				}
+				// var canvas = document.getElementById("scan-canvas"),
+				// 	// colormap = new LaserCanvas.ColorMap("rainbow", 256);
+				// 	colormap = new LaserCanvas.ColorMap("ire", 256);
+				// if (!canvas) {
+				// 	canvas = document.createElement("canvas");
+				// 	canvas.id = "scan-canvas";
+				// 	document.body.appendChild(canvas);
+				// 	canvas.style.position = "absolute";
+				// 	canvas.style.left = "0";
+				// 	canvas.style.top = "0";
+				// 	canvas.style.zIndex = "10000";
+				// 	canvas.style.border = "1px solid red";
+				// 	(function (ctx, N) {
+				// 		var w = ctx.canvas.width,
+				// 			h = ctx.canvas.height,
+				// 			dx = 0.05 * w,
+				// 			dy = h / N;
+				// 		for (var z = 0; z < N; z += 1) {
+				// 			ctx.fillStyle = colormap.rgb(z, [0, N]);
+				// 			ctx.fillRect(w - dx, h - z * dy, dx, -dy);						
+				// 		}
+				// 	})(canvas.getContext("2d"), 64);
+				// }
+				// mvariablePanel.scan2(["x", "y"], function (variableValues, n) {
+				// 	var ctx = canvas.getContext("2d"),
+				// 		x = variableValues[0],
+				// 		y = variableValues[1],
+				// 		dx = 0.95 * canvas.width / n,
+				// 		dy = canvas.height / n;
+				// 	msystem.onVariablesChange();
+				// 	msystem.calculateAbcd();
+				// 	var stability = msystem.get("stability");
+				// 	ctx.fillStyle = colormap.rgb(stability[0], [-2, 2]);
+				// 	ctx.fillRect(x * dx, (n - y - 1) * dy, dx, dy);
+				// });
+			};
+
+			/**
+			 * Update renderer, properties, and info panels.
+			 */
 			var updateAll = function () {
 				mrender.update();
 				mpropertiesPanel.update();
@@ -211,7 +229,7 @@ window.LaserCanvas.Application = function (canvas, info) {
 				msystem.calculateAbcd();
 				updateAll();
 			});
-			
+
 			// Structure has changed.
 			msystem.addEventListener('change', function () {
 				scanVariables();

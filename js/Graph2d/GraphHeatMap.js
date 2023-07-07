@@ -72,20 +72,23 @@
 
   /**
    * Calculate the ticks and scaling.
-   * @param {object} extents Extents to map for the axes.
+   * @param {Range[]} extents Extents to map for the axes.
    */
   GraphHeatMap.prototype.calcTicks = function (extents) {
     var size = this.canvasSize(),
       fontSize = this.getFontSize();
-    console.log(`»» calcTicks size=${JSON.stringify(size)} fontSize=${fontSize} extents=${JSON.stringify(extents)}`)
-    this.axes.x.calcTicks(extents.x, size.width, {
-      minTickSpacing: 2.5 * fontSize,
-      tightLimits: true,
-    }).render();
-    this.axes.y.calcTicks(extents.y, size.height, {
-      minTickSpacing: 1.5 * fontSize,
-      tightLimits: true
-    }).render();
+    this.axes.x
+      .calcTicks(extents[0], size.width, {
+        minTickSpacing: 2.5 * fontSize,
+        tightLimits: true,
+      })
+      .render();
+    this.axes.y
+      .calcTicks(extents[1], size.height, {
+        minTickSpacing: 1.5 * fontSize,
+        tightLimits: true,
+      })
+      .render();
   };
 
   // ------------
@@ -98,10 +101,12 @@
   GraphHeatMap.prototype.canvasSize = function () {
     var canvas = this.el.querySelector("canvas"),
       container = canvas.parentElement,
-      width = container.offsetWidth,
-      height = container.offsetHeight;
-    canvas.width = parseInt(width);
-    canvas.height = parseInt(height);
+      width = parseInt(container.offsetWidth, 10),
+      height = parseInt(container.offsetHeight, 10);
+    if (canvas.width !== width || canvas.height !== height) {
+      canvas.width = parseInt(width);
+      canvas.height = parseInt(height);
+    }
     return {
       width: width,
       height: height,
@@ -121,17 +126,21 @@
   };
 
   /**
-   * Update the graph rendering.
+   * Draw a single patch of value. The graph doesn't actually store the raw
+   * data, this merely draws a patch. We may need to change this.
+   * @param {string} fillStyle Color to draw.
+   * @param {[number, number]} coords Coordinates in plane.
+   * @param {number} subs Subdivision count for this level of mipmap.
    */
-  GraphHeatMap.prototype.render = function () {
+  GraphHeatMap.prototype.fillPatch = function (fillStyle, coords, subs) {
     var canvas = this.el.querySelector("canvas"),
-      ctx = canvas.getContext("2d");
-    this.axes.x.render();
-    this.axes.y.render();
-    ctx.beginPath();
-    ctx.moveTo(0, 0);
-    ctx.lineTo(100, 100);
-    ctx.stroke();
+      ctx = canvas.getContext("2d"),
+      x = coords[0],
+      y = coords[1],
+      dx = (0.95 * canvas.width) / subs,
+      dy = canvas.height / subs;
+    ctx.fillStyle = fillStyle;
+    ctx.fillRect(x * dx, (subs - y - 1) * dy, dx, dy);
   };
 
   this.LaserCanvas.GraphHeatMap = GraphHeatMap;

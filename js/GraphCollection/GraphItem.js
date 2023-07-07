@@ -223,12 +223,11 @@
 		this._source = source;
 		this._propertyName = propertyName;
 		this._fieldName = fieldName;
-		this._variableNames = ["x", "y"];
-		this._extents = {
-			x: { min: 0, max: 1 },
-			y: { min: 0, max: 1 }
-		};
+
+		this._colormap = GraphHeatMapItem.getColormap("ire");
+		this._colorRange = [-2, 2];
 		this._plane = LaserCanvas.Enum.modePlane.sagittal;
+
 		this.graph = new LaserCanvas.GraphHeatMap();
 		this.el = this.init();
 		this.events = {
@@ -246,6 +245,17 @@
 		'<span class="noPlaneAnnotation" color-theme-plane="tan"><em>T</em></span>',
  		'</div>'
 	].join("");
+
+	/** Get a color map by its name, creating it if needed. */
+	GraphHeatMapItem.getColormap = (function () {
+		var maps = {};
+		return function (name) {
+			if (!maps[name]) {
+				maps[name] = new LaserCanvas.Colormap(name, 256);
+			}
+			return maps[name];
+		};
+	}());
 
 	/** Initialize the DOM element. */
 	GraphHeatMapItem.prototype.init = function () {
@@ -265,11 +275,28 @@
 	GraphHeatMapItem.prototype.destroy = GraphItem.prototype.destroy;
 	GraphHeatMapItem.prototype.addEventListener = GraphItem.prototype.addEventListener;
 	GraphHeatMapItem.prototype.getTitle = GraphItem.prototype.getTitle;
-	GraphHeatMapItem.prototype.getGraphValue = GraphItem.prototype.getGraphValue;
 	GraphHeatMapItem.prototype.source = GraphItem.prototype.source;
 	GraphHeatMapItem.prototype.toJson = GraphItem.prototype.toJson;
 	GraphHeatMapItem.prototype.sourceFromJson = GraphItem.prototype.sourceFromJson;
 	GraphHeatMapItem.prototype.isEqual = GraphItem.prototype.isEqual;
+	
+
+	/** Returns the property value for the graph. */
+	GraphHeatMapItem.prototype.getGraphValue = function () {
+		var value,
+			index = this._plane === LaserCanvas.Enum.modePlane.sagittal ? 0 : 1;
+		if (this._fieldName) {
+			return this._source.abcdQ[index][this._fieldName];
+		} else {
+			value = this._source.get(this._propertyName);
+			if (Array.isArray(value)) {
+				return value[index];
+			} else {
+				return value;
+			}
+		}
+	};
+
 
 	// -------------
 	//  Accessors.
@@ -280,43 +307,26 @@
 	 * @returns {string[]}
 	 */
 	GraphHeatMapItem.prototype.variableNames = function () {
-		return this._variableNames;
+		return [];
 	};
 
 	/**
-	 * Prepare for a new variable scan.
-	 * @param {string} variableName Variable being scanned.
+	 * Prepare for a new 2d scan.
+	 * @param {Range[]} extents Extents for horizontal and vertical axes.
 	 */
-	GraphHeatMapItem.prototype.scanStart = function (variableName) {
-		this._extents[variableName].min = NaN;
-		this._extents[variableName].max = NaN;
+	GraphHeatMapItem.prototype.scan2dStart = function (extents) {
+		this.graph.calcTicks(extents);
 	};
 
 	/**
-	 * Add a scanning data point.
-	 * @param {string} variableName Name of variable being scanned.
-	 * @param {number} variableValue Current value of the variable.
+	 * Iterate a single patch (pixel) at the given subdivision resolution.
+	 * @param {[number, number]} coords Coordinates on plane being scanned.
+	 * @param {number} subs Subdivision of plane for current mipmap level.
 	 */
-	GraphHeatMapItem.prototype.scanValue = function (variableName, variableValue) {
-		var range = this._extents[variableName];
-		range.min = isNaN(range.min)
-			? variableValue
-			: Math.min(range.min, variableValue);
-		range.max = isNaN(range.max)
-			? variableValue
-			: Math.max(range.max, variableValue);
+	GraphHeatMapItem.prototype.scan2dValue = function (coords, subs) {
+		var value = this.getGraphValue(),
+			fillStyle = this._colormap.rgb(value, this._colorRange);
+		this.graph.fillPatch(fillStyle, coords, subs);
 	};
-
-	/**
-	 * Complete a variable scan and update the graphs.
-	 */
-	GraphHeatMapItem.prototype.scanEnd = function () {
-		var extents = this._extents;
-		console.log(`extents=`,extents)
-		if (!isNaN(extents.x.min + extents.y.max + extents.x.min + extents.y.max)) {
-			this.graph.calcTicks(extents);
-		}
-	};
-
 	LaserCanvas.GraphHeatMapItem = GraphHeatMapItem;
 }(window.LaserCanvas));

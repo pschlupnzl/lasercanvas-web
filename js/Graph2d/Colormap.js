@@ -2,7 +2,7 @@
   /**
    * Class to handle mapping of a value to a false color scale.
    */
-  class ColorMap {
+  class Colormap {
     static COLOR_STOPS = {
       rainbow: [
         [0, 0, 255],
@@ -28,7 +28,7 @@
     _rgb = [];
 
     /**
-     * Initialize a new instance of the {@link ColorMap} class by preparing
+     * Initialize a new instance of the {@link Colormap} class by preparing
      * an initial colormap.
      * @param {number[] | string} stops Color stops for the map, or map name.
      * @param {number=} steps Optional number of steps to generate, default 128.
@@ -44,7 +44,7 @@
 
     /**
      * Reverse the color map.
-     * @returns {ColorMap}
+     * @returns {Colormap}
      */
     reverse() {
       this._rgb.reverse();
@@ -55,12 +55,12 @@
      * Prepare a new colormap by calculating the steps.
      * @param {number[] | string} stops Color stops for the map, or map name.
      * @param {number=} steps Optional number of steps to generate, default 128.
-     * @returns {ColorMap}
+     * @returns {Colormap}
      */
     prepareMap(stops, steps) {
       steps = steps || 128;
       if (typeof stops === "string") {
-        stops = ColorMap.COLOR_STOPS[stops];
+        stops = Colormap.COLOR_STOPS[stops];
       }
       this._rgb = new Array(steps)
         .join(".")
@@ -99,5 +99,6 @@
       return this._rgb[k < 0 ? 0 : k > n - 1 ? n - 1 : k];
     }
   }
-  LaserCanvas.ColorMap = ColorMap;
+  LaserCanvas.Colormap = Colormap;
+  LaserCanvas.Colormap.MAP_NAMES = ["ire", "rainbow"];
 })(window.LaserCanvas);
