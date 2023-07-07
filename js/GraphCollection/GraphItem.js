@@ -12,13 +12,13 @@
 		this._propertyName = propertyName;
 		this._fieldName = fieldName;
 		this._variableName = variableName || "x";
+		this._lines = {}; // Lines keyed by variable name.
+		this._marker = {}; // Marker value (current variable value).
+
 		this.graph2d = new LaserCanvas.Graph2d();
 		this.el = this.init();
 		this.variableInput = this.el.querySelector('.variable input[type="checkbox"]');
 		this.variableInput.onchange = this.onVariableChange.bind(this);
-		this.events = {
-			variableChange: []
-		};
 	};
 
 	/** Template HTML for the item. */
@@ -55,27 +55,10 @@
 		return this;
 	};
 
-	// ---------
-	//  Events.
-	// ---------
-
-	/** Add the handler to the given event. */
-	GraphItem.prototype.addEventListener = function (eventName, handler) {
-		this.events[eventName].push(handler);
-		return this;
-	};
-
-	/** Fire all event listeners. */
-	GraphItem.prototype.fireEvent = function (eventName) {
-		this.events[eventName].forEach(function (handler) {
-			handler();
-		});
-	};
-
 	/** The variable selector has changed. */
 	GraphItem.prototype.onVariableChange = function () {
 		this._variableName = this.variableInput.checked ? "y" : "x";
-		this.fireEvent("variableChange");
+		this.updatePlot();
 	};
 
 	// -------------
@@ -91,46 +74,26 @@
 			: property;
 	};
 
-	/** Returns the property value for the graph. */
-	GraphItem.prototype.getGraphValue = function (variableValue) {
+	/**
+	 * Returns the property value for the graph.
+	 * @returns {number[]}
+	 */
+	GraphItem.prototype.getGraphValue = function () {
 		var value;
 		if (this._fieldName) {
-			return [{
-				x: variableValue,
-				y: this._source.abcdQ[0][this._fieldName]
-			}, {
-				x: variableValue,
-				y: this._source.abcdQ[1][this._fieldName]
-			}];
+			return [
+				this._source.abcdQ[0][this._fieldName],
+				this._source.abcdQ[1][this._fieldName]
+			];
 		} else {
 			value = this._source.get(this._propertyName);
-			if (Array.isArray(value)) {
-				return value.map(function (val) {
-					return {
-						x: variableValue,
-						y: val
-					};
-				});
-			} else {
-				return [{
-					x: variableValue,
-					y: value
-				}];
-			}
+			return Array.isArray(value) ? value : [value];
 		}
 	};
 
 	// ------------
 	//  Accessors.
 	// ------------
-
-	/**
-	 * Returns the current variable dependency.
-	 * @returns {string[]}
-	 */
-	GraphItem.prototype.variableNames = function () {
-		return [this._variableName];
-	};
 
 	/** Returns this item's source. */
 	GraphItem.prototype.source = function () {
@@ -173,40 +136,87 @@
 			&& (!fieldName || fieldName === this._fieldName);
 	};
 
-	// --------------
-	//  Passthrough.
-	// --------------
+	// ----------------
+	//  Data plotting.
+	// ----------------
 
 	/** Prepare for a new variables can by clearing any data lines, if the variable matches. */
 	GraphItem.prototype.scanStart = function (variableName) {
-		if (variableName === this._variableName) {
-			this.graph2d.clearDataPoints();
-		}
+		this._lines[variableName] = [];
 	};
 
 	/** Add a scanning variable data point, if the variable matches. */
 	GraphItem.prototype.scanValue = function (variableName, variableValue) {
-		if (variableName === this._variableName) {
-			this.graph2d.addDataPoints(this.getGraphValue(variableValue));
-		}
+		var dataValues = this.getGraphValue(),
+			line = this._lines[variableName];
+		dataValues.forEach(function (dataValue, lineIndex) {
+			if (!line[lineIndex]) {
+				line[lineIndex] = { x: [], y: [] };
+			}
+			line[lineIndex].x.push(variableValue);
+			line[lineIndex].y.push(dataValue);
+		});
 	};
 
 	/** Complete a variable scan and update the graphs, if the variable matches. */
 	GraphItem.prototype.scanEnd = function (variableName, currentValue) {
+		this._marker[variableName] = currentValue;
 		if (variableName === this._variableName) {
-			this.graph2d.calcTicks();
-			this.graph2d.createVerticalMarker(currentValue);
-			this.graph2d.render();
+			this.updatePlot();
 		}
+	};
+
+	/**
+	 * Returns the extents (ranges) of data across all plotting lines.
+	 * @param {string} variableName Name of variable whose data to check.
+	 */
+	GraphItem.prototype.getDataExtents = function (variableName) {
+		var lines = this._lines[variableName],
+			extents = {
+				x: { min: 0, max: 1, firstPoint: true },
+				y: { min: 0, max: 1, firstPoint: true }
+			};
+		lines.forEach(function (line) {
+			var p;
+			for (var ax of ["x", "y"]) {
+				for (var k = 0; k < line[ax].length; k += 1) {
+					p = line[ax][k];
+					if (isNaN(p) || !isFinite(p)) {
+						// NOP - skip NaN and Infinity.
+					} else if (extents[ax].firstPoint) {
+						extents[ax].min = extents[ax].max = p;
+						delete extents[ax].firstPoint;
+					} else {
+						extents[ax].min = Math.min(extents[ax].min, p);
+						extents[ax].max = Math.max(extents[ax].max, p);
+					}
+				}
+			}
+		});
+		return extents;
+	};
+
+	/**
+	 * Update the plot using internal data, e.g. after a scan, or when the
+	 * display variable changes.
+	 */
+	GraphItem.prototype.updatePlot = function () {
+		var extents = this.getDataExtents(this._variableName);
+		this.graph2d.calcTicks(extents);
+		this.graph2d.renderLines(this._lines[this._variableName]);
+		this.graph2d.renderVerticalMarker(this._marker[this._variableName]);
 	};
 
 	LaserCanvas.GraphItem = GraphItem;
 }(window.LaserCanvas));
 
 
+
+
 // =======================================================
 //  Graph2d Item.
 // =======================================================
+
 (function (LaserCanvas) {
 	/** Reference to {@link GraphItem} - much of the code is the same. */
 	const GraphItem = LaserCanvas.GraphItem;
@@ -224,15 +234,22 @@
 		this._propertyName = propertyName;
 		this._fieldName = fieldName;
 
+		this._plane = 0; // Sagittal / tangential plane.
+		this._data = []; // 2d surface data for each plane.
+		this._subs = 0; // Subdivision size (assume square).
+
 		this._colormap = GraphHeatMapItem.getColormap("ire");
 		this._colorRange = [-2, 2];
-		this._plane = LaserCanvas.Enum.modePlane.sagittal;
 
 		this.graph = new LaserCanvas.GraphHeatMap();
+		this.graph.getValueAt = function (rx, ry) {
+			return this._data[this._plane]
+				?.[Math.round(ry * this._subs)]
+				?.[Math.round(rx * this._subs)];
+		}.bind(this);
 		this.el = this.init();
-		this.events = {
-			variableChange: []
-		};
+		this.planeInput = this.el.querySelector('input[type="checkbox"]');
+		this.planeInput.onchange = this.onPlaneChange.bind(this);
 	};
 
 	/** Template HTML for the item. */
@@ -265,51 +282,29 @@
 		el.innerHTML = GraphHeatMapItem.template;
 		this.graph.appendTo(el.querySelector(".graph2dContainer"));
 		el.querySelector(".title").innerText = this.getTitle();
-		el.querySelector('input[type="checkbox"]').checked = 
-			this._plane !== LaserCanvas.Enum.modePlane.sagittal;
+		el.querySelector('input[type="checkbox"]').checked = this._plane !== 0;
 		return el;
 	};
+
+	/** The plane toggle has changed. */
+	GraphHeatMapItem.prototype.onPlaneChange = function () {
+		this._plane = this.planeInput.checked ? 1 : 0;
+		this.updatePlot();
+	}
 
 	// Copy prototype methods from GraphItem.
 	GraphHeatMapItem.prototype.appendTo = GraphItem.prototype.appendTo;
 	GraphHeatMapItem.prototype.destroy = GraphItem.prototype.destroy;
-	GraphHeatMapItem.prototype.addEventListener = GraphItem.prototype.addEventListener;
-	GraphHeatMapItem.prototype.fireEvent = GraphItem.prototype.fireEvent;
 	GraphHeatMapItem.prototype.getTitle = GraphItem.prototype.getTitle;
+	GraphHeatMapItem.prototype.getGraphValue = GraphItem.prototype.getGraphValue;
 	GraphHeatMapItem.prototype.source = GraphItem.prototype.source;
 	GraphHeatMapItem.prototype.toJson = GraphItem.prototype.toJson;
 	GraphHeatMapItem.prototype.sourceFromJson = GraphItem.prototype.sourceFromJson;
 	GraphHeatMapItem.prototype.isEqual = GraphItem.prototype.isEqual;
-	
-
-	/** Returns the property value for the graph. */
-	GraphHeatMapItem.prototype.getGraphValue = function () {
-		var value,
-			index = this._plane === LaserCanvas.Enum.modePlane.sagittal ? 0 : 1;
-		if (this._fieldName) {
-			return this._source.abcdQ[index][this._fieldName];
-		} else {
-			value = this._source.get(this._propertyName);
-			if (Array.isArray(value)) {
-				return value[index];
-			} else {
-				return value;
-			}
-		}
-	};
-
 
 	// -------------
 	//  Accessors.
 	// -------------
-
-	/**
-	 * Returns the current variable dependency.
-	 * @returns {string[]}
-	 */
-	GraphHeatMapItem.prototype.variableNames = function () {
-		return [];
-	};
 
 	/**
 	 * Prepare for a new 2d scan.
@@ -318,6 +313,8 @@
 	GraphHeatMapItem.prototype.scan2dStart = function (extents) {
 		this.graph.calcTicks(extents);
 		this.graph.fillColormap(this._colormap, this._colorRange);
+		this._data = [];
+		this._subs = 0;
 	};
 
 	/**
@@ -326,9 +323,84 @@
 	 * @param {number} subs Subdivision of plane for current mipmap level.
 	 */
 	GraphHeatMapItem.prototype.scan2dValue = function (coords, subs) {
-		var value = this.getGraphValue(),
-			fillStyle = this._colormap.rgb(value, this._colorRange);
-		this.graph.fillPatch(fillStyle, coords, subs);
+		var data = this._data,
+			dataValues = this.getGraphValue(),
+			row = coords[1],
+			col = coords[0];
+
+		// Subdivide up the existing data, if needed.
+		this.subdivideData(subs);
+
+		// Store the data.
+		dataValues.forEach(function (dataValue, planeIndex) {
+			var p = data[planeIndex];
+			if (!p) {
+				p = data[planeIndex] = [];
+			}
+			if (!p[row]) {
+				p[row] = [];
+			}
+			p[row][col] = dataValue;
+		});
+
+		// Fill as we go.
+		this.fillPatch(row, col);
 	};
+
+	/**
+	 * Subdivide the data, i.e. double up the existing data ready for the next
+	 * mipmap level. Assumes that we're going up by a factor of two.
+	 * @param {number} subs Subdivision level.
+	 */
+	GraphHeatMapItem.prototype.subdivideData = function (subs) {
+		if (subs > this._subs) {
+			if (this._subs && !subs / this._subs === 2) {
+				console.warning("GraphHeatMapItem.subdivideData: Subdivision not by 2:", subs / this._subs);
+			}
+			if (this._subs) {
+				this._data.forEach(function (p) {
+					// Assume we're doubling the subs.
+					for (var rr = this._subs - 1; rr >= 0; rr -= 1) {
+						p[2 * rr] = p[2 * rr] || [];
+						p[2 * rr + 1] = p[2 * rr + 1] || [];
+						for (var cc = this._subs - 1; cc >= 0; cc -= 1) {
+							// Subdivide up the columns.
+							p[2 * rr + 0][2 * cc + 0] = 
+							p[2 * rr + 0][2 * cc + 1] =
+							p[2 * rr + 1][2 * cc + 0] = 
+							p[2 * rr + 1][2 * cc + 1] = 
+								p[rr][cc];
+						}
+					}
+				}.bind(this));
+			};
+			this._subs = subs;
+		}
+	};
+
+	/**
+	 * Fill a single patch on the graph.
+	 * @param {number} row Row index to fill.
+	 * @param {number} col Column index to fill.
+	 */
+	GraphHeatMapItem.prototype.fillPatch = function (row, col) {
+		this.graph.fillPatch(
+			this._colormap.rgb(
+				this._data[this._plane][row][col],
+				this._colorRange),
+			row, col, this._subs);
+	};
+
+	/**
+	 * Update the whole plot.
+	 */
+	GraphHeatMapItem.prototype.updatePlot = function () {
+		for (var row = 0; row < this._subs; row += 1) {
+			for (var col = 0; col < this._subs; col += 1) {
+				this.fillPatch(row, col);
+			}
+		}
+	};
+
 	LaserCanvas.GraphHeatMapItem = GraphHeatMapItem;
 }(window.LaserCanvas));

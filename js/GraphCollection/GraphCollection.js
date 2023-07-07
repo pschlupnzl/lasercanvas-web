@@ -58,7 +58,7 @@
 	/** Returns a value indicating whether any graphs depend on the variable. */
 	GraphCollection.prototype.hasRange = function (variableName) {
 		return this.graphs.some(function (graph) { 
-			return graph.variableNames().includes(variableName);
+			return !!graph.scanStart;
 		});
 	};
 
@@ -81,11 +81,6 @@
 		this.graphs.forEach(function (graph) {
 			graph.scanEnd && graph.scanEnd(variableName, currentValue);
 		});
-	};
-
-	/** One of the graph's variable dependencies has changed. */
-	GraphCollection.prototype.onVariableChange = function () {
-		this.fireEvent("change");
 	};
 
 	// -----------
@@ -168,8 +163,7 @@
 			: LaserCanvas.GraphItem
 		this.graphs.push(
 			new Item(source, propertyName, fieldName, variableName)
-			.appendTo(this.el.querySelector(".graphItems"))
-			.addEventListener("variableChange", this.onVariableChange.bind(this)));
+			.appendTo(this.el.querySelector(".graphItems")));
 		this.fireEvent("change");
 		this.el.setAttribute("data-has-graphs", this.graphs.length ? "true" : "false");
 	};

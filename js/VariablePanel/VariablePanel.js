@@ -7,7 +7,7 @@
 	};
 
 	/** Number of scanning steps (not including starting point). */
-	VariablePanel.scanSteps = 32;
+	VariablePanel.scanSteps = 64;
 
 	/** First density of mimap for 2d scans. */
 	VariablePanel.scan2dMin = 16;
@@ -101,7 +101,7 @@
 			x, y, vx, vy,
 			scan2dId = ++this.scan2dId,
 			subs = VariablePanel.scan2dMin, // Starting mipmap resolution.
-			blockSize = subs * subs, // Ensure one full scan.
+			blockSize = Math.max(200, subs * subs), // Ensure one full scan.
 			extents = variableNames.map(function (variableName) {
 				return self.numberSliders[variableName].getRange();
 			}),
