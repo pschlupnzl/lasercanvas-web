@@ -27,7 +27,7 @@ window.LaserCanvas.Application = function (canvas, info) {
 	*  - Help / documentation
 	*    Explanation and exposition of equations used.
 	*/	
-	var msystem, mrender, minfo, mvariables, mvariablePanel, mworker,
+	var msystem, mrender, minfo, mvariables, mvariablePanel,
 		mpropertiesPanel,                     // {PropertiesPanel} Properties panel handler.
 		mgraphCollection,                     // {GraphCollection} Currently active graphs.
 		mlisteners = {
@@ -130,7 +130,6 @@ window.LaserCanvas.Application = function (canvas, info) {
 			mgraphCollection = new LaserCanvas.GraphCollection(); // {GraphCollection} Graphing collection on Variables panel.
 			mvariables = new LaserCanvas.Variables();
 			mvariablePanel = new LaserCanvas.VariablePanel(mvariables);
-			mworker = new LaserCanvas.StabilityWorker().init();
 
 			onResize();
 			window.addEventListener('resize', onResize, false);
@@ -220,7 +219,6 @@ window.LaserCanvas.Application = function (canvas, info) {
 				mgraphCollection.change(msystem.elements());
 				minfo.change();
 				updateAll();
-				mworker.setSystem(msystem);
 			});
 			
 			// Variables have changed.
