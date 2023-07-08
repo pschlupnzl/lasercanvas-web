@@ -55,6 +55,16 @@
 	//  Scanning variables.
 	// ---------------------
 
+	/**
+	 * Update the graphs' variable markers.
+	 * @param {object} values Current variable values.
+	 */
+	GraphCollection.prototype.updateMarkers = function (values) {
+		this.graphs.forEach(function (graph) {
+			graph.updateMarkers(values);
+		});
+	};
+
 	/** Returns a value indicating whether any graphs depend on the variable. */
 	GraphCollection.prototype.hasRange = function (variableName) {
 		return this.graphs.some(function (graph) { 

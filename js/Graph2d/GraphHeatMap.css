@@ -1,0 +1,67 @@
+.LaserCanvasGraphHeatMap .plot {
+  right: 4em;
+}
+
+.LaserCanvasGraphHeatMap .plotHeatMap .tooltip {
+  position: absolute;
+  padding: 8px;
+  border-radius: 8px;
+  background: white;
+  text-align: center;
+  pointer-events: none;
+  z-index: 1;
+  box-shadow: 0 0.5em 1em rgba(0, 0, 0, 0.15);
+}
+
+.LaserCanvasGraphHeatMap .plotHeatMap .marker {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.LaserCanvasGraphHeatMap .plotHeatMap .marker > * {
+  position: absolute;
+  margin: -0.5px;
+  border: 1px solid #333;
+}
+
+.LaserCanvasGraphHeatMap .plotHeatMap .marker > *:first-child {
+  height: 100%;
+  border-top: none;
+  border-right: none;
+  border-bottom: none;
+}
+
+.LaserCanvasGraphHeatMap .plotHeatMap .marker > *:nth-child(2) {
+  width: 100%;
+  border-left: none;
+  border-right: none;
+  border-bottom: none;
+}
+
+.LaserCanvasGraphHeatMap .colormapContainer {
+  position: absolute;
+  right: 1.5em;
+  width: 1em;
+  top: 0.75em;
+  height: calc(160px - 0.75em - 1.5em);
+}
+
+.LaserCanvasGraphHeatMap .colormapContainer canvas {
+  width: 100%;
+  height: 100%;
+}
+
+.LaserCanvasGraphHeatMap .colormapContainer > div {
+  position: absolute;
+  left: -2em;
+  width: 5em;
+  text-align: center;
+}
+
+.LaserCanvasGraphHeatMap .colormapContainer > div.max {
+  top: -1.7em;
+}

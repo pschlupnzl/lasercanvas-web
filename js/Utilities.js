@@ -216,17 +216,21 @@ window.LaserCanvas.Utilities = {
 	*/
 	numberFormat: function (val, useFixed) {
 		"use strict";
-		var str, c, pt;
+		var str, sign, c, pt;
 		
 		if (isNaN(val)) {
 			str = '-';
 		} else if (typeof val !== 'number') {
 			str = val;
-		} else if (Math.abs(val) === Infinity) {
-			str = (val < 0 ? '−' : '') + '∞';
-		} else if (Math.abs(val) > 1e4) {
+		}
+		sign = val < 0 ? '–' : '';
+		val = Math.abs(val);
+		
+		if (val === Infinity) {
+			str = '∞';
+		} else if (val > 1e4) {
 			str = val.toPrecision(2);
-		} else if (Math.abs(val) >= 100) {
+		} else if (val >= 100) {
 			str = Math.round(val).toString();
 		} else {
 			str = useFixed  // First pass at string.
@@ -241,7 +245,7 @@ window.LaserCanvas.Utilities = {
 				}
 			}
 		}
-		return str;
+		return sign + str;
 	},
 	
 

@@ -10,7 +10,8 @@
 
 	Graph2d.template = [
 		'<div class="plot">',
-		'<canvas/>',
+		'<canvas></canvas>',
+		'<div class="marker"></div>',
 		'</div>'
 	].join("");
 
@@ -46,18 +47,6 @@
 			x: new Graph2dAxis(Graph2dAxis.Direction.HORIZONTAL),
 			y: new Graph2dAxis(Graph2dAxis.Direction.VERTICAL)
 		};
-	};
-
-	// -------------
-	//  Data lines.
-	// -------------
-
-	/** Create a new line corresponding to a vertical marker line. */
-	Graph2d.prototype.renderVerticalMarker = function (x) {
-		this.renderPlotLines([{
-			x: [x, x],
-			y: [this.axes.y.min(), this.axes.y.max()]
-		}], "#333");
 	};
 
 	// ----------
@@ -165,5 +154,15 @@
 			ctx.restore();
 		});
 	};
+
+	/**
+	 * Update the position of the markers.
+	 * @param {number} value Value to set the marker to.
+	 */
+	Graph2d.prototype.updateMarker = function (value) {
+		this.el.querySelector(".marker").style.left =
+			this.axes.x.transform(value) + "px";
+	};
+
 	LaserCanvas.Graph2d = Graph2d;
 }(window.LaserCanvas));

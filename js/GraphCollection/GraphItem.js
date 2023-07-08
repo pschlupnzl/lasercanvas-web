@@ -13,7 +13,7 @@
 		this._fieldName = fieldName;
 		this._variableName = variableName || "x";
 		this._lines = {}; // Lines keyed by variable name.
-		this._marker = {}; // Marker value (current variable value).
+		this._marker = {}; // Current variable values.
 
 		this.graph2d = new LaserCanvas.Graph2d();
 		this.el = this.init();
@@ -140,6 +140,15 @@
 	//  Data plotting.
 	// ----------------
 
+	/**
+	 * Update the markers showing the current variables.
+	 * @param {object} values Current variable values.
+	 */
+	GraphItem.prototype.updateMarkers = function (values) {
+		this._marker = values;
+		this.updatePlot();
+	};
+
 	/** Prepare for a new variables can by clearing any data lines, if the variable matches. */
 	GraphItem.prototype.scanStart = function (variableName) {
 		this._lines[variableName] = [];
@@ -159,8 +168,7 @@
 	};
 
 	/** Complete a variable scan and update the graphs, if the variable matches. */
-	GraphItem.prototype.scanEnd = function (variableName, currentValue) {
-		this._marker[variableName] = currentValue;
+	GraphItem.prototype.scanEnd = function (variableName) {
 		if (variableName === this._variableName) {
 			this.updatePlot();
 		}
@@ -204,7 +212,7 @@
 		var extents = this.getDataExtents(this._variableName);
 		this.graph2d.calcTicks(extents);
 		this.graph2d.renderLines(this._lines[this._variableName]);
-		this.graph2d.renderVerticalMarker(this._marker[this._variableName]);
+		this.graph2d.updateMarker(this._marker[this._variableName]);
 	};
 
 	LaserCanvas.GraphItem = GraphItem;
@@ -302,9 +310,17 @@
 	GraphHeatMapItem.prototype.sourceFromJson = GraphItem.prototype.sourceFromJson;
 	GraphHeatMapItem.prototype.isEqual = GraphItem.prototype.isEqual;
 
-	// -------------
-	//  Accessors.
-	// -------------
+	// ----------------
+	//  Data scanning.
+	// ----------------
+
+	/**
+	 * Update the markers showing the current variables.
+	 * @param {object} values Current variable values.
+	 */
+	GraphHeatMapItem.prototype.updateMarkers = function (values) {
+		this.graph.updateMarker(values);
+	};
 
 	/**
 	 * Prepare for a new 2d scan.

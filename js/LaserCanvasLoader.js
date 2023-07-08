@@ -101,6 +101,7 @@ window.LaserCanvas = {
 			"css/SellmeierPanel.css",
 			"css/Themes.css",
 			"js/Graph2d/Graph2d.css",
+			"js/Graph2d/GraphHeatMap.css",
 			"js/GraphCollection/GraphCollection.css",
 			"js/NumberSlider/NumberSlider.css",
 			"js/VariablePanel/VariablePanel.css",

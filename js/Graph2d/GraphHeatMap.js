@@ -1,7 +1,4 @@
 (function (LaserCanvas) {
-  /** Fractional width of colorbar display. */
-  var COLORMAP_WIDTH = 0.04;
-
   /**
    * Class to display a heatmap of values.
    */
@@ -13,6 +10,7 @@
     this.getValueAt = function () {};
     this.axes = this.initAxes();
     this.el = this.init();
+    this.canvas = this.el.querySelector("canvas");
     this.activate();
     this.events = {
       variableChange: [],
@@ -21,9 +19,15 @@
 
   GraphHeatMap.template = [
     // Template.
-    '<div class="plot">',
+    '<div class="plot plotHeatMap">',
     '<canvas style="cursor: crosshair"></canvas>',
-    '<div class="tooltip" style="position: absolute; pointer-events: none; background: white; padding: 8px; border-radius: 8px; text-align: center;"></div>',
+    '<div class="marker"><div></div><div></div></div>',
+    '<div class="tooltip"></div>',
+    "</div>",
+    '<div class="colormapContainer">',
+    "<canvas></canvas>",
+    '<div class="max">max</div>',
+    '<div class="min">min</div>',
     "</div>",
   ].join("");
 
@@ -34,7 +38,7 @@
     var plot,
       el = document.createElement("div");
     // TODO: We may need separate css classes.
-    el.className = "LaserCanvasGraph2d";
+    el.className = "LaserCanvasGraph2d LaserCanvasGraphHeatMap";
     el.innerHTML = GraphHeatMap.template;
     plot = el.querySelector(".plot");
     this.axes.x.appendTo(plot);
@@ -47,7 +51,7 @@
    */
   GraphHeatMap.prototype.activate = function () {
     var self = this,
-      canvas = this.el.querySelector("canvas"),
+      canvas = this.canvas,
       tooltip = this.el.querySelector(".tooltip");
 
     canvas.addEventListener("mouseleave", function () {
@@ -60,7 +64,7 @@
         rect = canvas.getBoundingClientRect(),
         posx = e.pageX - rect.left,
         posy = e.pageY - rect.top,
-        rx = posx / ((1 - COLORMAP_WIDTH) * rect.width),
+        rx = posx / rect.width,
         ry = 1 - posy / rect.height,
         x = (1 - rx) * extents[0].min + rx * extents[0].max,
         y = (1 - ry) * extents[1].min + ry * extents[1].max;
@@ -126,7 +130,7 @@
       fontSize = this.getFontSize();
     this._extents = extents;
     this.axes.x
-      .calcTicks(extents[0], (1 - COLORMAP_WIDTH) * size.width, {
+      .calcTicks(extents[0], size.width, {
         minTickSpacing: 2.5 * fontSize,
         tightLimits: true,
       })
@@ -147,16 +151,13 @@
    * Update the size of canvas, returning the dimensions.
    */
   GraphHeatMap.prototype.canvasSize = function () {
-    var canvas = this.el.querySelector("canvas"),
+    var canvas = this.canvas,
       container = canvas.parentElement,
       width = parseInt(container.offsetWidth, 10),
       height = parseInt(container.offsetHeight, 10);
     if (canvas.width !== width || canvas.height !== height) {
       canvas.width = width;
       canvas.height = height;
-      this.el.querySelector(
-        '.Graph2dAxis[data-direction="horizontal"]'
-      ).style.width = 100 * (1 - COLORMAP_WIDTH) + "%";
     }
     return {
       width: width,
@@ -179,17 +180,32 @@
   /**
    * Draw the colormap into the canvas space.
    * @param {colormap} colormap Colormap whose scale to draw.
+   * @param {Range} range Range to mark.
    */
-  GraphHeatMap.prototype.fillColormap = function (colormap) {
-    var canvas = this.el.querySelector("canvas"),
+  GraphHeatMap.prototype.fillColormap = function (colormap, range) {
+    var Utilities = LaserCanvas.Utilities,
+      colormapContainer = this.el.querySelector(".colormapContainer"),
+      canvas = colormapContainer.querySelector("canvas"),
       ctx = canvas.getContext("2d"),
-      w = canvas.width,
-      h = canvas.height,
-      dx = COLORMAP_WIDTH * canvas.width;
+      rect = canvas.getBoundingClientRect(),
+      w = rect.width,
+      h = rect.height;
+
+    // Fill the color map.
+    canvas.width = w;
+    canvas.height = h;
     for (var k = 0; k < h; k += 1) {
       ctx.fillStyle = colormap.rgb(k, [0, h - 1]);
-      ctx.fillRect(w - dx, k, dx, 1);
+      ctx.fillRect(0, k, w, 1);
     }
+
+    // Update the ranges.
+    colormapContainer.querySelector(".min").innerText = Utilities.numberFormat(
+      range[0]
+    );
+    colormapContainer.querySelector(".max").innerText = Utilities.numberFormat(
+      range[1]
+    );
   };
 
   /**
@@ -201,12 +217,29 @@
    * @param {number} subs Subdivision count for this level of mipmap.
    */
   GraphHeatMap.prototype.fillPatch = function (fillStyle, row, col, subs) {
-    var canvas = this.el.querySelector("canvas"),
+    var canvas = this.canvas,
       ctx = canvas.getContext("2d"),
-      dx = ((1 - COLORMAP_WIDTH) * canvas.width) / subs,
+      dx = canvas.width / subs,
       dy = canvas.height / subs;
     ctx.fillStyle = fillStyle;
     ctx.fillRect(col * dx, (subs - row - 1) * dy, dx + 1, dy + 1);
+  };
+
+  /**
+   * Update the position of the markers.
+   * @param {object} marker Values of the marker to show.
+   */
+  GraphHeatMap.prototype.updateMarker = function (marker) {
+    var extents = this._extents,
+      markers = this.el.querySelector(".marker").children;
+    markers[0].style.left =
+      (100 * (marker.x - extents[0].min)) /
+        (extents[0].max - extents[0].min || 1) +
+      "%";
+    markers[1].style.bottom =
+      (100 * (marker.y - extents[1].min)) /
+        (extents[1].max - extents[1].min || 1) +
+      "%";
   };
 
   this.LaserCanvas.GraphHeatMap = GraphHeatMap;
