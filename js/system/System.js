@@ -581,12 +581,14 @@ LaserCanvas.System = function () {
 		* @param {Element} element Element to delete.
 		*/
 		removeElement = function (element) {
-			var k, prevElement,
+			var prevElement,
 				variables = getVariables(),
+				isRing = mprop.configuration === LaserCanvas.System.configuration.ring,
+				k = isRing ? melements.length - 1 : melements.length - 2,
 				n = 1; // {number} Count of items to remove.
 				
 			// Don't delete last or first elements.
-			for (k = melements.length - 2; k >= 1; k -= 1) {
+			for (; k >= 1; k -= 1) {
 				if (melements[k] === element) {
 					prevElement = melements[k - 1];
 					if (typeof element.removeGroup === 'function') {
