@@ -167,8 +167,7 @@ LaserCanvas.systemAdjust = function (melements, calculateCartesianCoordinates, g
 					Bnorm = B.norm();             // {number} (mm) Length of fixed vector.
 					Bcoscc = Bnorm * Math.cos(cc);
 					Bsincc = Bnorm * Math.sin(cc);
-						
-					
+
 					return {
 						a: A.norm(),               // {number} (mm) Length of stretch vector.
 						b: B.norm(),               // {number} (mm) Length of fixed vector.
@@ -242,19 +241,65 @@ LaserCanvas.systemAdjust = function (melements, calculateCartesianCoordinates, g
 
 		/**
 		* Start dragging an element.
+		* @this {System} System being edited.
 		* @param {Point} pt (mm) Current mouse world coordinates during drag.
-		* @param {Point} ptStart (mm) Mouse world coordinates at start of drag.
 		* @param {Element} elDrag Element being dragged.
 		* @returns {boolean} Value indicating whether drag should start.
 		*/
 		dragElementStart = function (pt, elDrag) {
 			mdragData = getDragElements(pt, elDrag);
-			if (mdragData) {
-				return true;
-			}
-			return false;
+			return !!mdragData;
 		},
 		
+		/** Snapshot of state before drag. */
+		msnapshot = [],
+
+		/**
+		 * Take a snapshot of the system being rearranged.
+		 */
+		takeSnapshot = function () {
+			var extend = LaserCanvas.Utilities.extend;
+			msnapshot = [
+				["prev", "stretch"],
+				["prev", "pivot"],
+				["next", "stretch"],
+				["next", "pivot"],
+			].map(function (relType) {
+				var rel = relType[0],
+					type = relType[1],
+					element = mdragData[rel]?.[type]?.element;
+				 return element && {
+					element: element,
+					loc: extend({}, element.loc),
+					dist: type === "stretch"
+						? element.get("distanceToNext")
+						: undefined,
+					aoi: type === "pivot"
+						? element.get("angleOfIncidence")
+						: undefined
+				};
+			}).filter(function(snapshot) {
+				return !!snapshot
+			});
+		},
+
+		/**
+		 * Apply an earlier snapshot of the system being rearranged.
+		 */
+		applySnapshot = function (apply) {
+			var extend = LaserCanvas.Utilities.extend;
+			msnapshot.forEach(function (snapshot) {
+				var element = snapshot.element;
+				extend(element.loc, snapshot.loc);
+				if (snapshot.dist !== undefined) {
+					element.set("distanceToNext", snapshot.dist);
+				} 
+				if (snapshot.aoi !== undefined) {
+					element.set("angleOfIncidence", snapshot.aoi);
+				}
+			});
+		},
+
 		/**
 		* An element is being dragged. This calculates the new stretch and
 		* pivot values for the relevant anchor points and updates the system
@@ -269,9 +314,17 @@ LaserCanvas.systemAdjust = function (melements, calculateCartesianCoordinates, g
 			pt.x += mdragData.offset.dx;
 			pt.y += mdragData.offset.dy;
 			
-			return mdragData.stretchOnly
-				? dragElementStretch(pt, ptStart, elDrag_notused)
-				: dragElementPivot(pt, ptStart, elDrag_notused);
+			try {
+				takeSnapshot();
+				return mdragData.stretchOnly
+					? dragElementStretch(pt, ptStart, elDrag_notused)
+					: dragElementPivot(pt, ptStart, elDrag_notused);
+			} catch (err) {
+				// Problem moving, undo.
+				applySnapshot();
+				calculateCartesianCoordinates();
+				return false;
+			}
 		},
 		
 		/**
@@ -354,7 +407,7 @@ LaserCanvas.systemAdjust = function (melements, calculateCartesianCoordinates, g
 
 				// Calculate new stretch and angles.
 				// From Wikipedia,         ____________________
-				//    |A| = B cos cc +/- \/ |C|^2 - B^2sin^2cc
+				//    |A| = B cos cc +/-  √ |C|^2 - B^2sin^2cc
 				// @param {object} data Data for prev or next segment.
 				// @param {number} dir Direction -1:prev, +1:next.
 				// @returns {boolean} Value indicating whether the move yields valid values.
@@ -533,7 +586,7 @@ LaserCanvas.systemAdjust = function (melements, calculateCartesianCoordinates, g
 				}
 			}
 
-			if (false) {
+			if (LaserCanvas.__render) {
 				if (__dragElementTmr) {
 					clearTimeout(__dragElementTmr);
 				}
@@ -555,6 +608,7 @@ LaserCanvas.systemAdjust = function (melements, calculateCartesianCoordinates, g
 		
 		/**
 		* Dragging ends.
+		* @this {System} System being edited.
 		* @param {Point} ptEnd_notused (mm) Final mouse world coordinates during drag.
 		* @param {Point} ptStart_notused (mm) Mouse world coordinates at start of drag.
 		* @param {Element} elDrag_notused Element being dragged.
@@ -573,16 +627,20 @@ LaserCanvas.systemAdjust = function (melements, calculateCartesianCoordinates, g
 		__dragElementConstruction = function (pt, ptStart_notused, dragData) {
 			"use strict";
 			var render = LaserCanvas.__render,
-				x, y, r,
+				x, y,
 			
 				// Show prev / next construction.
 				// @param {object} data Data to show, dragData.prev|dragData.next.
 				// @param {string.ColorRef} rgb Color to use for drawing.
 				// @param {number} dir Direction -1:prev, +1:next.
 				showConstruction = function (data, rgb, dir) {
+					if (!data.pivot || !data.stretch || !data.construct) {
+						return;
+					}
 					var 
 						stretchLoc = data.stretch.element.location(),
 						pivotLoc   = data.pivot.element.location(),
+						A = data.construct.A, // Initial stretch vector.
 						B = data.construct.B, // Fixed construction vector.
 						b = data.construct.b, // {number} (mm) Length of fixed vector.
 						c = data.construct.c; // {number} (mm) Distance from pivot to mouse
@@ -590,48 +648,39 @@ LaserCanvas.systemAdjust = function (melements, calculateCartesianCoordinates, g
 					// Pivot anchor.
 					x = pivotLoc.x;
 					y = pivotLoc.y;
-					render.setStroke(rgb, 4)
-						.beginPath()
-						.arc(x, y, 4, 0, 2 * Math.PI)
+					render
+						.drawPath("M -32 0 L 32 0 M 0 -32 L 0 32", x, y)
+						.setStroke(rgb, 1)
 						.stroke();
 					
 					// Stretch (A).
-					render.setStroke(rgb, 4);
-					render.beginPath();
 					x = stretchLoc.x;
 					y = stretchLoc.y;
-					render.arc(x, y, 3, 0, 2 * Math.PI);
-					render.moveTo(x, y);
-					r = stretchLoc.l;
-					x += r * Math.cos(stretchLoc.q);
-					y += r * Math.sin(stretchLoc.q);
-					render.lineTo(x, y);
-					render.stroke();
-					
+					render
+						.drawPath("M -12 0 L 12 0 M 0 -12 L 0 12", x, y)
+						.moveTo(x, y)
+						.lineTo(x + A[0], y + A[1])
+						.setStroke(rgb, 2)
+						.stroke();
+						
 					// Fixed (B).
 					x = pivotLoc.x;
 					y = pivotLoc.y;
 					render
-						.setStroke(rgb, 2.5)
-						.beginPath()
-						.arc(x, y, 8, 0, 2 * Math.PI)
-						.moveTo(x, y)
-						.lineTo(x - dir * B[0], y - dir * B[1])
-						.stroke();
-
-					render
-						.setStroke(rgb, 0.5)
-						.arc(x, y, b, 0, 1.8 * Math.PI)
+						.drawPath("M -8 0 L 8 0 M 0 -8 L 0 8", x, y)
+						.moveTo(x + B.norm(), y)
+						.arc(x, y,  b, 0, 2 * Math.PI)
+						.setStroke(rgb, 3)
 						.stroke();
 
 					// Arc from pivot to mouse.
 					render
-						.setStroke(rgb, 2)
 						.beginPath()
 						.arc(x, y, c, 0, 2 * Math.PI)
+						.setStroke(rgb, 0.5)
 						.stroke();
 				};
-				
+
 			render.save();
 			showConstruction(dragData.prev, '#00c', -1);
 			showConstruction(dragData.next, '#a00', +1);

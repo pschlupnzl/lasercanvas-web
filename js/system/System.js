@@ -150,6 +150,24 @@ LaserCanvas.System = function () {
 		},
 
 		/**
+		 * Returns a value indicating whether the given element can be removed
+		 * from the system. This will normally be TRUE, but FALSE to ensure at
+		 * least three mirrors remain in a ring cavity.
+		 * @param {Element} element Element queried for removal.
+		 */
+		canDeleteElement = function (element) {
+			if (element.type === LaserCanvas.Element.Mirror.Type &&
+				mprop.configuration === LaserCanvas.System.configuration.ring &&
+				melements.reduce(function(count, elem) {
+					return count + (elem.type === LaserCanvas.Element.Mirror.Type ? 1 : 0);
+				}, 0) <= 3
+			) {
+				return false;
+			}
+			return true;
+		},
+
+		/**
 		* Determine whether a given element property should
 		* be shown. For example, group velocity dispersion is
 		* only used in ultrafast resonator types.
@@ -230,6 +248,7 @@ LaserCanvas.System = function () {
 				Vector = LaserCanvas.Math.Vector, // {function} Construction function for vector.
 				kmax = mprop.configuration === LaserCanvas.System.configuration.ring
 					? melements.length : melements.length - 1;   // How many segments to check.
+
 			for (k = 0; k < kmax; k += 1) {
 				if (!filterBy || melements[k].canSetProperty(filterBy)) {
 					loc = melements[k].location(); // {Point} Current optic location.
@@ -362,45 +381,9 @@ LaserCanvas.System = function () {
 		* anti-parallel.
 		*/
 		alignEndElements = function () {
-			var Vector = LaserCanvas.Math.Vector, // {function} Vector construction function.
-				U, V, Z, l,         // Vectors for ring cavity.
-				el = melements[0],  // {Element} Starting element.
-				le = melements[melements.length - 1]; // {Element} Final element.
-			
-			if (mprop.configuration === LaserCanvas.System.configuration.ring) { 
-				// Ring cavity construction vectors.
-				// TODO: This simple ring doesn't allow optics between
-				// the last and first mirror. A complete ring layout
-				// would need changes:
-				//  - The last pivot mirror (and any subsequent inline
-				//    elements) would need proper angleOfIncidence,
-				//    distanceToNext etc. calculated.
-				//  - These values would need to accurately meet up
-				//    with the first pivot mirror location.
-				//  - Dragging the last pivot mirror (and any subsequent
-				//    elements) might be achieved by temporarily adding
-				//    a clone of the first mirror at the end of the
-				//    cavity while doing the adjustment calculations.
-				//  - Dragging the first pivot mirror would be a bit
-				//    more complex.
-				// For now - let's just make a simple ring.
-				Z = new Vector(el.loc.x - le.loc.x, el.loc.y - le.loc.y);
-				l = Z.norm();                           // Vector length.
-				Z = Z.normalize();                      // Vector from last to first element.
-				U = new Vector(1, 0).rotate(-el.loc.q); // Bisected outgoing vector from first element.
-				V = new Vector(1, 0).rotate(-le.loc.p); // Bisected incoming vector to last element.
-
-				// Alignments.
-				el.loc.p = Z.atan2();
-				el.set("deflectionAngle", Math.atan2(Z.cross(U), Z.dot(U))); // Updates angleOfIncidence.
-				le.set("deflectionAngle", Math.atan2(V.cross(Z), V.dot(Z))); // Updates angleOfIncidence.
-				le.loc.q = Z.atan2();
-				le.set("distanceToNext", l);
-			} else {
-				// Linear cavity: Normal incidence.
-				el.loc.p = el.loc.q + Math.PI;
-				le.set("distanceToNext", 0);
-				le.set("deflectionAngle", Math.PI);
+			var pivotIndex = LaserCanvas.SystemUtil.alignEndElements(mprop, melements);
+			if (pivotIndex) {
+				calculateCartesianCoordinatesOnly(pivotIndex);
 			}
 		},
 		
@@ -410,6 +393,12 @@ LaserCanvas.System = function () {
 		* @param {number=} kend_in Index of final element to calculate, if any. The element is included.
 		*/
 		calculateCartesianCoordinates = function (kstart_in, kend_in) {
+			calculateCartesianCoordinatesOnly(kstart_in, kend_in);
+			// Align cavity end elements.
+			alignEndElements();
+		},
+
+		calculateCartesianCoordinatesOnly = function (kstart_in, kend_in) {
 			var variables = getVariables(),
 				k, element, d,
 				loc,                                 // {object} Current element location (x, y, q, ...).
@@ -436,8 +425,6 @@ LaserCanvas.System = function () {
 				ax.y += d * Math.sin(ax.q); // {number} (mm) Advance vertical location.
 			}
 			
-			// Align cavity end elements.
-			alignEndElements();
 		},
 		
 		/**
@@ -462,7 +449,7 @@ LaserCanvas.System = function () {
 		* @returns {boolean} Value indicating whether drag should start.
 		*/
 		dragElementStart = function (pt, elDrag) {
-			return adjust.start(pt, elDrag);
+			return adjust.start.call(this, pt, elDrag);
 		},
 		
 		/**
@@ -475,7 +462,7 @@ LaserCanvas.System = function () {
 		* @param {Element} elDrag Element being dragged. The parameter is not used.
 		*/
 		dragElement = function (pt, ptStart, elDrag_notused) {
-			var needsUpdate = adjust.drag(pt, ptStart);
+			var needsUpdate = adjust.drag.call(this, pt, ptStart);
 			if (needsUpdate) {
 				update();
 			}
@@ -488,7 +475,7 @@ LaserCanvas.System = function () {
 		* @param {Element} elDrag Element being dragged. The parameter is not used.
 		*/
 		dragElementEnd = function (ptEnd, ptStart, elDrag_notused) {
-			adjust.end(ptEnd, ptStart);
+			adjust.end.call(this, ptEnd, ptStart);
 			update();
 		},
 		
@@ -524,7 +511,11 @@ LaserCanvas.System = function () {
 			// anyway, so do it now. When scanning ring cavities, we need
 			// to calculate the coordinates to determine the final leg.
 			if (updateCoordinates || this.get("configuration") === LaserCanvas.System.configuration.ring) {
-				calculateCartesianCoordinates();
+				try {
+					calculateCartesianCoordinates();
+				} catch (err) {
+					// TODO: Handle bad cavity (e.g. ring that didn't close)
+				}
 			}
 		},
 
@@ -590,12 +581,14 @@ LaserCanvas.System = function () {
 		* @param {Element} element Element to delete.
 		*/
 		removeElement = function (element) {
-			var k, prevElement,
+			var prevElement,
 				variables = getVariables(),
+				isRing = mprop.configuration === LaserCanvas.System.configuration.ring,
+				k = isRing ? melements.length - 1 : melements.length - 2,
 				n = 1; // {number} Count of items to remove.
 				
 			// Don't delete last or first elements.
-			for (k = melements.length - 2; k >= 1; k -= 1) {
+			for (; k >= 1; k -= 1) {
 				if (melements[k] === element) {
 					prevElement = melements[k - 1];
 					if (typeof element.removeGroup === 'function') {
@@ -682,6 +675,7 @@ LaserCanvas.System = function () {
 		showElementProperty: showElementProperty, // Determine whether a given element property should be shown.
 		calculateAbcd: calculateAbcd,             // Calculate the ABCD values for this system.
 		canSetProperty: canSetProperty,           // Determine whether a property value can be set.
+		canDeleteElement: canDeleteElement,       // Determine whether an element can be deleted.
 		createNew: createNew,                     // Create a new system.
 		dragElement: dragElement,                 // Update during drag.
 		dragElementEnd: dragElementEnd,           // Finished dragging an element.

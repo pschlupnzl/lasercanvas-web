@@ -197,6 +197,16 @@ window.LaserCanvas.Math = {};
 		},
 		
 		/**
+		* Calculate the cross product between this and the given vector,
+		* normalizing both vectors.
+		* @param {Vector} bvec Vector with which to calculate the cross product.
+		* @returns {number|Vector} For 2-vectors: Magnitude of cross product; 3-vectors: Cross product vector.
+		*/
+		normalizeCross: function (bvec) {
+			return this.normalize().cross(bvec.normalize());
+		},
+		
+		/**
 		* Returns a new vector representing this vector rotated by a given angle.
 		* @param {number} q (rad) Rotation angle.
 		*/

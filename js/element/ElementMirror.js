@@ -30,8 +30,12 @@ LaserCanvas.Element.Mirror.Type = "Mirror";
 
 // Standard radii of curvature.
 LaserCanvas.Element.Mirror.standard = [
-	-1000, -750, -500, -400, -300, -250, -200, -175, -150, -125, -100,  -75,  -50,   -25, 0,
-	  +25,  +50,  +75, +100, +125, +150, +175, +200, +250, +300, +400, +500, +750, +1000]
+	-1000, -750, -500, -400, -300, -250, -200, -175, -150, -125, -100,  -75,  -50,   -25, 
+	{ label: "Convex", value: undefined },
+	{ label: "Plane", value: 0 },
+	+25,  +50,  +75, +100, +125, +150, +175, +200, +250, +300, +400, +500, +750, +1000,
+	{ label: "Concave", value: undefined }, 
+];
 
 LaserCanvas.Element.Mirror.prototype = {
 
@@ -225,7 +229,6 @@ LaserCanvas.Element.Mirror.prototype = {
 	* @param {LaserCanvas.renderLayer} layer Rendering layer.
 	*/
 	draw: function (render, layer) {
-		////return this.wireframe(render, layer);
 		var image, roc,
 			qc = -this.loc.p + this.get("angleOfIncidenceRad"), // {number} (rad) Display angle on canvas.
 			renderLayer = LaserCanvas.Enum.renderLayer; // {Enum} Layer to draw.

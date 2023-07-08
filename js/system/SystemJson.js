@@ -59,22 +59,28 @@
 		 * @param {function} variablesGetter Delegate that exposes current variable values.
 		 */
 		fromJson = function (json, mprop, melements, system, variablesGetter) {
+			var n, isRing;
 			LaserCanvas.Utilities.extend(mprop, json.prop);
 			mprop.wavelength = new LaserCanvas.Equation(mprop.wavelength);
 			mprop.initialWaist = new LaserCanvas.Equation(mprop.initialWaist);
 			LaserCanvas.SystemUtil.resetElements(melements);
-			for (var elementJson of json.elements) {
+			n = json.elements.length;
+			isRing = mprop.configuration === LaserCanvas.System.configuration.ring;
+			json.elements.forEach(function (elementJson, index, all) {
 				var element = newElement(elementJson.type, variablesGetter);
 				element.fromJson(elementJson);
 if (element.init && !system) {
 	console.warn("SystemJson.fromJson has no reference to system for element", element);
 }
+				if (index === 0) {
+					element.set("startOptic", true);
+				} else if (index === n - 1 && !isRing) {
+					element.set("endOptic", true);
+				}
 				element.init && element.init(system);
 				melements.push(element);
-			}
+			});
 			LaserCanvas.Element.collectGroups(melements);
-			melements[0].set("startOptic", true);
-			melements[melements.length - 1].set("endOptic", true);
 		};
 
 	LaserCanvas.SystemUtil = LaserCanvas.SystemUtil || {};
