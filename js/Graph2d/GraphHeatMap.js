@@ -14,6 +14,7 @@
     this.activate();
     this.events = {
       variableChange: [],
+      colormapChange: [],
     };
   };
 
@@ -26,8 +27,8 @@
     "</div>",
     '<div class="colormapContainer">',
     "<canvas></canvas>",
-    '<div class="max">max</div>',
-    '<div class="min">min</div>',
+    '<div class="max"></div>',
+    '<div class="min"></div>',
     "</div>",
   ].join("");
 
@@ -81,6 +82,13 @@
         ].join("");
       }
     });
+
+    this.el.querySelector(".colormapContainer").addEventListener(
+      "click",
+      function () {
+        this.fireEvent("colormapChange");
+      }.bind(this)
+    );
   };
 
   /** Attach the graph to the parent element. */

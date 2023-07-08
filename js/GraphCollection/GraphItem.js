@@ -246,8 +246,8 @@
 		this._data = []; // 2d surface data for each plane.
 		this._subs = 0; // Subdivision size (assume square).
 
-		this._colormap = GraphHeatMapItem.getColormap("ire");
-		this._colorRange = [-2, 2];
+		this._colormapType = 0; // Index into MAP_NAMES
+		this._colorRange = [-1, 1];
 
 		this.graph = new LaserCanvas.GraphHeatMap();
 		this.graph.getValueAt = function (rx, ry) {
@@ -289,8 +289,15 @@
 		el.className = "graphCollectionPanel"; 
 		el.innerHTML = GraphHeatMapItem.template;
 		this.graph.appendTo(el.querySelector(".graph2dContainer"));
+		this.graph.addEventListener("colormapChange", function () {
+			this._colormapType = (this._colormapType + 1)
+				% LaserCanvas.Colormap.MAP_NAMES.length;
+			this.graph.fillColormap(this.getColormap(), this._colorRange);
+			this.updatePlot();
+		}.bind(this));
 		el.querySelector(".title").innerText = this.getTitle();
 		el.querySelector('input[type="checkbox"]').checked = this._plane !== 0;
+		
 		return el;
 	};
 
@@ -328,7 +335,7 @@
 	 */
 	GraphHeatMapItem.prototype.scan2dStart = function (extents) {
 		this.graph.calcTicks(extents);
-		this.graph.fillColormap(this._colormap, this._colorRange);
+		this.graph.fillColormap(this.getColormap(), this._colorRange);
 		this._data = [];
 		this._subs = 0;
 	};
@@ -364,6 +371,13 @@
 	};
 
 	/**
+	 * Finish a 2d scan, redrawing the whole image to clean up any jagged edges.
+	 */
+	GraphHeatMapItem.prototype.scan2dEnd = function () {
+		this.updatePlot();
+	};
+
+	/**
 	 * Subdivide the data, i.e. double up the existing data ready for the next
 	 * mipmap level. Assumes that we're going up by a factor of two.
 	 * @param {number} subs Subdivision level.
@@ -395,13 +409,23 @@
 	};
 
 	/**
+	 * Returns the currently selected colormap.
+	 * @returns {Colormap}
+	 */
+	GraphHeatMapItem.prototype.getColormap = function () {
+		return GraphHeatMapItem.getColormap(
+			LaserCanvas.Colormap.MAP_NAMES[this._colormapType]
+		);
+	};
+
+	/**
 	 * Fill a single patch on the graph.
 	 * @param {number} row Row index to fill.
 	 * @param {number} col Column index to fill.
 	 */
 	GraphHeatMapItem.prototype.fillPatch = function (row, col) {
 		this.graph.fillPatch(
-			this._colormap.rgb(
+			this.getColormap().rgb(
 				this._data[this._plane][row][col],
 				this._colorRange),
 			row, col, this._subs);

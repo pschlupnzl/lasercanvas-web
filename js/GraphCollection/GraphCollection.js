@@ -122,6 +122,15 @@
 		})
 	};
 
+	/**
+	 * Finish scanning over 2d patches.
+	 */
+	GraphCollection.prototype.scan2dEnd = function () {
+		this.graphs.forEach(function (graph) {
+			graph.scan2dEnd && graph.scan2dEnd();
+		})
+	};
+
 	// -------------------
 	//  Graph management.
 	// -------------------

@@ -147,21 +147,29 @@ window.LaserCanvas.Application = function (canvas, info) {
 			
 			/**
 			 * Scan each variable to generate display plots, if any are used.
+			 * @param {string[]=} changedVariables Optional array of variables
+			 * that were changed and thus do *not* need to be scanned.
 			 */
-			var scanVariables = function () {
-				for (var variableName of ["x", "y"]) {
+			var scanVariables = function (changedVariables) {
+				var variables = ["x", "y"]
+					.filter(function (variableName) {
+						return !changedVariables || 
+							!changedVariables.includes(variableName);
+					});
+				for (var variableName of variables) {
 					if (mgraphCollection.hasRange(variableName)) {
 						mgraphCollection.scanStart(variableName);
 						mvariablePanel.scan(variableName, function (variableValue) {
 							msystem.onVariablesChange();
-							msystem.calculateAbcd();
 							mgraphCollection.scanValue(variableName, variableValue);
 						});
 						mgraphCollection.scanEnd(variableName, mvariables.value()[variableName]);
 						msystem.onVariablesChange();
 					}
 				}
-				scanVariables2d();
+				if (!changedVariables) {
+					scanVariables2d();
+				}
 				mgraphCollection.updateMarkers(mvariables.value());
 			};
 
@@ -174,8 +182,11 @@ window.LaserCanvas.Application = function (canvas, info) {
 						},
 						function iterator (coords, subs) {
 							msystem.onVariablesChange();
-							msystem.calculateAbcd();
 							mgraphCollection.scan2dValue(coords, subs);
+						},
+						function end () {
+							msystem.onVariablesChange();
+							mgraphCollection.scan2dEnd();
 						});
 				}
 			};
@@ -206,9 +217,10 @@ window.LaserCanvas.Application = function (canvas, info) {
 			});
 			
 			// Variables have changed.
-			mvariables.addEventListener("change", function () {
+			mvariables.addEventListener("change", function (changedVariables) {
 				msystem.onVariablesChange(true); // Update cartesian coordinates.
-				msystem.update();
+				scanVariables(changedVariables);
+				updateAll();
 			});
 
 			// Graphs have changed.

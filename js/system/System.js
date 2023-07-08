@@ -526,6 +526,9 @@ LaserCanvas.System = function () {
 			if (updateCoordinates || this.get("configuration") === LaserCanvas.System.configuration.ring) {
 				calculateCartesianCoordinates();
 			}
+
+			// Calculate the new ABCD, we'll need it right away.
+			this.calculateAbcd();
 		},
 
 		// -------------------------------------------------

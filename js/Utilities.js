@@ -219,9 +219,9 @@ window.LaserCanvas.Utilities = {
 		var str, sign, c, pt;
 		
 		if (isNaN(val)) {
-			str = '-';
+			return '-';
 		} else if (typeof val !== 'number') {
-			str = val;
+			return val;
 		}
 		sign = val < 0 ? '–' : '';
 		val = Math.abs(val);

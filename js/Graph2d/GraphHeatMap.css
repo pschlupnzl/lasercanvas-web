@@ -9,6 +9,7 @@
   background: white;
   text-align: center;
   pointer-events: none;
+  visibility: hidden;
   z-index: 1;
   box-shadow: 0 0.5em 1em rgba(0, 0, 0, 0.15);
 }
@@ -48,6 +49,7 @@
   width: 1em;
   top: 0.75em;
   height: calc(160px - 0.75em - 1.5em);
+  cursor: pointer;
 }
 
 .LaserCanvasGraphHeatMap .colormapContainer canvas {
