@@ -183,7 +183,7 @@ def add_html(filename):
                 # Remove gaps between tags.
                 re.sub(r'(>)[\s\n\r]+(<)', r'\1 \2',
                 # Remove newline + indent spaces.
-                re.sub(r'(?:[\n\r]+\s+|[\n\r\s]+$)', '',
+                re.sub(r'(?:[\n\r]+\s+|[\n\r\s]+$)', ' ',
                 # Remove <!-- HTML comments -->.
                 re.sub(r'(?:\s+>|<!\-\-[\s\S]*?\-\->)', '',
                 body)))) + "'",
