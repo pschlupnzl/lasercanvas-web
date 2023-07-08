@@ -13,7 +13,7 @@
 	}
 
 	.graphCollection .about {
-		max-width: 360px;
+		max-width: 400px;
 	}
 
 	.graphCollection[data-has-graphs="true"] .about {

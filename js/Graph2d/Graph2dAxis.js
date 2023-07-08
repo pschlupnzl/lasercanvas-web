@@ -108,6 +108,7 @@
 		// Metrics and scale.
 		this._length = length;
 		this._scale = length / (this._max - this._min);
+		return this;
 	};
 
 	/** Attach myself to the DOM. */

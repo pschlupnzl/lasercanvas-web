@@ -3,19 +3,15 @@
 	 * Creates a 2d graph of data.
 	 */
 	var Graph2d = function () {
-		/** Array of lines to plot. */
-		this.lines = [];
 		this.axes = this.initAxes();
 		/** Element where to render the component. */
 		this.el = this.init();
-		this.events = {
-			variableChange: []
-		};
 	};
 
 	Graph2d.template = [
 		'<div class="plot">',
-		'<canvas/>',
+		'<canvas></canvas>',
+		'<div class="marker"></div>',
 		'</div>'
 	].join("");
 
@@ -53,93 +49,17 @@
 		};
 	};
 
-	// ---------
-	//  Events.
-	// ---------
-
-	Graph2d.prototype.addEventListener = function (eventName, handler) {
-		this.events[eventName].push(handler);
-	};
-
-	Graph2d.prototype.fireEvent = function (eventName) {
-		this.events[eventName].forEach(function (handler) {
-			handler();
-		});
-	};
-
-	// -------------
-	//  Data lines.
-	// -------------
-
-	/** Reset the plotting data lines. */
-	Graph2d.prototype.clearDataPoints = function () {
-		this.lines = [];
-	};
-
-	/**
-	 * Add a data point to each of the plotting lines. The data point is
-	 * formatted as an array of {x, y} objects, which are added to the
-	 * corresponding plotting lines.
-	 * @param {Array<object>} dataPoints Points to add to each line.
-	 */
-	Graph2d.prototype.addDataPoints = function (dataPoints) {
-		dataPoints.forEach(function (dataPoint, index) {
-			if (!this.lines[index]) {
-				this.lines[index] = { x: [], y: [] };
-			}
-			this.lines[index].x.push(dataPoint.x);
-			this.lines[index].y.push(dataPoint.y);
-		}.bind(this));
-	};
-
-	/** Create a new line corresponding to a vertical marker line. */
-	Graph2d.prototype.createVerticalMarker = function (x) {
-		this.lines.push({
-			x: [x, x],
-			y: [this.axes.y.min(), this.axes.y.max()]
-		});
-	};
-
 	// ----------
 	//  Scaling.
 	// ----------
 
 	/**
-	 * Returns the extents (ranges) of data across all plotting lines.
-	 */
-	Graph2d.prototype.getDataExtents = function () {
-		var firstPoint = true,
-			extents = {
-				x: { min: 0, max: 1, firstPoint: true },
-				y: { min: 0, max: 1, firstPoint: true }
-			};
-		this.lines.forEach(function (line) {
-			var p;
-			for (var ax of ["x", "y"]) {
-				for (var k = 0; k < line[ax].length; k += 1) {
-					p = line[ax][k];
-					if (isNaN(p) || !isFinite(p)) {
-						// NOP - skip NaN and Infinity.
-					} else if (extents[ax].firstPoint) {
-						extents[ax].min = extents[ax].max = p;
-						delete extents[ax].firstPoint;
-					} else {
-						extents[ax].min = Math.min(extents[ax].min, p);
-						extents[ax].max = Math.max(extents[ax].max, p);
-					}
-				}
-			}
-		});
-		return extents;
-	};
-
-	/**
 	 * Calculate the ticks and scaling.
+	 * @param {Range} extents Extents of data to fit.
 	 */
-	Graph2d.prototype.calcTicks = function () {
+	Graph2d.prototype.calcTicks = function (extents) {
 		var size = this.canvasSize(),
-			extents = this.getDataExtents(),
-			fontSize = this.getFontSize();
+			fontSize = LaserCanvas.Utilities.getFontSize(this.el);
 		this.axes.x.calcTicks(extents.x, size.width, { minTickSpacing: 2.5 * fontSize, tightLimits: true });
 		this.axes.y.calcTicks(extents.y, size.height, { minTickSpacing: 1.5 * fontSize });
 	};
@@ -164,36 +84,36 @@
 		};
 	};
 
-	/** Returns the current font size, in px, or a default value. */
-	Graph2d.prototype.getFontSize = function () {
-		var el = this.el,
-			style = window.getComputedStyle(el),
-			match = style.fontSize.match(/^(\d+)px$/);
-		if (match) {
-			return +match[1];
-		}
-		// Default.
-		return 16;
+	/**
+	 * Update the graph rendering.
+	 * @param {Lines[]} lines Lines to plot.
+	 */
+	Graph2d.prototype.renderLines = function (lines) {
+		this.axes.x.render();
+		this.axes.y.render();
+		this.clearPlot();
+		this.renderPlotLines(lines);
 	};
 
 	/**
-	 * Update the graph rendering.
+	 * Clear the plot area.
 	 */
-	Graph2d.prototype.render = function () {
-		this.axes.x.render();
-		this.axes.y.render();
-		this.renderPlotLines();
+	Graph2d.prototype.clearPlot = function () {
+		var canvas = this.el.querySelector("canvas");
+		canvas.getContext("2d").clearRect(0, 0, canvas.width, canvas.height);
 	};
 
-	/** Update the plotting area and lines. */
-	Graph2d.prototype.renderPlotLines = function () {
+	/**
+	 * Update the plotting area and lines.
+	 * @param {Lines[]} lines Lines to plot.
+	 */
+	Graph2d.prototype.renderPlotLines = function (lines) {
 		var canvas = this.el.querySelector("canvas"),
 			ctx = canvas.getContext("2d"),
 			axisX = this.axes.x,
 			axisY = this.axes.y;
 
-		ctx.clearRect(0, 0, canvas.width, canvas.height);
-		this.lines.forEach(function (line, lineIndex) {
+		lines.forEach(function (line, lineIndex) {
 			var k, ptx, pty, x, y,
 				moveTo = true;
 			ctx.save();
@@ -219,5 +139,16 @@
 			ctx.restore();
 		});
 	};
+
+	/**
+	 * Update the position of the markers.
+	 * @param {number} value Value to set the marker to.
+	 */
+	Graph2d.prototype.updateMarker = function (value) {
+		var ax = this.axes.x;
+		this.el.querySelector(".marker").style.left =
+			ax.transform(Math.max(ax.min(), Math.min(ax.max(), value))) + "px";
+	};
+
 	LaserCanvas.Graph2d = Graph2d;
 }(window.LaserCanvas));

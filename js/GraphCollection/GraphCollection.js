@@ -19,7 +19,7 @@
 			'<ul>',
 				'<li>Variables  <em>x</em>, <em>y</em> in properties: <input class="demoPropertyInput" disabled data-expression="true" value="200 * cos(x)" /></li>',
 				'<li>Sliders change values</li>',
-				'<li>Toggle graphs with <span>👁</span></li>',
+				'<li>Toggle graphs with <span>&#x1f4ca;</span> in information panel</li>',
 			'</ul>',
 		'</div>',
 		'<vid class="graphItems"></div>'
@@ -55,37 +55,80 @@
 	//  Scanning variables.
 	// ---------------------
 
+	/**
+	 * Update the graphs' variable markers.
+	 * @param {object} values Current variable values.
+	 */
+	GraphCollection.prototype.updateMarkers = function (values) {
+		this.graphs.forEach(function (graph) {
+			graph.updateMarkers(values);
+		});
+	};
+
 	/** Returns a value indicating whether any graphs depend on the variable. */
 	GraphCollection.prototype.hasRange = function (variableName) {
 		return this.graphs.some(function (graph) { 
-			return graph.variableName() === variableName;
+			return !!graph.scanStart;
 		});
 	};
 
 	/** Prepare for a new variable scan by clearing any data lines. */
 	GraphCollection.prototype.scanStart = function (variableName) {
 		this.graphs.forEach(function (graph) {
-			graph.scanStart(variableName);
+			graph.scanStart && graph.scanStart(variableName);
 		});
 	};
 
 	/** Add a scanning variable data point. */
 	GraphCollection.prototype.scanValue = function (variableName, variableValue) {
 		this.graphs.forEach(function (graph) {
-			graph.scanValue(variableName, variableValue);
+			graph.scanValue && graph.scanValue(variableName, variableValue);
 		});
 	};
 
 	/** Complete a variable scan and update the graphs. */
 	GraphCollection.prototype.scanEnd = function (variableName, currentValue) {
 		this.graphs.forEach(function (graph) {
-			graph.scanEnd(variableName, currentValue);
+			graph.scanEnd && graph.scanEnd(variableName, currentValue);
 		});
 	};
 
-	/** One of the graph's variable dependencies has changed. */
-	GraphCollection.prototype.onVariableChange = function () {
-		this.fireEvent("change");
+	// -----------
+	//  2d Scans.
+	// -----------
+
+	/** Returns a value indicating whether any graphs use 2d scan (e.g. heat map). */
+	GraphCollection.prototype.has2dRange = function () {
+		return this.graphs.some(function (graph) {
+			return !!graph.scan2dStart;
+		});
+	};
+
+	/** Start a new 2d scan. */
+	GraphCollection.prototype.scan2dStart = function (extents) {
+		this.graphs.forEach(function (graph) {
+			graph.scan2dStart && graph.scan2dStart(extents);
+		});
+	};
+
+	/**
+	 * Iterate a single patch (pixel) at the given subdivision resolution.
+	 * @param {[number, number]} coords Coordinates on plane being scanned.
+	 * @param {number} subs Subdivision of plane for current mipmap level.
+	 */
+	GraphCollection.prototype.scan2dValue = function (coords, subs) {
+		this.graphs.forEach(function (graph) {
+			graph.scan2dValue && graph.scan2dValue(coords, subs);
+		});
+	};
+
+	/**
+	 * Finish scanning over 2d patches.
+	 */
+	GraphCollection.prototype.scan2dEnd = function () {
+		this.graphs.forEach(function (graph) {
+			graph.scan2dEnd && graph.scan2dEnd();
+		});
 	};
 
 	// -------------------
@@ -133,10 +176,13 @@
 	 * @param {string=} variableName Optional variable to plot against, default "x".
 	 */
 	GraphCollection.prototype.addGraph = function (source, propertyName, fieldName, variableName) {
+		var Item = 
+			["System.stability"].includes(source.type + "." + propertyName)
+			? LaserCanvas.GraphHeatMapItem
+			: LaserCanvas.GraphItem;
 		this.graphs.push(
-			new LaserCanvas.GraphItem(source, propertyName, fieldName, variableName)
-			.appendTo(this.el.querySelector(".graphItems"))
-			.addEventListener("variableChange", this.onVariableChange.bind(this)));
+			new Item(source, propertyName, fieldName, variableName)
+				.appendTo(this.el.querySelector(".graphItems")));
 		this.fireEvent("change");
 		this.el.setAttribute("data-has-graphs", this.graphs.length ? "true" : "false");
 	};

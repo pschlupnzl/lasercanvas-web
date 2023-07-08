@@ -517,6 +517,9 @@ LaserCanvas.System = function () {
 					// TODO: Handle bad cavity (e.g. ring that didn't close)
 				}
 			}
+
+			// Calculate the new ABCD, we'll need it right away.
+			this.calculateAbcd();
 		},
 
 		// -------------------------------------------------

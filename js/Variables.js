@@ -24,7 +24,7 @@
 	Variables.prototype.set = function (variableName, value, silent) {
 		this.byName[variableName] = value;
 		if (!silent) {
-			this.fireEvent("change");
+			this.fireEvent("change", [variableName]);
 		}
 	};
 

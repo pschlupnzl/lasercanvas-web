@@ -6,7 +6,7 @@
 		position: absolute;
 		border: 1px solid;
 
-		left: 4em;
+		left: 3em;
 		top: 0.75em;
 		right: 2em;
 		bottom: 1.5em;
@@ -82,3 +82,11 @@
 				height: 0.5em;
 				border-left: 1px solid;
 			}
+
+.LaserCanvasGraph2d .marker {
+	position: absolute;
+	top: 0;
+	height: 100%;
+	margin-left: -0.5px;
+	border-left: 1px solid #333;
+}

@@ -154,15 +154,37 @@ window.LaserCanvas.Application = function (canvas, info) {
 						mgraphCollection.scanStart(variableName);
 						mvariablePanel.scan(variableName, function (variableValue) {
 							msystem.onVariablesChange();
-							msystem.calculateAbcd();
 							mgraphCollection.scanValue(variableName, variableValue);
 						});
 						mgraphCollection.scanEnd(variableName, mvariables.value()[variableName]);
 						msystem.onVariablesChange();
 					}
 				}
+				scanVariables2d();
+				mgraphCollection.updateMarkers(mvariables.value());
 			};
 
+			var scanVariables2d = function () {
+				if (mgraphCollection.has2dRange()) {
+					mvariablePanel.scan2d(
+						["x", "y"],
+						function init (extents) {
+							mgraphCollection.scan2dStart(extents);
+						},
+						function iterator (coords, subs) {
+							msystem.onVariablesChange();
+							mgraphCollection.scan2dValue(coords, subs);
+						},
+						function end () {
+							msystem.onVariablesChange();
+							mgraphCollection.scan2dEnd();
+						});
+				}
+			};
+
+			/**
+			 * Update renderer, properties, and info panels.
+			 */
 			var updateAll = function () {
 				mrender.update();
 				mpropertiesPanel.update();
@@ -175,7 +197,7 @@ window.LaserCanvas.Application = function (canvas, info) {
 				msystem.calculateAbcd();
 				updateAll();
 			});
-			
+
 			// Structure has changed.
 			msystem.addEventListener('change', function () {
 				scanVariables();
@@ -186,9 +208,10 @@ window.LaserCanvas.Application = function (canvas, info) {
 			});
 			
 			// Variables have changed.
-			mvariables.addEventListener("change", function () {
+			mvariables.addEventListener("change", function (changedVariables) {
 				msystem.onVariablesChange(true); // Update cartesian coordinates.
-				msystem.update();
+				scanVariables(changedVariables);
+				updateAll();
 			});
 
 			// Graphs have changed.

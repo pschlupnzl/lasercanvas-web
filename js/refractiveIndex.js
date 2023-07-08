@@ -1,4 +1,12 @@
-window.LaserCanvas.Sellmeier.refractiveIndex = [{
+(function (LaserCanvas) {
+   function set() {
+      if (!LaserCanvas.Sellmeier) {
+         setTimeout(set, 10);
+         return;
+      }
+   
+      LaserCanvas.Sellmeier.refractiveIndex = [
+{
    "book": "Al2O3",
    "coefficients": [0, 1.503976, 0.0740288, 0.5506914, 0.1216529, 6.592738, 20.07225],
    "comments": "Synthetic sapphire, Extraordinary ray (e), 20 °C",
@@ -450,3 +458,6 @@ window.LaserCanvas.Sellmeier.refractiveIndex = [{
    "references": "D. T. F. Marple. Refractive index of ZnSe, ZnTe, and CdTe, <a href=\"https://doi.org/10.1063/1.1713411\"><i>J. Appl. Phys.</i> <b>35</b>, 539-542 (1964)</a>",
    "source": "Marple"
 }];
+   };
+   set();
+}(window.LaserCanvas));
