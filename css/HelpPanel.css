@@ -94,6 +94,12 @@
 		text-align: right;
 	}
 
+		.helpPanel .footer .version {
+			float: left;
+			color: #ccc;
+			font-size: 0.8em;
+		}
+
 		.helpPanel .footer button {
 			padding: 0.5em 1em;
 			margin: 0.25em;

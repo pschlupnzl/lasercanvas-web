@@ -95,7 +95,7 @@
 			body: [
 				'<ul class="about">',
 				'<li>Laser modeling using the <em>ABCD</em> matrix calculations.</li>',
-				'<li>(c) 2007 - 2020 Philip Schlup, PhD</li>',
+				'<li>(c) 2007 - 2023 Philip Schlup, PhD</li>',
 				'<li><a href="mailto:lasercanvas@outlook.com">Send feedback</a></li>',
 				'<li><a href="LasrCanv5.exe" download>Download</a> LaserCanvas 5 for Windows</li>',
 				'</ul>',
@@ -131,12 +131,14 @@
 			'<div class="body"><div class="scroller"></div></div>',
 			'<div class="hint"></div>',
 			'<div class="footer">',
+			'<span class="version"></span>',
 			'<button data-action="prev">Previous</button>',
 			'<button data-action="next">Next</button>',
 			'<button data-action="close">Close</button>',
 			'</div>'
 		].join('');
 
+		el.querySelector('.version').innerText = LaserCanvas.SHA_SHORT || '';
 		this.activate(
 			el.querySelector('button[data-action="prev"]'),
 			el.querySelector('button[data-action="next"]'),
