@@ -189,11 +189,7 @@ LaserCanvas.System = function () {
 		* @returns {Array<Element>} Elements in this system.
 		*/
 		elements = function () {
-			// Temporary offset while dragging across ring.
-			var offset = melements._offset || 0;
-			return []
-				.concat(melements.slice(offset))
-				.concat(melements.slice(0, offset))
+			return melements;
 		},
 		
 		/**
@@ -388,40 +384,7 @@ LaserCanvas.System = function () {
 			var pivotIndex = LaserCanvas.SystemUtil.alignEndElements(mprop, melements);
 			if (pivotIndex) {
 				calculateCartesianCoordinatesOnly(pivotIndex);
-
-				// //  /|\  TODO
-				// // /_._\ Remove second calculation
-
-				// LaserCanvas.SystemUtil.alignEndElements(mprop, melements);
-				// calculateCartesianCoordinatesOnly();
 			}
-		// 	var Vector = LaserCanvas.Math.Vector, // {function} Vector construction function.
-		// 		U, V, Z, l,         // Vectors for ring cavity.
-		// 		el = melements[0],  // {Element} Starting element.
-		// 		le = melements[melements.length - 1]; // {Element} Final element.
-			
-		// 	if (mprop.configuration === LaserCanvas.System.configuration.ring) { 
-		// 		// Ring cavity construction vectors.
-		// 		// This closes the space between the last optic (mirror or
-		// 		// other) to the start optic (always mirror).
-		// 		Z = new Vector(el.loc.x - le.loc.x, el.loc.y - le.loc.y);
-		// 		l = Z.norm();                           // Vector length.
-		// 		Z = Z.normalize();                      // Vector from last to first element.
-		// 		U = new Vector(1, 0).rotate(-el.loc.q); // Bisected outgoing vector from first element.
-		// 		V = new Vector(1, 0).rotate(-le.loc.p); // Bisected incoming vector to last element.
-
-		// 		// Alignments.
-		// 		el.loc.p = Z.atan2();
-		// 		el.set("deflectionAngle", Math.atan2(Z.cross(U), Z.dot(U))); // Updates angleOfIncidence.
-		// 		le.set("deflectionAngle", Math.atan2(V.cross(Z), V.dot(Z))); // Updates angleOfIncidence.
-		// 		le.loc.q = Z.atan2();
-		// 		le.set("distanceToNext", l);
-		// 	} else {
-		// 		// Linear cavity: Normal incidence.
-		// 		el.loc.p = el.loc.q + Math.PI;
-		// 		le.set("distanceToNext", 0);
-		// 		le.set("deflectionAngle", Math.PI);
-		// 	}
 		},
 		
 		/**

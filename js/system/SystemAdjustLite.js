@@ -586,15 +586,15 @@ LaserCanvas.systemAdjust = function (melements, calculateCartesianCoordinates, g
 				}
 			}
 
-			// if (LaserCanvas.__render) {
-			// 	if (__dragElementTmr) {
-			// 		clearTimeout(__dragElementTmr);
-			// 	}
-			// 	__dragElementTmr = setTimeout(function () {
-			// 		__dragElementTmr = null;
-			// 		__dragElementConstruction(pt, ptStart, mdragData);
-			// 	}, 0);
-			// }
+			if (LaserCanvas.__render) {
+				if (__dragElementTmr) {
+					clearTimeout(__dragElementTmr);
+				}
+				__dragElementTmr = setTimeout(function () {
+					__dragElementTmr = null;
+					__dragElementConstruction(pt, ptStart, mdragData);
+				}, 0);
+			}
 
 			// Cancel drag, if needed.
 			if (!dragPermitted && mdragData.prev.stretch) {
@@ -635,9 +635,6 @@ LaserCanvas.systemAdjust = function (melements, calculateCartesianCoordinates, g
 				// @param {number} dir Direction -1:prev, +1:next.
 				showConstruction = function (data, rgb, dir) {
 					if (!data.pivot || !data.stretch || !data.construct) {
-						//  /|\  TODO
-						// /_._\ Reinstate warning log (perhaps)
-						// console.log(`missing pivot, stretch, or construct`, data.pivot, data.stretch, data.construct)
 						return;
 					}
 					var 

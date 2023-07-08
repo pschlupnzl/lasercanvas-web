@@ -131,8 +131,6 @@ window.LaserCanvas.Application = function (canvas, info) {
 			mvariables = new LaserCanvas.Variables();
 			mvariablePanel = new LaserCanvas.VariablePanel(mvariables);
 
-			LaserCanvas.__render = mrender; // To render construction lines
-
 			onResize();
 			window.addEventListener('resize', onResize, false);
 
@@ -250,7 +248,7 @@ window.LaserCanvas.Application = function (canvas, info) {
 				.initSystemNew(launch);
 
 				/* Load a system! */
-			var useLocalStorage = false;
+			var useLocalStorage = true;
 			if (useLocalStorage) {
 				try {
 					LaserCanvas.SystemUtil.fromLocalStorage(loadJson);
@@ -258,8 +256,7 @@ window.LaserCanvas.Application = function (canvas, info) {
 					msystem.createNew(LaserCanvas.System.configuration.linear);
 				}
 			} else {
-				// msystem.createNew(LaserCanvas.System.configuration.linear);
-				msystem.createNew(LaserCanvas.System.configuration.ring);
+				msystem.createNew(LaserCanvas.System.configuration.linear);
 			}
 		},
 		

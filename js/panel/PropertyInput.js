@@ -65,15 +65,20 @@
 				el.setAttribute("data-has-standard", "true");
 				self.prop.standard.forEach(function (value) {
 					var option = document.createElement("option");
-					if (typeof value === "object") {
+					if (typeof value !== "object") {
+						option.value =
+						option.innerText = value;
+					} else if (value.value === undefined) {
+						option.innerText = LaserCanvas.localize(
+							option.innerText = value.label
+						);
+						option.disabled = true;
+					} else {
 						option.value = value.value;
 						option.innerText = LaserCanvas.Utilities.stringFormat(
 							"{0} ({1})",
 							value.value,
 							LaserCanvas.localize(value.label));
-					} else {
-						option.value =
-						option.innerText = value;
 					}
 					select.insertBefore(option, select.firstChild);
 				});

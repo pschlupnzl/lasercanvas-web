@@ -31,8 +31,11 @@ LaserCanvas.Element.Mirror.Type = "Mirror";
 // Standard radii of curvature.
 LaserCanvas.Element.Mirror.standard = [
 	-1000, -750, -500, -400, -300, -250, -200, -175, -150, -125, -100,  -75,  -50,   -25, 
+	{ label: "Convex", value: undefined },
 	{ label: "Plane", value: 0 },
-	  +25,  +50,  +75, +100, +125, +150, +175, +200, +250, +300, +400, +500, +750, +1000]
+	+25,  +50,  +75, +100, +125, +150, +175, +200, +250, +300, +400, +500, +750, +1000,
+	{ label: "Concave", value: undefined }, 
+];
 
 LaserCanvas.Element.Mirror.prototype = {
 
@@ -226,7 +229,6 @@ LaserCanvas.Element.Mirror.prototype = {
 	* @param {LaserCanvas.renderLayer} layer Rendering layer.
 	*/
 	draw: function (render, layer) {
-		////return this.wireframe(render, layer);
 		var image, roc,
 			qc = -this.loc.p + this.get("angleOfIncidenceRad"), // {number} (rad) Display angle on canvas.
 			renderLayer = LaserCanvas.Enum.renderLayer; // {Enum} Layer to draw.
@@ -242,16 +244,6 @@ LaserCanvas.Element.Mirror.prototype = {
 					"mirrorPlane"
 				];
 				render.drawImage(image, this.loc.x, this.loc.y, qc);
-				if (this.priv.startOptic) {
-					render
-						.beginPath()
-						.drawPath("M 0 0 L 30 0 L 20 5 L 20 -5 L 30 0 F",
-							this.loc.x,
-							this.loc.y,
-							-this.loc.q)
-						.setStroke("#000", 3)
-						.stroke();
-				}
 				break;
 			case renderLayer.annotation:
 				render.fillText(this.name, this.loc.x, this.loc.y, 

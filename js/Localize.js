@@ -108,7 +108,7 @@ window.LaserCanvas.localize.de = {
 	
 	// Element labels.
 	"Plane mirror": "Flacher Spiegel",
-	"No lens": "Keine linse",
+	"No lens": "Keine Linse",
 
 	// System labels.
 	'linear resonator': 'Standwellenresonator',
