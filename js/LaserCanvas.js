@@ -147,16 +147,9 @@ window.LaserCanvas.Application = function (canvas, info) {
 			
 			/**
 			 * Scan each variable to generate display plots, if any are used.
-			 * @param {string[]=} changedVariables Optional array of variables
-			 * that were changed and thus do *not* need to be scanned.
 			 */
-			var scanVariables = function (changedVariables) {
-				var variables = ["x", "y"]
-					.filter(function (variableName) {
-						return !changedVariables || 
-							!changedVariables.includes(variableName);
-					});
-				for (var variableName of variables) {
+			var scanVariables = function () {
+				for (var variableName of ["x", "y"]) {
 					if (mgraphCollection.hasRange(variableName)) {
 						mgraphCollection.scanStart(variableName);
 						mvariablePanel.scan(variableName, function (variableValue) {
@@ -167,9 +160,7 @@ window.LaserCanvas.Application = function (canvas, info) {
 						msystem.onVariablesChange();
 					}
 				}
-				if (!changedVariables) {
-					scanVariables2d();
-				}
+				scanVariables2d();
 				mgraphCollection.updateMarkers(mvariables.value());
 			};
 
