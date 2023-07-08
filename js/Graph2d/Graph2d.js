@@ -59,7 +59,7 @@
 	 */
 	Graph2d.prototype.calcTicks = function (extents) {
 		var size = this.canvasSize(),
-			fontSize = this.getFontSize();
+			fontSize = LaserCanvas.Utilities.getFontSize(this.el);
 		this.axes.x.calcTicks(extents.x, size.width, { minTickSpacing: 2.5 * fontSize, tightLimits: true });
 		this.axes.y.calcTicks(extents.y, size.height, { minTickSpacing: 1.5 * fontSize });
 	};
@@ -84,18 +84,6 @@
 		};
 	};
 
-	/** Returns the current font size, in px, or a default value. */
-	Graph2d.prototype.getFontSize = function () {
-		var el = this.el,
-			style = window.getComputedStyle(el),
-			match = style.fontSize.match(/^(\d+)px$/);
-		if (match) {
-			return +match[1];
-		}
-		// Default.
-		return 16;
-	};
-
 	/**
 	 * Update the graph rendering.
 	 * @param {Lines[]} lines Lines to plot.
@@ -118,9 +106,8 @@
 	/**
 	 * Update the plotting area and lines.
 	 * @param {Lines[]} lines Lines to plot.
-	 * @param {string?} strokeStyle Optional stroke style to use.
 	 */
-	Graph2d.prototype.renderPlotLines = function (lines, strokeStyle) {
+	Graph2d.prototype.renderPlotLines = function (lines) {
 		var canvas = this.el.querySelector("canvas"),
 			ctx = canvas.getContext("2d"),
 			axisX = this.axes.x,
@@ -147,9 +134,7 @@
 					}
 				}
 			}
-			ctx.strokeStyle = strokeStyle ||
-				LaserCanvas.theme.current.mode[lineIndex] ||
-				"#333";
+			ctx.strokeStyle = LaserCanvas.theme.current.mode[lineIndex] || "#333";
 			ctx.stroke();
 			ctx.restore();
 		});
@@ -160,8 +145,9 @@
 	 * @param {number} value Value to set the marker to.
 	 */
 	Graph2d.prototype.updateMarker = function (value) {
+		var ax = this.axes.x;
 		this.el.querySelector(".marker").style.left =
-			this.axes.x.transform(value) + "px";
+			ax.transform(Math.max(ax.min(), Math.min(ax.max(), value))) + "px";
 	};
 
 	LaserCanvas.Graph2d = Graph2d;

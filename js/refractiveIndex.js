@@ -458,5 +458,6 @@
    "references": "D. T. F. Marple. Refractive index of ZnSe, ZnTe, and CdTe, <a href=\"https://doi.org/10.1063/1.1713411\"><i>J. Appl. Phys.</i> <b>35</b>, 539-542 (1964)</a>",
    "source": "Marple"
 }];
-   }
+   };
+   set();
 }(window.LaserCanvas));

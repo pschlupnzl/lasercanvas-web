@@ -101,14 +101,14 @@
 	GraphCollection.prototype.has2dRange = function () {
 		return this.graphs.some(function (graph) {
 			return !!graph.scan2dStart;
-		})
+		});
 	};
 
 	/** Start a new 2d scan. */
 	GraphCollection.prototype.scan2dStart = function (extents) {
 		this.graphs.forEach(function (graph) {
 			graph.scan2dStart && graph.scan2dStart(extents);
-		})
+		});
 	};
 
 	/**
@@ -119,7 +119,7 @@
 	GraphCollection.prototype.scan2dValue = function (coords, subs) {
 		this.graphs.forEach(function (graph) {
 			graph.scan2dValue && graph.scan2dValue(coords, subs);
-		})
+		});
 	};
 
 	/**
@@ -128,7 +128,7 @@
 	GraphCollection.prototype.scan2dEnd = function () {
 		this.graphs.forEach(function (graph) {
 			graph.scan2dEnd && graph.scan2dEnd();
-		})
+		});
 	};
 
 	// -------------------
@@ -179,10 +179,10 @@
 		var Item = 
 			["System.stability"].includes(source.type + "." + propertyName)
 			? LaserCanvas.GraphHeatMapItem
-			: LaserCanvas.GraphItem
+			: LaserCanvas.GraphItem;
 		this.graphs.push(
 			new Item(source, propertyName, fieldName, variableName)
-			.appendTo(this.el.querySelector(".graphItems")));
+				.appendTo(this.el.querySelector(".graphItems")));
 		this.fireEvent("change");
 		this.el.setAttribute("data-has-graphs", this.graphs.length ? "true" : "false");
 	};

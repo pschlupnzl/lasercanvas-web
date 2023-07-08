@@ -408,7 +408,17 @@ window.LaserCanvas.Utilities = {
 			this.timeout = null;
 		};
 		return Debounce;
-	}())
+	}()),
+
+	/**
+	 * Return the metric font size for the element, in px, or a default value.
+	 * @param {HTMLElement} elem Element whose font size to returne.
+	 */
+	getFontSize: function (elem) {
+		var style = window.getComputedStyle(elem),
+			match = style.fontSize.match(/^(\d+)px$/);
+		return match ? +match[1] : 16;
+	}
 };
 
 /**

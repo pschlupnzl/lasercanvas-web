@@ -135,7 +135,7 @@
    */
   GraphHeatMap.prototype.calcTicks = function (extents) {
     var size = this.canvasSize(),
-      fontSize = this.getFontSize();
+      fontSize = LaserCanvas.Utilities.getFontSize(this.el);
     this._extents = extents;
     this.axes.x
       .calcTicks(extents[0], size.width, {
@@ -150,10 +150,6 @@
       })
       .render();
   };
-
-  // ------------
-  //  Rendering.
-  // ------------
 
   /**
    * Update the size of canvas, returning the dimensions.
@@ -171,18 +167,6 @@
       width: width,
       height: height,
     };
-  };
-
-  /** Returns the current font size, in px, or a default value. */
-  GraphHeatMap.prototype.getFontSize = function () {
-    var el = this.el,
-      style = window.getComputedStyle(el),
-      match = style.fontSize.match(/^(\d+)px$/);
-    if (match) {
-      return +match[1];
-    }
-    // Default.
-    return 16;
   };
 
   /**
@@ -239,15 +223,14 @@
    */
   GraphHeatMap.prototype.updateMarker = function (marker) {
     var extents = this._extents,
-      markers = this.el.querySelector(".marker").children;
-    markers[0].style.left =
-      (100 * (marker.x - extents[0].min)) /
-        (extents[0].max - extents[0].min || 1) +
-      "%";
-    markers[1].style.bottom =
-      (100 * (marker.y - extents[1].min)) /
-        (extents[1].max - extents[1].min || 1) +
-      "%";
+      markers = this.el.querySelector(".marker").children,
+      pos = function (val, ex) {
+        return 100 * Math.max(0, Math.min(1,
+          (val - ex.min) / (ex.max - ex.min || 1))
+        ) + '%';
+      };
+    markers[0].style.left = pos(marker.x, extents[0]);
+    markers[1].style.bottom = pos(marker.y, extents[1]);
   };
 
   this.LaserCanvas.GraphHeatMap = GraphHeatMap;

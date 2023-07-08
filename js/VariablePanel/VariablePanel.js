@@ -98,89 +98,64 @@
 	 * @param {function} end Delegate to call when each scan set ends.
 	 */
 	VariablePanel.prototype.scan2d = function (variableNames, init, iterator, end) {
-		// TODO: Track this in code, not DOM
-		if (document.body.getAttribute("data-variables-visible") !== "true") {
-			return;
-		}
-
 		var self = this,
-			x, y, vx, vy, toc,
+			vx, vy, toc,
+			x = 0,
+			y = 0,
 			scan2dId = ++this.scan2dId,
 			subs = VariablePanel.scan2dMin, // Starting mipmap resolution.
-			tic = new Date().valueOf(), // Start scan time to auto-adjust lowest scan.
 			blockSize = Math.max(200, subs * subs), // Ensure one full scan.
 			extents = variableNames.map(function (variableName) {
 				return self.numberSliders[variableName].getRange();
 			}),
-			steps = extents.map(function (extent) {
+			ranges = extents.map(function (extent) {
 				return extent.max - extent.min;
 			}),
 			current = self.mvariables.value(),
+			/** Restore all variables to previous state. */
+			restore = function () {
+				variableNames.forEach(function (variableName) {
+					self.mvariables.set(variableName, current[variableName], true);
+				});
+			};
 
-			/** Iterate the next level. */
+			/**
+			 * Iterate the next level. The iterator is implemented as a fixed
+			 * block of iterations to preserve render speed across resolution
+			 * levels. A subsequent block is triggered on a timeout, with an
+			 * identifier used as an abort signaler.
+			 */
 			iterate = function () {
 				// Abort if re-triggered since scan started.
 				if (scan2dId !== self.scan2dId) {
 					return;
 				}
 
-				// Scan an arbitrary block of steps.
-				for (var kk = blockSize; kk > 0; kk -= 1) {
-					// We can skip values from previous subdivision.
-					if (!(subs > VariablePanel.scan2dMin &&
-						x % 2 === 0 &&
-						y % 2 === 0)) {
-						
-						vx = extents[0].min + x * steps[0] / subs;
+				kk = blockSize;
+				for (; subs <= VariablePanel.scan2dMax; x = 0, y = 0, subs *= 2) {
+					for (; x < subs; y = 0, x += 1) {
+						vx = extents[0].min + x * ranges[0] / subs;
 						self.mvariables.set(variableNames[0], vx, true);
-						
-						vy = extents[1].min + y * steps[1] / subs;
-						self.mvariables.set(variableNames[1], vy, true);
-						
-						iterator([x, y], subs, extents);
-					}
+						for (; y < subs; y += 1) {
+							vy = extents[1].min + y * ranges[1] / subs;
+							self.mvariables.set(variableNames[1], vy, true);
+							
+							iterator([x, y], subs, extents);
 
-					// Advance to next step.
-
-					y += 1;
-					if (y >= subs) {
-						y = 0;
-						x += 1;
-						if (x >= subs) {
-							if (subs === VariablePanel.scan2dMin) {
-								toc = new Date().valueOf() - tic;
-								if (toc < FAST_SUBS_TIME && 
-									VariablePanel.scan2dMin < VariablePanel.scan2dMax) {
-									VariablePanel.scan2dMin *= 2;
-								} else if (toc > SLOW_SUBS_TIME &&
-									VariablePanel.scan2dMin > 4) {
-									VariablePanel.scan2dMin /= 2;
-								}
-							}
-
-							x = 0;
-							subs *= 2;
-							if (subs > VariablePanel.scan2dMax) {
-								break;
+							if (--kk <= 0) {
+								restore();
+								setTimeout(iterate, 0);
+								return;
 							}
 						}
 					}
 				}
 
-				// Restore all variables.
-				variableNames.forEach(function (variableName) {
-					self.mvariables.set(variableName, current[variableName], true);
-				});
+				restore();
 				end();
-
-				// Prepare for next block.
-				if (subs <= VariablePanel.scan2dMax) {
-					setTimeout(iterate, 0);
-				}
 			};
 
 		// Start a new scan.
-		x = y = 0;
 		init(extents);
 		setTimeout(iterate, 0);
 	};

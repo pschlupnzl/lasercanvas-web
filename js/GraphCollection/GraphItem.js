@@ -227,7 +227,7 @@
 
 (function (LaserCanvas) {
 	/** Reference to {@link GraphItem} - much of the code is the same. */
-	const GraphItem = LaserCanvas.GraphItem;
+	var GraphItem = LaserCanvas.GraphItem;
 
 	/**
 	 * Single Graph Collection item containing a 2d heatmap graph, suitable e.g.

@@ -304,7 +304,6 @@
 		this.fieldName = fieldName;
 		this.source = source;
 		this.toggleGraph = toggleGraph;
-		this.onGraphChange = this.onGraphChange.bind(this);
 		this.el = this.init();
 	};
 
@@ -315,7 +314,7 @@
 		tr.setAttribute("data-property-name", this.propertyName);
 		tr.querySelector('[data-cell="label"]').innerText = LaserCanvas.Utilities.prettify(this.propertyName);
 		tr.querySelector('[data-cell="unit"]').innerText = window.LaserCanvas.unit[this.propertyName] || "";
-		tr.querySelector('[data-cell="graph"] input[type="checkbox"]').onchange = this.onGraphChange;
+		tr.querySelector('[data-cell="graph"] input[type="checkbox"]').onchange = this.onGraphChange.bind(this);
 		return tr;
 	};
 
