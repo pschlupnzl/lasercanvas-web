@@ -485,9 +485,9 @@ LaserCanvas.Element.Dielectric.prototype = {
 				// elements can be inserted.
 				break;
 
-default:
-	console.warn(`Set property ${propertyName}=${newValue} not implemented`);
-	break;
+			default:
+				console.warn(`Set property ${propertyName}=${newValue} not implemented`);
+				break;
 		}
 	},
 

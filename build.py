@@ -1,6 +1,8 @@
 import base64
 import re
 import json
+from datetime import date
+import subprocess
 from jsmin import jsmin # Install with: pip3 install jsmin
 
 '''
@@ -181,14 +183,26 @@ def add_html(filename):
                 # Remove gaps between tags.
                 re.sub(r'(>)[\s\n\r]+(<)', r'\1 \2',
                 # Remove newline + indent spaces.
-                re.sub(r'(?:[\n\r]+\s+|[\n\r\s]+$)', '',
+                re.sub(r'(?:[\n\r]+\s+|[\n\r\s]+$)', ' ',
                 # Remove <!-- HTML comments -->.
                 re.sub(r'(?:\s+>|<!\-\-[\s\S]*?\-\->)', '',
                 body)))) + "'",
                 ';',
             ]))    
 
+def get_git_revision_short_hash() -> str:
+    try:
+        return subprocess.check_output(['git', 'rev-parse', '--short', 'HEAD']).decode('ascii').strip()
+    except:
+        return None
+
+def add_sha():
+    sha_short = get_git_revision_short_hash()
+    if sha_short:
+        w('LaserCanvas.SHA_SHORT = "' + sha_short + '";')
+
 add_html('index.html')
 add_script(loadername)
+add_sha()
 
 w()

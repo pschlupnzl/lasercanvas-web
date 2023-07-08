@@ -208,7 +208,10 @@ LaserCanvas.PropertiesPanel = function (render, system) {
 
 			// Panel properties.
 			panel.querySelector("h1 input").value = element.name;
-			panel.setAttribute("data-can-delete", props.canDelete === false ? "false" : "true");
+			panel.setAttribute("data-can-delete",
+				props.canDelete === false ||
+				system.canDeleteElement(element) === false
+				? "false" : "true");
 
 			// Refractive index button.
 			panel.setAttribute("data-has-refractive-index", hasRefractiveIndex);

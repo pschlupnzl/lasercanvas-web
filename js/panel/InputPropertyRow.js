@@ -211,7 +211,15 @@
 
 	/** Respond to a change in the input's value. */
 	InputPropertyRow.prototype.onInputChange = function (value) {
-		this.onChange && this.onChange(this.prop.propertyName, value);
+		var prevValue = this.get();
+		if (this.onChange) {
+			try {
+				this.onChange(this.prop.propertyName, value);
+			} catch (err) {
+				// Error rearranging the cavity, restore to previous.
+				this.onChange(this.prop.propertyName, prevValue);
+			}
+		}
 	};
 
 	/** Respond to a click on the graph click. */
